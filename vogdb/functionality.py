@@ -1,9 +1,7 @@
 import pandas as pd
-from vogdb.vogdb_api import VOG, Species
+from .vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
-
-#filename = "data/vog.species.list"
 
 
 class SpeciesService:
@@ -91,13 +89,13 @@ class GroupService:
                 if not set(species).issubset(row.species):
                     continue
 
-            if stringency is not None:
-                if stringency == Stringency.high and not row.stringency_high:
-                    continue
-                if stringency == Stringency.medium and not row.stringency_medium:
-                    continue
-                if stringency == Stringency.low and not row.stringency_low:
-                    continue
+            # if stringency is not None:
+            #     if stringency == Stringency.high and not row.stringency_high:
+            #         continue
+            #     if stringency == Stringency.medium and not row.stringency_medium:
+            #         continue
+            #     if stringency == Stringency.low and not row.stringency_low:
+            #         continue
 
             yield VOG(id=id, **row)
 
