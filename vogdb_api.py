@@ -6,9 +6,9 @@ from pydantic import BaseModel
 class Species(BaseModel):
 	id: int
 	name: str
-	tax: str
 	phage: bool
 	source: str
+	#version: int
 
 
 class VOG(BaseModel):
@@ -19,7 +19,7 @@ class VOG(BaseModel):
 	proteins: Set[str]
 	genes: Set[str]
 	cons_fct_description: str
-	#vius_specific: int[3] #high, medium and low stringency
+	#virus_specific: int[3] #high, medium and low stringency
 	lca: str
 
 class Protein(BaseModel):
