@@ -1,5 +1,5 @@
 import pandas as pd
-from vogdb_api import VOG, Species, Protein, Gene
+from vogdb.vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
 

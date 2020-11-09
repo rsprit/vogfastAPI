@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from typing import Optional, List, Set
 from pydantic import BaseModel
-from vogdb_api import VOG, Species, Protein, Gene
-from functionality import VogService, SpeciesService
+from vogdb.vogdb_api import Species
+from vogdb.functionality import VogService, SpeciesService
 
 api = FastAPI()
 svc = VogService('data')
