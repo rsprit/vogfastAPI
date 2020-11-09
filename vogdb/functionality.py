@@ -1,5 +1,5 @@
 import pandas as pd
-from .vogdb_api import VOG, Species
+from vogdb.vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
 
@@ -77,7 +77,7 @@ class GroupService:
         self._data = members.join(annotations).join(lca).join(virusonly)
 
     def __getitem__(self, id):
-        return VOG(id=id, **self._data.loc[id])
+        return VOG(name=id, **self._data.loc[id])
 
     def find(self, description=None, species=None, stringency=None):
         for id, row in self._data.iterrows():
@@ -97,7 +97,7 @@ class GroupService:
             #     if stringency == Stringency.low and not row.stringency_low:
             #         continue
 
-            yield VOG(id=id, **row)
+            yield VOG(name=id, **row)
 
     def proteins(self, id):
         filename = os.path.join(self._directory, 'faa', '{}.faa'.format(id))
