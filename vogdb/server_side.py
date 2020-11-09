@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from typing import Optional, List, Set
 from pydantic import BaseModel
 from .vogdb_api import Species
-from .functionality import VogService, SpeciesService
+from .functionality import VogService
 
 api = FastAPI()
 svc = VogService('data')
@@ -19,7 +19,7 @@ async def root():
 async def get_species(name: Optional[Set[str]] = None, id: Optional[Set[int]] = None, phage: Optional[bool] = None,
                       source: Optional[str] = None):
     # need to write function to find species....
-    result = SpeciesService.search(name=name, id=id, phage=phage, source=source)
+    result = svc.species.search(name=name, id=id, phage=phage, source=source)
     return result
 
 
