@@ -1,12 +1,13 @@
 from vogdb.functionality import VogService, SpeciesService
 from vogdb.vogdb_api import Species
 
-svc = VogService('data')
-filename = "data/vog.species.list"
+svc = VogService('/home/sigi/Documents/fastAPI/data')
+#filename = "/home/sigi/Documents/fastAPI/data"
 
-sp_srch = SpeciesService(filename)
+print("Testing Search:")
+result = svc.species.search(name='India')
+print(result)
 
-sp_srch.search(name='India')
 
-print(sp_srch[99930])
+
 
