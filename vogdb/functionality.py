@@ -7,7 +7,8 @@ import os
 class SpeciesService:
 
     def __init__(self, filename):
-        self._data = pd.read_table(filename,
+        self._data = pd.read_csv(filename,
+                                 sep='\t',
                                    header=0,
                                    names=['name', 'id', 'phage', 'source', 'version'],
                                    index_col='id') \
@@ -16,12 +17,12 @@ class SpeciesService:
     def __getitem__(self, id):
         return Species(id=id, **self._data.loc[id])
 
-    def search(self, id=None, name=None, phage=None, source=None):
+    def search(self, ids=None, name=None, phage=None, source=None):
         result = self._data
 
-        if id is not None:
-            for i in id:
-                result = result[result.id.apply(i == result.id)]
+        if ids is not None:
+            for i in ids:
+                result = result[result.id.apply(result.id == i)]
 
         if phage is not None:
             result = result[result.phage == bool(phage)]
