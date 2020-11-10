@@ -19,8 +19,11 @@ class VOG(BaseModel):
 	proteins: Set[str]
 	genes: Set[str]
 	cons_fct_description: str
-	#virus_specific: int[3] #high, medium and low stringency
 	lca: str
+	#virus_specific: int[3] #high, medium and low stringency
+	h_stringency: bool
+	m_stringency: bool
+	l_stringency: bool
 
 class Protein(BaseModel):
 	id: str
