@@ -22,7 +22,9 @@ class SpeciesService:
 
         if ids is not None:
             for i in ids:
-                result = result[result.id.apply(result.id == i)]
+                yield Species(id=i, **self._data.loc[i])
+            # if they ask for ID, everything else is ignored, bc ID is unique.
+            return
 
         if phage is not None:
             result = result[result.phage == bool(phage)]
