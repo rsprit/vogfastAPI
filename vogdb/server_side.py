@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from typing import Optional, List, Set
 from pydantic import BaseModel
-from .vogdb_api import Species
-from .functionality import VogService
+from vogdb.vogdb_api import Species
+from vogdb.functionality import VogService
 
 api = FastAPI()
 svc = VogService('data')
-data_path = "/files/home/sigi/Documents/fastAPI/data_202/vog.genes.all.fa"
+#data_path = "/files/home/sigi/Documents/fastAPI/data_202/vog.genes.all.fa"
 
 
 @api.get("/")
@@ -38,8 +38,11 @@ class Filter(BaseModel):
     pid: Optional[str] = None
     gn: Optional[str] = None
     fct: Optional[str] = None
-    vs: Optional[str] = None  # high, medium, low stringency
     lca: Optional[str] = None
+    vs: Optional[bool] = None  # high, medium, low stringency
+    h_stringency: Optional[bool] = None
+    m_stringency: Optional[bool] = None
+    l_stringency: Optional[bool] = None
 
 
 @api.post("/filter/")
