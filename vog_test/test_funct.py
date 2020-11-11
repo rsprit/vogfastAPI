@@ -32,17 +32,12 @@ class TestSpeciesMethods(unittest.TestCase):
         print("Testing species id:")
         self.assertEqual(svc.species[1002724], Species(id=1002724, name='Shigella virus Shfl1', phage=True, source='NCBI Refseq'))
 
-        geno = svc.species.search(ids=[1002724, 1000664])
-        print("geno")
-        print(geno.__next__())
-        print(geno.__next__())
+        list1 = [Species(id=1002724, name='Shigella virus Shfl1', phage=True, source='NCBI Refseq'),
+                 Species(id=1000664, name='Chilli leaf curl Vellanad virus [India/Vellanad/2008]', phage=False,
+                         source='NCBI Refseq')]
+        self.assertEqual(list(svc.species.search(ids=[1002724, 1000664])),
+                          list1)
 
-        self.assertEqual(svc.species.search(ids=[1002724, 1000664]),
-                          geno)
-
-        mock_foo = MagicMock()
-        mock_foo.iter.return_value = iter([1, 2, 3])
-        list(mock_foo.iter())
 
 if __name__ == '__main__':
     unittest.main()
