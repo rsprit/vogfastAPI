@@ -9,9 +9,9 @@ class SpeciesService:
     def __init__(self, filename):
         self._data = pd.read_csv(filename,
                                  sep='\t',
-                                   header=0,
-                                   names=['name', 'id', 'phage', 'source', 'version'],
-                                   index_col='id') \
+                                 header=0,
+                                 names=['name', 'id', 'phage', 'source', 'version'],
+                                 index_col='id') \
             .assign(phage=lambda df: df.phage == 'phage')
 
     def __getitem__(self, id):
@@ -36,9 +36,9 @@ class SpeciesService:
         if source is not None:
             result = result[result.source.apply(lambda x: source.lower() in x.lower())]
 
+        # return the result as generator object (more efficient than long list)
         for id, row in result.iterrows():
             yield Species(id=id, **row)
-
 
 
 class GroupService:
@@ -46,10 +46,11 @@ class GroupService:
     def __init__(self, directory):
         self._directory = directory
 
-        members = pd.read_table(os.path.join(directory, 'vog.members.tsv'),
-                                header=0,
-                                names=['group', 'protein_count', 'species_count', 'categories', 'proteins'],
-                                index_col='group')
+        members = pd.read_csv(os.path.join(directory, 'vog.members.tsv'),
+                              sep='\t',
+                              header=0,
+                              names=['group', 'protein_count', 'species_count', 'categories', 'proteins'],
+                              index_col='group')
         members = members.assign(
             proteins=members.proteins.apply(lambda s: frozenset(s.split(','))),
         )
@@ -57,25 +58,28 @@ class GroupService:
             species=members.proteins.apply(lambda s: frozenset(p.split('.')[0] for p in s))
         )
 
-        annotations = pd.read_table(os.path.join(directory, 'vog.annotations.tsv'),
-                                    header=0,
-                                    names=['group', 'protein_count', 'species_count', 'categories', 'description'],
-                                    usecols=['group', 'description'],
-                                    index_col='group')
+        annotations = pd.read_csv(os.path.join(directory, 'vog.annotations.tsv'),
+                                  sep='\t',
+                                  header=0,
+                                  names=['group', 'protein_count', 'species_count', 'categories', 'description'],
+                                  usecols=['group', 'description'],
+                                  index_col='group')
 
-        lca = pd.read_table(os.path.join(directory, 'vog.lca.tsv'),
-                            header=0,
-                            names=['group', 'genomes_in_group', 'genomes_total', 'ancestors'],
-                            index_col='group')
+        lca = pd.read_csv(os.path.join(directory, 'vog.lca.tsv'),
+                          sep='\t',
+                          header=0,
+                          names=['group', 'genomes_in_group', 'genomes_total', 'ancestors'],
+                          index_col='group')
         lca = lca.assign(
             ancestors=lca.ancestors.fillna('').apply(lambda s: s.split(';'))
         )
 
-        virusonly = pd.read_table(os.path.join(directory, 'vog.virusonly.tsv'),
-                                  header=0,
-                                  names=['group', 'stringency_high', 'stringency_medium', 'stringency_low'],
-                                  dtype={'stringency_high': bool, 'stringency_medium': bool, 'stringency_low': bool},
-                                  index_col='group')
+        virusonly = pd.read_csv(os.path.join(directory, 'vog.virusonly.tsv'),
+                                sep='\t',
+                                header=0,
+                                names=['group', 'stringency_high', 'stringency_medium', 'stringency_low'],
+                                dtype={'stringency_high': bool, 'stringency_medium': bool, 'stringency_low': bool},
+                                index_col='group')
 
         self._data = members.join(annotations).join(lca).join(virusonly)
 
