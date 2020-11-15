@@ -1,10 +1,8 @@
 import pandas as pd
-from vogdb.vogdb_api import VOG, Species
+from .vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
 
-
-# tst
 
 class SpeciesService:
 
@@ -14,7 +12,7 @@ class SpeciesService:
                                  header=0,
                                  names=['name', 'id', 'phage', 'source', 'version'],
                                  index_col='id') \
-            .assign(phage=lambda df: df.phage == 'phage')
+            .assign(phage=lambda p: p.phage == 'phage')
 
     def __getitem__(self, id):
         return Species(id=id, **self._data.loc[id])
@@ -38,7 +36,7 @@ class SpeciesService:
         if source is not None:
             result = result[result.source.apply(lambda x: source.lower() in x.lower())]
 
-        # return the result as generator object (more efficient than long list)
+        # return the result as generator object (more efficient than long list, and also iterable)
         for id, row in result.iterrows():
             yield Species(id=id, **row)
 
@@ -51,7 +49,7 @@ class GroupService:
         members = pd.read_csv(os.path.join(directory, 'vog.members.tsv'),
                               sep='\t',
                               header=0,
-                              names=['group', 'protein_count', 'species_count', 'categories', 'proteins'],
+                              names=['group', 'protein_count', 'species_count', 'fct_category', 'proteins'],
                               index_col='group')
         members = members.assign(
             proteins=members.proteins.apply(lambda s: frozenset(s.split(','))),
@@ -63,7 +61,7 @@ class GroupService:
         annotations = pd.read_csv(os.path.join(directory, 'vog.annotations.tsv'),
                                   sep='\t',
                                   header=0,
-                                  names=['group', 'protein_count', 'species_count', 'categories', 'description'],
+                                  names=['group', 'protein_count', 'species_count', 'fct_category', 'description'],
                                   usecols=['group', 'description'],
                                   index_col='group')
 
@@ -88,24 +86,82 @@ class GroupService:
     def __getitem__(self, id):
         return VOG(name=id, **self._data.loc[id])
 
-    def find(self, description=None, species=None, stringency=None):
-        for id, row in self._data.iterrows():
-            if description is not None:
-                if description.lower() not in row.description.lower():
-                    continue
+    def search(self, names=None, fct_description=None, fct_category=None, gmin=None, gmax=None,
+               pmin=None, pmax=None, species=None, protein_names=None, mingLCA=None, maxgLCA=None,
+               mingGLCA=None, maxgGLCA=None, ancestors=None, h_stringency=None, m_stringency=None, l_stringency=None,
+               virus_spec=None):
 
-            if species is not None:
-                if not set(species).issubset(row.species):
-                    continue
+        result = self._data
 
-            # if stringency is not None:
-            #     if stringency == Stringency.high and not row.stringency_high:
-            #         continue
-            #     if stringency == Stringency.medium and not row.stringency_medium:
-            #         continue
-            #     if stringency == Stringency.low and not row.stringency_low:
-            #         continue
+        # if names is not None:
+        #     for name in names:
+        #         result.add(VOG(id=name, **self._data.loc[name]))
+        #     # if they ask for ID, everything else is ignored, bc ID is unique.
 
+        # name not working because it is the index.....
+        if names is not None:
+            result = result.loc[names]
+
+        if fct_description is not None:
+            for fct_d in fct_description:
+                result = result[result.description.apply(lambda x: fct_d.lower() in x.lower())]
+
+        if fct_category is not None:
+            for fct_c in fct_category:
+                result = result[result.fct_category.apply(lambda x: fct_c.lower() in x.lower())]
+
+        if gmin is not None:
+            result = result[result.species_count > gmin - 1]
+
+        if gmax is not None:
+            result = result[result.species_count < gmax + 1]
+
+        if pmin is not None:
+            result = result[result.protein_count > pmin - 1]
+
+        if pmax is not None:
+            result = result[result.protein_count < pmax + 1]
+
+        if protein_names is not None:
+            for protein in protein_names:
+                result = result[result.proteins.apply(lambda x: protein in x)]
+
+        if species is not None:
+            for spec in species:
+                result = result[result.species.apply(lambda x: spec in x)]
+
+        if mingLCA is not None:
+            result = result[result.genomes_total > mingGLCA - 1]
+
+        if maxgLCA is not None:
+            result = result[result.genomes_total < maxgGLCA + 1]
+
+        if mingGLCA is not None:
+            result = result[result.ggenomes_in_group > mingGLCA - 1]
+
+        if maxgGLCA is not None:
+            result = result[result.genomes_in_group < maxgGLCA + 1]
+
+        if ancestors is not None:
+            for anc in ancestors:
+                result = result[result.ancestors.apply(lambda x: anc.lower() in x.lower())]
+
+        if h_stringency is not None:
+            result = result[result.stringency_high == bool(h_stringency)]
+
+        if m_stringency is not None:
+            result = result[result.stringency_medium == bool(m_stringency)]
+
+        if l_stringency is not None:
+            result = result[result.stringency_low == bool(l_stringency)]
+
+        if virus_spec is not None:
+            result = result[
+                (result.stringency_low | result.stringency_low | result.stringency_low)]
+                #((result.stringency_low is True) | (result.stringency_low is True) | (result.stringency_low is True))]
+
+        # return the result as generator object (more efficient than long list)
+        for id, row in result.iterrows():
             yield VOG(name=id, **row)
 
     def proteins(self, id):

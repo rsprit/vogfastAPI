@@ -1,33 +1,22 @@
-from fastapi import FastAPI
-from typing import Optional, List, Set
+from fastapi import FastAPI, Query
+from typing import Optional, Set
 from pydantic import BaseModel
-from vogdb.vogdb_api import Species
-from vogdb.functionality import VogService
+from .functionality import VogService
 
 api = FastAPI()
 svc = VogService('data')
-#data_path = "/files/home/sigi/Documents/fastAPI/data_202/vog.genes.all.fa"
 
 
 @api.get("/")
 async def root():
-    return {"message": "Here is the Server :)"}
-
-
-# Filtering for species
-@api.get("/species", response_model=List[Species])
-async def get_species(name: Optional[Set[str]] = None, id: Optional[Set[int]] = None, phage: Optional[bool] = None,
-                      source: Optional[str] = None):
-    # need to write function to find species....
-    result = svc.species.search(name=name, id=id, phage=phage, source=source)
-    return result
+    return {"message": "Here is the root :)"}
 
 
 # here all the filter options are listed
 class Filter(BaseModel):
     sid: Optional[Set[int]] = None
     sn: Optional[Set[str]] = None
-    #tx: Optional[str] = None
+    # tx: Optional[str] = None
     p: Optional[bool] = None
     src: Optional[str] = None
     gmin: Optional[int] = None
@@ -39,10 +28,38 @@ class Filter(BaseModel):
     gn: Optional[str] = None
     fct: Optional[str] = None
     lca: Optional[str] = None
-    vs: Optional[bool] = None  # high, medium, low stringency
+    vs: Optional[bool] = None  # high, medium, or low stringency
     h_stringency: Optional[bool] = None
     m_stringency: Optional[bool] = None
     l_stringency: Optional[bool] = None
+
+
+@api.get("/species")
+async def get_species(name: Optional[Set[str]] = Query(None), id: Optional[Set[int]] = Query(None),
+                      phage: Optional[bool] = None, source: Optional[str] = None):
+    response = list(svc.species.search(name=name, ids=id, phage=phage, source=source))
+    if not response:
+        return {"message": "Nothing could be found for your search options."}
+    return response
+
+
+@api.get("/vog")
+async def get_vogs(
+        names: Optional[Set[str]] = Query(None), fct_description: Optional[Set[str]] = Query(None),
+        fct_category: Optional[Set[str]] = Query(None), gmin: Optional[int] = None, gmax: Optional[int] = None,
+        pmin: Optional[int] = None, pmax: Optional[int] = None, species: Optional[Set[str]] = Query(None),
+        protein_names: Optional[Set[str]] = Query(None), mingLCA: Optional[int] = None, maxgLCA: Optional[int] = None,
+        mingGLCA: Optional[int] = None, maxgGLCA: Optional[int] = None, ancestors: Optional[Set[str]] = Query(None),
+        h_stringency: Optional[bool] = None, m_stringency: Optional[bool] = None, l_stringency: Optional[bool] = None,
+        virus_spec: Optional[bool] = None):
+    response = list(svc.groups.search(names=names, fct_description=fct_description, fct_category=fct_category,
+                                      gmin=gmin, gmax=gmax, pmin=pmin, pmax=pmax, species=species,
+                                      protein_names=protein_names, mingLCA=mingLCA, maxgLCA=maxgLCA, mingGLCA=mingGLCA,
+                                      maxgGLCA=maxgGLCA, ancestors=ancestors, h_stringency=h_stringency,
+                                      m_stringency=m_stringency, l_stringency=l_stringency, virus_spec=virus_spec))
+    if not response:
+        return {"message": "Nothing could be found for your search options."}
+    return response
 
 
 @api.post("/filter/")
