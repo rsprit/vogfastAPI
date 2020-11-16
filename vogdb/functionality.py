@@ -93,12 +93,6 @@ class GroupService:
 
         result = self._data
 
-        # if names is not None:
-        #     for name in names:
-        #         result.add(VOG(id=name, **self._data.loc[name]))
-        #     # if they ask for ID, everything else is ignored, bc ID is unique.
-
-        # name not working because it is the index.....
         if names is not None:
             result = result.loc[names]
 
