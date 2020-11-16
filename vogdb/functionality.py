@@ -156,9 +156,16 @@ class GroupService:
             result = result[result.stringency_low == bool(l_stringency)]
 
         if virus_spec is not None:
-            result = result[
-                (result.stringency_low | result.stringency_low | result.stringency_low)]
-                #((result.stringency_low is True) | (result.stringency_low is True) | (result.stringency_low is True))]
+            if virus_spec:
+                result = result[
+                    ((result.stringency_high == True) |
+                     (result.stringency_medium == True) |
+                     (result.stringency_low == True))]
+            else:
+                result = result[
+                    ((result.stringency_high == False) &
+                     (result.stringency_medium == False) &
+                     (result.stringency_low == False))]
 
         # return the result as generator object (more efficient than long list)
         for id, row in result.iterrows():

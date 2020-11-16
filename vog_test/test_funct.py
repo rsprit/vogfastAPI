@@ -1,7 +1,7 @@
 from typing import Set
 
 from vogdb.functionality import VogService, SpeciesService
-from vogdb.vogdb_api import Species
+from vogdb.vogdb_api import Species, VOG
 import unittest
 
 svc = VogService('/home/sigi/Documents/fastAPI/data')
@@ -27,7 +27,10 @@ print("result of VOG search: ")
 for val in res:
     print(val)
     print("tst5")
-res5 = svc.groups.search(names=['VOG00029'])
+#res5 = svc.groups.search(names=['VOG00029', 'VOG00027'], l_stringency=True)
+#res5 = svc.groups.search(gmin=1000, gmax=20000, names=['VOG00029', 'VOG00027', 'VOG00818'], virus_spec=False)
+res5 = svc.groups.search(names=['VOG00029', 'VOG00027', 'VOG00818'], virus_spec=False)
+
 for val in res5:
     print(val)
 
@@ -50,9 +53,12 @@ class TestSpeciesMethods(unittest.TestCase):
                           Species(id=1000664, name='Chilli leaf curl Vellanad virus [India/Vellanad/2008]', phage=False,
                                   source='NCBI Refseq')])
 
-    #def test_group_search(self):
-        # test getting VOG by id:
-        #self.assertEqual(svc.groups["VOG00029"])
+    def test_group_search(self):
+        # test getting VOG by id, check for length:
+        self.assertEqual(len(list(svc.groups.search(["VOG00029"]))), 1)
+        self.assertEqual(len(list(svc.groups.search(["VOG00029", "VOG00001"]))), 2)
+        self.assertEqual(len(list(svc.groups.search(names=['VOG00029', 'VOG00027', 'VOG00818'], virus_spec=True))), 1)
+        self.assertEqual(len(list(svc.groups.search(names=['VOG00029', 'VOG00027', 'VOG00818'], virus_spec=False))), 2)
 
 
 if __name__ == '__main__':
