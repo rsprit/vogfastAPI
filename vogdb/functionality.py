@@ -2,7 +2,23 @@ import pandas as pd
 from .vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
+from sqlalchemy.orm import Session
+from . import models
+from typing import Optional, Set, List
 
+"""
+Here we define all the search methods that are used for extracting the data from the database
+"""
+
+def get_vogs1(db: Session, ids: Optional[List[str]]):
+    results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
+    return results
+
+def get_proteins(db: Session, species: str):
+    search = "%" + species + "%"
+    print(search)
+    results  = db.query(models.Protein_profile).filter(models.Protein_profile.species_name.like(search)).all()
+    return results
 
 class SpeciesService:
 
