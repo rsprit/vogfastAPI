@@ -1,37 +1,50 @@
-from fastapi import FastAPI, Query
-from typing import Optional, Set
-from pydantic import BaseModel
-from .functionality import VogService
+from fastapi import Query, HTTPException
+from typing import Optional, Set, List
+from .functionality import VogService, get_vogs1, get_proteins
+from .database import SessionLocal
+from sqlalchemy.orm import Session
+from fastapi import Depends, FastAPI
+from .schemas import VOG_profile, Protein_profile, Filter
+
 
 api = FastAPI()
 svc = VogService('data')
+
+# Dependency. Connect to the database session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @api.get("/")
 async def root():
     return {"message": "Here is the root :)"}
 
+#ToDo: include more filtering options
+@api.get("/vog_profile1/", response_model=List[VOG_profile])
+def read_users(ids: Optional[List[str]] = Query(None), db: Session = Depends(get_db)):
+    """This function takes a list of VOGids and returns all the matching VOG_profiles
+    """
+    vogs = get_vogs1(db, ids )
 
-# here all the filter options are listed
-class Filter(BaseModel):
-    sid: Optional[Set[int]] = None
-    sn: Optional[Set[str]] = None
-    # tx: Optional[str] = None
-    p: Optional[bool] = None
-    src: Optional[str] = None
-    gmin: Optional[int] = None
-    gmax: Optional[int] = None
-    pmin: Optional[int] = None
-    pmax: Optional[int] = None
-    fc: Optional[str] = None
-    pid: Optional[str] = None
-    gn: Optional[str] = None
-    fct: Optional[str] = None
-    lca: Optional[str] = None
-    vs: Optional[bool] = None  # high, medium, or low stringency
-    h_stringency: Optional[bool] = None
-    m_stringency: Optional[bool] = None
-    l_stringency: Optional[bool] = None
+    if vogs is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return vogs
+
+#ToDO: include more filtering options
+@api.get("/protein_profile1/", response_model=List[Protein_profile])
+def read_users(species: str = Query(None), db: Session = Depends(get_db)):
+    """This function takes only one species and returns all protein profiles associated with this species/family
+    """
+    proteins = get_proteins(db, species )
+
+    if proteins is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return proteins
+
 
 
 @api.get("/species")
