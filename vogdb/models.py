@@ -33,7 +33,8 @@ class Species_profile(Base):
     # mysql table name
     __tablename__ = "Species_profile"
 
-    taxon_id = Column('TaxonID', int, index=True, primary_key=True)
+    taxon_id = Column('TaxonID', Integer, index=True, primary_key=True)
     species_name = Column('SpeciesName', String, index=False)
-    phage = Column('Phage', bool, index=False)
+    phage = Column('Phage', Boolean, index=False)
     source = Column('Source', String, index=False)
+    version = Column('Version', Integer, index=False)

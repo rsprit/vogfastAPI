@@ -31,6 +31,7 @@ class Species_profile(BaseModel):
     species_name = str
     phage = str
     source = str
+    version = int
 
     class Config:
         orm_mode = True
