@@ -1,4 +1,3 @@
-
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
@@ -17,7 +16,6 @@ password = "password"
 server = "localhost"
 database = "VOGDB"
 SQLALCHEMY_DATABASE_URL = ("mysql+pymysql://{0}:{1}@{2}/{3}").format(username, password, server, database)
-
 
 # Create an engine object.
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
@@ -108,30 +106,31 @@ else:
 #     con.execute('CREATE INDEX Protein_profile_by_species ON Protein_profile (Species_name);')
 #     con.execute('CREATE INDEX VOG_profile_index_by_protein ON Protein_profile (ProteinID);')
 #
-# print('Protein_profile table successfuly created!')
+# print('Protein_profile table successfully created!')
 #
 
-#ToDo creating other tables, modifying the existing tables, optimizing the structure
-#---------------------
+# ToDo creating other tables, modifying the existing tables, optimizing the structure
+# ---------------------
 # Species_table generation
-#----------------------
-# extract Species from the list
-#species_list_df = pd.read_csv(data_path + "vog.species.list", sep='\t', header=0,  names=['name', 'id', 'phage', 'source']).iloc[:, [0, 3]]
+# ----------------------
+# extract Species information from the list
 species_list_df = pd.read_csv(data_path + "vog.species.list",
-                         sep='\t',
-                         header=0,
-                         names=['name', 'id', 'phage', 'source', 'version']) \
-    .assign(phage=lambda p: p.phage == 'phage').iloc[:, [0, 3]]
-species_list_df = species_list_df.rename(columns={"SpeciesName": "TaxonID", "Phage": "Source"})
+                              sep='\t',
+                              header=0,
+                              names=['SpeciesName', 'TaxonID', 'Phage', 'Source', 'Version']) \
+                      .assign(Phage=lambda p: p.Phage == 'phage')
+print(species_list_df)
 
-# create a protein table in the database
+# create a species table in the database
 species_list_df.to_sql(name='Species_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
 
 with engine.connect() as con:
     con.execute('ALTER TABLE `Species_profile` ADD PRIMARY KEY (`TaxonID`);')
     con.execute('ALTER TABLE Species_profile  MODIFY  SpeciesName char(100) NOT NULL; ')
-    con.execute('ALTER TABLE Species_profile  MODIFY  TaxonID int(30) NOT NULL; ')
-    con.execute('ALTER TABLE Species_profile  MODIFY  phage bool NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  TaxonID int(255) NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  Phage bool NOT NULL; ')
     con.execute('ALTER TABLE Species_profile  MODIFY  Source char(100) NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  Version int(255) NOT NULL; ')
+
 
 print('Species_profile table successfully created!')
