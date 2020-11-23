@@ -2,11 +2,11 @@ from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from .database import Base
 
-
 """
 "model" refers to classes and instances that interact with the database.
 A model is equivalent to a database table e.g. VOG_profile table and it contains all the same attributes
 """
+
 
 class VOG_profile(Base):
     # mysql table name
@@ -18,6 +18,7 @@ class VOG_profile(Base):
     function = Column('FunctionalCategory', String, index=True)
     consensus_function = Column('Consensus_func_description', String(100), index=False)
 
+
 class Protein_profile(Base):
     # mysql table name
     __tablename__ = "Protein_profile"
@@ -26,3 +27,13 @@ class Protein_profile(Base):
     vog_id = Column('VOG_ID', String, index=False)
     taxon_id = Column('TaxonID', Integer, index=False)
     species_name = Column('Species_name', String, primary_key=True)
+
+
+class Species_profile(Base):
+    # mysql table name
+    __tablename__ = "Species_profile"
+
+    taxon_id = Column('TaxonID', int, index=True, primary_key=True)
+    species_name = Column('SpeciesName', String, index=False)
+    phage = Column('Phage', bool, index=False)
+    source = Column('Source', String, index=False)
