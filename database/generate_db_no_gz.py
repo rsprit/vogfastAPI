@@ -52,6 +52,33 @@ with engine.connect() as con:
 print('VOG_table successfuly created!')
 
 # ---------------------
+# Species_table generation
+# ----------------------
+# extract Species information from the list
+species_list_df = pd.read_csv(data_path + "vog.species.list",
+                              sep='\t',
+                              header=0,
+                              names=['SpeciesName', 'TaxonID', 'Phage', 'Source', 'Version']) \
+    .assign(Phage=lambda p: p.Phage == 'phage')
+print(species_list_df)
+
+# create a species table in the database
+species_list_df.to_sql(name='Species_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
+
+with engine.connect() as con:
+    con.execute('ALTER TABLE `Species_profile` ADD PRIMARY KEY (`TaxonID`);')
+    con.execute('ALTER TABLE Species_profile  MODIFY  SpeciesName char(100) NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  TaxonID int(255) NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  Phage bool NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  Source char(100) NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  Version int(255) NOT NULL; ')
+
+# ToDo add foreign key to connect tax_id in protein_profile and species_profile? create index?
+
+print('Species_profile table successfully created!')
+
+
+# ---------------------
 # Protein_table generation
 # ----------------------
 # extract proteins for each VOG
@@ -101,32 +128,10 @@ with engine.connect() as con:
     con.execute('ALTER TABLE Protein_profile  MODIFY  Species_name char(100) NOT NULL; ')
     con.execute('CREATE INDEX Protein_profile_by_species ON Protein_profile (Species_name);')
     con.execute('CREATE INDEX VOG_profile_index_by_protein ON Protein_profile (ProteinID);')
+    #add foreign key
+    con.execute('ALTER TABLE Protein_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
 
 print('Protein_profile table successfully created!')
 
 # ToDo creating other tables, modifying the existing tables, optimizing the structure
-# ---------------------
-# Species_table generation
-# ----------------------
-# extract Species information from the list
-species_list_df = pd.read_csv(data_path + "vog.species.list",
-                              sep='\t',
-                              header=0,
-                              names=['SpeciesName', 'TaxonID', 'Phage', 'Source', 'Version']) \
-    .assign(Phage=lambda p: p.Phage == 'phage')
-print(species_list_df)
 
-# create a species table in the database
-species_list_df.to_sql(name='Species_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
-
-with engine.connect() as con:
-    con.execute('ALTER TABLE `Species_profile` ADD PRIMARY KEY (`TaxonID`);')
-    con.execute('ALTER TABLE Species_profile  MODIFY  SpeciesName char(100) NOT NULL; ')
-    con.execute('ALTER TABLE Species_profile  MODIFY  TaxonID int(255) NOT NULL; ')
-    con.execute('ALTER TABLE Species_profile  MODIFY  Phage bool NOT NULL; ')
-    con.execute('ALTER TABLE Species_profile  MODIFY  Source char(100) NOT NULL; ')
-    con.execute('ALTER TABLE Species_profile  MODIFY  Version int(255) NOT NULL; ')
-
-# ToDo add foreign key to connect tax_id in protein_profile and species_profile? create index?
-
-print('Species_profile table successfully created!')
