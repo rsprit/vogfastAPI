@@ -96,7 +96,7 @@ protein_list_df.to_sql(name='Protein_profile', con=engine,
 with engine.connect() as con:
     con.execute('ALTER TABLE `Protein_profile` ADD PRIMARY KEY (`ProteinID`(767));')
     con.execute('ALTER TABLE Protein_profile  MODIFY  ProteinID char(30) NOT NULL; ')
-    con.execute('ALTER TABLE Protein_profile  MODIFY  TaxonID int(30) NOT NULL; ')
+    con.execute('ALTER TABLE Protein_profile  MODIFY  TaxonID int(30) NOT NULL; ') #FOREIGN KEY for species...??
     con.execute('ALTER TABLE Protein_profile  MODIFY  VOG_ID char(30) NOT NULL; ')
     con.execute('ALTER TABLE Protein_profile  MODIFY  Species_name char(100) NOT NULL; ')
     con.execute('CREATE INDEX Protein_profile_by_species ON Protein_profile (Species_name);')
@@ -127,6 +127,6 @@ with engine.connect() as con:
     con.execute('ALTER TABLE Species_profile  MODIFY  Source char(100) NOT NULL; ')
     con.execute('ALTER TABLE Species_profile  MODIFY  Version int(255) NOT NULL; ')
 
-# ToDo add foreign key? create index?
+# ToDo add foreign key to connect tax_id in protein_profile and species_profile? create index?
 
 print('Species_profile table successfully created!')
