@@ -13,28 +13,30 @@ class VOG_profile(Base):
     __tablename__ = "VOG_profile"
 
     id = Column('VOG_ID', String, primary_key=True, index=True)
-    protein_count = Column('ProteinCount', Integer, index=False)
-    species_count = Column('SpeciesCount', Integer, index=False)
-    function = Column('FunctionalCategory', String, index=True)
-    consensus_function = Column('Consensus_func_description', String(100), index=False)
-
-
-class Protein_profile(Base):
-    # mysql table name
-    __tablename__ = "Protein_profile"
-
-    protein_id = Column('ProteinID', String, index=True)
-    vog_id = Column('VOG_ID', String, index=False)
-    taxon_id = Column('TaxonID', Integer, index=False)
-    species_name = Column('Species_name', String, primary_key=True)
+    protein_count = Column('ProteinCount', Integer)
+    species_count = Column('SpeciesCount', Integer)
+    function = Column('FunctionalCategory', String)
+    consensus_function = Column('Consensus_func_description', String(100))
 
 
 class Species_profile(Base):
     # mysql table name
     __tablename__ = "Species_profile"
 
-    taxon_id = Column('TaxonID', Integer, index=True, primary_key=True)
-    species_name = Column('SpeciesName', String, index=False)
-    phage = Column('Phage', Boolean, index=False)
-    source = Column('Source', String, index=False)
-    version = Column('Version', Integer, index=False)
+    taxon_id = Column('ID', Integer,primary_key=True, index=True)
+    species_name = Column('SpeciesName', String)
+    phage = Column('Phage', Boolean)
+    source = Column('Source', String)
+    version = Column('Version', Integer)
+    protein_names = relationship("Protein_profile", back_populates="species_names")
+
+
+
+class Protein_profile(Base):
+    # mysql table name
+    __tablename__ = "Protein_profile"
+
+    protein_id = Column('ProteinID', String,primary_key=True)
+    vog_id = Column('VOG_ID', String)
+    taxon_id = Column('TaxonID', Integer,  ForeignKey("Species_profile.ID"), index=True)
+    species_names = relationship("Species_profile", back_populates="protein_names")

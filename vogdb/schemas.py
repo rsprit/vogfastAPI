@@ -16,14 +16,7 @@ class VOG_profile(BaseModel):
         orm_mode = True
 
 
-class Protein_profile(BaseModel):
-    protein_id: str
-    vog_id: str
-    taxon_id: int
-    species_name: str
 
-    class Config:
-        orm_mode = True
 
 
 class Species_profile(BaseModel):
@@ -33,6 +26,14 @@ class Species_profile(BaseModel):
     source = str
     version = int
 
+    class Config:
+        orm_mode = True
+
+class Protein_profile(BaseModel):
+    protein_id: str
+    vog_id: str
+    taxon_id: int
+    species_names: str
     class Config:
         orm_mode = True
 

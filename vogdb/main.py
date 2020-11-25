@@ -1,3 +1,5 @@
+import sys
+
 from fastapi import Query, HTTPException
 from typing import Optional, Set, List
 from .functionality import VogService, get_vogs1, get_proteins
@@ -39,8 +41,8 @@ def read_users(ids: Optional[List[str]] = Query(None), db: Session = Depends(get
 def read_users(species: str = Query(None), db: Session = Depends(get_db)):
     """This function takes only one species and returns all protein profiles associated with this species/family
     """
-    proteins = get_proteins(db, species )
 
+    proteins = get_proteins(db, species )
     if proteins is None:
         raise HTTPException(status_code=404, detail="User not found")
     return proteins
