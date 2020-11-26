@@ -149,12 +149,11 @@ class GroupService:
             for spec in species:
                 result = result[result.species.apply(lambda x: spec in x)]
 
-# ToDo fix LCA counts..
         if mingLCA is not None:
-            result = result[result.genomes_total > mingGLCA - 1]
+            result = result[result.genomes_total > mingLCA - 1]
 
         if maxgLCA is not None:
-            result = result[result.genomes_total < maxgGLCA + 1]
+            result = result[result.genomes_total < maxgLCA + 1]
 
         if mingGLCA is not None:
             result = result[result.ggenomes_in_group > mingGLCA - 1]
