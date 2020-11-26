@@ -6,7 +6,7 @@
 Write in terminal
 ```bash
 sudo apt-get update
-install mysql server
+sudo apt-get install mysql-server
 ```
 
 set root privileges for the mysql server
