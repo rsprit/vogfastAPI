@@ -17,7 +17,7 @@ def get_vogs1(db: Session, ids: Optional[List[str]]):
 
 def get_proteins(db: Session, species: str):
     search = "%" + species + "%"
-
+    #ToDo Try just with VOG parameter search and see if it will link the species to protein automatically
     #ToDo FIX This returns (Protein_profile: protein_id, vog_id, taxon_id, species_names(which is a whole SpeciesProfile, but we need only species_name attribute
     results = db.query(models.Protein_profile).join(models.Species_profile).filter(models.Species_profile.species_name.like(search)).all()
 

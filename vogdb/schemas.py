@@ -31,7 +31,7 @@ class Protein_profile(BaseModel):
     protein_id: str
     vog_id: str
     taxon_id: int
-    species_name: str
+    species_names: str
 
     class Config:
         orm_mode = True
