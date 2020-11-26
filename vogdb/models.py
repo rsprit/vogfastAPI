@@ -23,13 +23,12 @@ class Species_profile(Base):
     # mysql table name
     __tablename__ = "Species_profile"
 
-    taxon_id = Column('ID', Integer,primary_key=True, index=True)
+    taxon_id = Column('ID', Integer, primary_key=True, index=True)
     species_name = Column('SpeciesName', String)
     phage = Column('Phage', Boolean)
     source = Column('Source', String)
     version = Column('Version', Integer)
-    protein_names = relationship("Protein_profile", back_populates="species_names")
-
+    protein_names = relationship("Protein_profile", back_populates="species_name")
 
 
 class Protein_profile(Base):
@@ -39,4 +38,4 @@ class Protein_profile(Base):
     protein_id = Column('ProteinID', String,primary_key=True)
     vog_id = Column('VOG_ID', String)
     taxon_id = Column('TaxonID', Integer,  ForeignKey("Species_profile.ID"), index=True)
-    species_names = relationship("Species_profile", back_populates="protein_names")
+    species_name = relationship("Species_profile", back_populates="protein_names")

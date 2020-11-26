@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
 from .schemas import VOG_profile, Protein_profile, Filter
 
-
 api = FastAPI()
 svc = VogService('data')
+
 
 # Dependency. Connect to the database session
 def get_db():
@@ -25,28 +25,29 @@ def get_db():
 async def root():
     return {"message": "Here is the root :)"}
 
-#ToDo: include more filtering options
+
+# ToDo: include more filtering options
 @api.get("/vog_profile1/", response_model=List[VOG_profile])
 def read_users(ids: Optional[List[str]] = Query(None), db: Session = Depends(get_db)):
     """This function takes a list of VOGids and returns all the matching VOG_profiles
     """
-    vogs = get_vogs1(db, ids )
+    vogs = get_vogs1(db, ids)
 
     if vogs is None:
         raise HTTPException(status_code=404, detail="User not found")
     return vogs
 
-#ToDO: include more filtering options
+
+# ToDO: include more filtering options
 @api.get("/protein_profile1/", response_model=List[Protein_profile])
 def read_users(species: str = Query(None), db: Session = Depends(get_db)):
     """This function takes only one species and returns all protein profiles associated with this species/family
     """
 
-    proteins = get_proteins(db, species )
+    proteins = get_proteins(db, species)
     if proteins is None:
         raise HTTPException(status_code=404, detail="User not found")
     return proteins
-
 
 
 @api.get("/species")
