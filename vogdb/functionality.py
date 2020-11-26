@@ -125,10 +125,10 @@ class GroupService:
                 result = result[result.species.apply(lambda x: spec in x)]
 
         if mingLCA is not None:
-            result = result[result.genomes_total > mingGLCA - 1]
+            result = result[result.genomes_total > mingLCA - 1]
 
         if maxgLCA is not None:
-            result = result[result.genomes_total < maxgGLCA + 1]
+            result = result[result.genomes_total < maxgLCA + 1]
 
         if mingGLCA is not None:
             result = result[result.ggenomes_in_group > mingGLCA - 1]
