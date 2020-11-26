@@ -23,29 +23,29 @@ def get_db():
 
 @api.get("/")
 async def root():
-    return {"message": "Here is the root :)"}
+    return {"message": "Welcome to VOGDB-API"}
 
 
 # ToDo: include more filtering options
 @api.get("/vog_profile1/", response_model=List[VOG_profile])
-def read_users(ids: Optional[List[str]] = Query(None), db: Session = Depends(get_db)):
+def read_vog(ids: Optional[List[str]] = Query(None), db: Session = Depends(get_db)):
     """This function takes a list of VOGids and returns all the matching VOG_profiles
     """
     vogs = get_vogs1(db, ids)
 
-    if vogs is None:
-        raise HTTPException(status_code=404, detail="User not found")
+    if not vogs:
+        raise HTTPException(status_code=404, detail="No VOGs found")
     return vogs
 
 
 # ToDO: include more filtering options
 @api.get("/protein_profile1/", response_model=List[Protein_profile])
-def read_users(species: str = Query(None), db: Session = Depends(get_db)):
+def read_protein(species: str = Query(None), db: Session = Depends(get_db)):
     """This function takes only one species and returns all protein profiles associated with this species/family
     """
 
     proteins = get_proteins(db, species)
-    if proteins is None:
+    if not proteins:
         raise HTTPException(status_code=404, detail="User not found")
     return proteins
 

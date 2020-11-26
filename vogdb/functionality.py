@@ -3,12 +3,25 @@ from .vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
 from sqlalchemy.orm import Session
-from . import models, schemas
-from typing import Optional, Set, List
+from . import models
+from typing import Optional, List
 
 
 """
 Here we define all the search methods that are used for extracting the data from the database
+"""
+
+"""
+Very important Note: Here we specify what columns we want to get from our query: e.g. protein_id,..,species_name
+In order that this result output is gonna pass through the Pydantic validation, two criteria need to be valid:
+1. the attribute type values of the returned query object (in functionality.py)  (e.g. Species_profile.species_name)
+ need to match the attribute type of the Pydantic response model (in this case schemas.Species_profile.species_name)
+2. The names of the  attributes the returned query object also need to be exactly the same as in the Pydantic 
+response model object, so we have in query object with attribute Protein_profile.species_name
+so the pydantic response model (Protein_profile) needs to have the attribute name species_name as well
+
+if those two criteria are not fulfilled, pydantic will throw an ValidationError
+
 """
 
 def get_vogs1(db: Session, ids: Optional[List[str]]):
@@ -17,16 +30,14 @@ def get_vogs1(db: Session, ids: Optional[List[str]]):
 
 def get_proteins(db: Session, species: str):
     search = "%" + species + "%"
-    #ToDo Try just with VOG parameter search and see if it will link the species to protein automatically
-    #ToDo FIX This returns (Protein_profile: protein_id, vog_id, taxon_id, species_names(which is a whole SpeciesProfile, but we need only species_name attribute
-    results = db.query(models.Protein_profile).join(models.Species_profile).filter(models.Species_profile.species_name.like(search)).all()
 
-    # This is a "dirty" workaround to return the data in format that the schemas.Protein_profile wants it
-    results_formated = [schemas.Protein_profile.parse_obj({"protein_id" : result.protein_id,
-                                                 "vog_id": result.vog_id,
-                                                 "taxon_id":result.taxon_id,
-                                                 "species_names": result.species_names.species_name}) for result in results]
-    return results_formated
+    results = db.query().with_entities(models.Protein_profile.protein_id,
+                                     models.Protein_profile.vog_id,
+                                     models.Protein_profile.taxon_id,
+                                     models.Species_profile.species_name).join(models.Species_profile).\
+        filter(models.Species_profile.species_name.like(search)).all()
+
+    return results
 
 
 class SpeciesService:

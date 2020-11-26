@@ -1,8 +1,22 @@
 from pydantic import BaseModel
 from typing import Optional, Set, List
 
+"""
+ Here we define the "schemas" i.e. specify what the output response should look like (which columns to select)
+"""
 
-# Here we define the "schemas" i.e. specify what the output response should look like (which columns to select)
+"""
+Very important Note: Here we specify what columns we want to return to the client
+Pydantic models bridges with SQLAlchemy models.
+In order that we connect Pydantic with SQLAlchemy, two criteria need to be valid:
+1. the attribute type values of the returned query object (in functionality.py)  (e.g. Species_profile.species_name)
+ need to match the attribute type of the Pydantic response model (in this case schemas.Species_profile.species_name)
+2. The names of the  attributes the returned query object also need to be exactly the same as in the Pydantic 
+response model object, so we have in query object with attribute Protein_profile.species_name
+so the pydantic response model (Protein_profile) needs to have the attribute name species_name as well
+
+if those two criteria are not fulfilled, pydantic will throw an ValidationError
+"""
 
 
 class VOG_profile(BaseModel):
@@ -31,7 +45,7 @@ class Protein_profile(BaseModel):
     protein_id: str
     vog_id: str
     taxon_id: int
-    species_names: str
+    species_name: str
 
     class Config:
         orm_mode = True
