@@ -3,8 +3,8 @@ from .vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
 from sqlalchemy.orm import Session
-from . import models
-from typing import Optional, List
+from . import models, schemas
+from typing import Optional, Set, List
 
 
 """
@@ -27,6 +27,7 @@ if those two criteria are not fulfilled, pydantic will throw an ValidationError
 def get_vogs1(db: Session, ids: Optional[List[str]]):
     results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
     return results
+
 
 def get_proteins(db: Session, species: str):
     search = "%" + species + "%"
