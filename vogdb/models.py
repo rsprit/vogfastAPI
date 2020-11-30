@@ -23,6 +23,7 @@ class VOG_profile(Base):
     stringency_high = Column('StringencyHigh', Boolean)
     stringency_medium = Column('StringencyMedium', Boolean)
     stringency_low = Column('StringencyLow', Boolean)
+    proteins = Column('Proteins', String)
 
 
 class Species_profile(Base):

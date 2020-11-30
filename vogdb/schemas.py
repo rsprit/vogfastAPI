@@ -31,6 +31,7 @@ class VOG_profile(BaseModel):
     stringency_high: bool
     stringency_medium: bool
     stringency_low: bool
+    proteins: str
 
     class Config:
         orm_mode = True

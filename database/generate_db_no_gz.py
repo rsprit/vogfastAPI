@@ -5,6 +5,7 @@ from Bio import Entrez
 import numpy as np
 import os
 from sqlalchemy import VARCHAR
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 """
 Here we create our VOGDB and create all the tables that we are going to use
@@ -36,14 +37,21 @@ members = pd.read_csv(os.path.join(data_path, 'vog.members.tsv'),
                       sep='\t',
                       header=0,
                       names=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Proteins'],
-                      usecols=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory'],
+                      usecols=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Proteins'],
                       index_col='VOG_ID')
+
 # members = members.assign(
 #     proteins=members.proteins.apply(lambda s: frozenset(s.split(','))),
 # )
 # members = members.assign(
 #     species=members.proteins.apply(lambda s: frozenset(p.split('.')[0] for p in s))
 # )
+# separate protein and taxonID into separate columns
+# members["TaxonID"] = members.Proteins.apply(
+#     for p in Proteins
+#     lambda s: str(p.split('.')[0] for p in s))
+#members["TaxonID"] = members["Proteins"].str.split(".").str[0]
+#members["ProteinID"] = members["ProteinID"].str.split(".").str[1:3].str.join(".")
 
 annotations = pd.read_csv(os.path.join(data_path, 'vog.annotations.tsv'),
                           sep='\t',
@@ -57,9 +65,6 @@ lca = pd.read_csv(os.path.join(data_path, 'vog.lca.tsv'),
                   header=0,
                   names=['VOG_ID', 'GenomesInGroup', 'GenomesTotal', 'Ancestors'],
                   index_col='VOG_ID')
-# lca = lca.assign(
-#     ancestors=lca.ancestors.fillna('').apply(lambda s: s.split(';'))
-# )
 
 virusonly = pd.read_csv(os.path.join(data_path, 'vog.virusonly.tsv'),
                         sep='\t',
@@ -69,18 +74,12 @@ virusonly = pd.read_csv(os.path.join(data_path, 'vog.virusonly.tsv'),
                         index_col='VOG_ID')
 
 dfr = members.join(annotations).join(lca).join(virusonly)
-#dfr = dfr.iloc[:, [0, 1, 2, 3]]
 
 # create a table in the database
 dfr.to_sql(name='VOG_profile', con=engine, if_exists='replace', index=True,
-           dtype={'VOG_ID': VARCHAR(dfr.index.get_level_values('VOG_ID').str.len().max())},
+           dtype={'VOG_ID': VARCHAR(dfr.index.get_level_values('VOG_ID').str.len().max()), 'Proteins': LONGTEXT,
+                  'TaxonID': LONGTEXT},
            chunksize=1000)
-
-# df = pd.read_csv(data_path + "vog.annotations.tsv", sep='\t')
-# df = df.rename(columns={"#GroupName": "VOG_ID"})
-# vog_fun_desc = df.iloc[:, 4].str.split(" ").str[1:].str.join(" ")  # trimming consensus functional description
-# df_selected = df.iloc[:, [0, 1, 2, 3]]
-# df_selected.insert(4, "Consensus_func_description", vog_fun_desc)
 
 
 with engine.connect() as con:
@@ -96,21 +95,11 @@ with engine.connect() as con:
     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyHigh bool NOT NULL; ')
     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyMedium bool NOT NULL; ')
     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyLow bool NOT NULL; ')
-    #con.execute('ALTER TABLE VOG_profile  MODIFY  Proteins TEXT; ')
+    con.execute('ALTER TABLE VOG_profile  MODIFY  Proteins LONGTEXT; ')
     con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);')  # create index
     # con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
 
-# df_selected.to_sql(name='VOG_profile', con=engine,
-#                    if_exists='replace', index=False, chunksize=1000)
-#
-# with engine.connect() as con:
-#     con.execute('ALTER TABLE `VOG_profile` ADD PRIMARY KEY (`VOG_ID`(767));')  # add primary key
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  VOG_ID char(30) NOT NULL; ')  # convert text to char
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  FunctionalCategory char(30) NOT NULL; ')
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  Consensus_func_description char(100) NOT NULL; ')
-#     # con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);')  # create index
-#     # con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
-
+# ToDo: add foreign keys to link to proteins, and species lists.
 print('VOG_table successfully created!')
 
 #
@@ -135,7 +124,7 @@ print('VOG_table successfully created!')
 #     con.execute('ALTER TABLE Species_profile  MODIFY  Source char(100) NOT NULL; ')
 #     con.execute('ALTER TABLE Species_profile  MODIFY  Version int(255) NOT NULL; ')
 #
-# # ToDo add foreign key to connect tax_id in protein_profile and species_profile? create index?
+#     #ToDo add foreign key to connect tax_id in protein_profile and species_profile? create index?
 #
 # print('Species_profile table successfully created!')
 #
@@ -170,7 +159,7 @@ print('VOG_table successfully created!')
 #
 # with engine.connect() as con:
 #     con.execute('ALTER TABLE Protein_profile  MODIFY  ProteinID char(30) NOT NULL; ')
-#     con.execute('ALTER TABLE `Protein_profile` ADD PRIMARY KEY (`ProteinID`(30));') # non-unique
+# #   con.execute('ALTER TABLE `Protein_profile` ADD PRIMARY KEY (`ProteinID`(30));') # non-unique
 #     con.execute('ALTER TABLE Protein_profile  MODIFY  TaxonID int(30) NOT NULL; ')
 #     con.execute('ALTER TABLE Protein_profile  MODIFY  VOG_ID char(30) NOT NULL; ')
 #   #  con.execute('ALTER TABLE Protein_profile  MODIFY  Species_name char(100) NOT NULL; ')
