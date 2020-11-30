@@ -25,6 +25,12 @@ class VOG_profile(BaseModel):
     species_count: int
     function: str
     consensus_function: str
+    genomes_in_group: int
+    genomes_total: int
+    ancestors: str
+    stringency_high: bool
+    stringency_medium: bool
+    stringency_low: bool
 
     class Config:
         orm_mode = True

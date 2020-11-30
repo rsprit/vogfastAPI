@@ -17,6 +17,12 @@ class VOG_profile(Base):
     species_count = Column('SpeciesCount', Integer)
     function = Column('FunctionalCategory', String)
     consensus_function = Column('Consensus_func_description', String(100))
+    genomes_in_group = Column('GenomesInGroup', Integer)
+    genomes_total = Column('GenomesTotal', Integer)
+    ancestors = Column('Ancestors', String)
+    stringency_high = Column('StringencyHigh', Boolean)
+    stringency_medium = Column('StringencyMedium', Boolean)
+    stringency_low = Column('StringencyLow', Boolean)
 
 
 class Species_profile(Base):
