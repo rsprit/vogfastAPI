@@ -88,7 +88,8 @@ def vog_get(db: Session, names: Optional[Set[str]],
 
     if species is not None:
         for spec in species:
-            result = result[result.species.apply(lambda x: spec in x)]
+            s = "%" + spec + '.' + "%"
+            result = result.filter(models.VOG_profile.proteins.like(s))
 
     if mingLCA is not None:
         result = result.filter(models.VOG_profile.genomes_total > mingLCA - 1)

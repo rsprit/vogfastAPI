@@ -40,19 +40,6 @@ members = pd.read_csv(os.path.join(data_path, 'vog.members.tsv'),
                       usecols=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Proteins'],
                       index_col='VOG_ID')
 
-# members = members.assign(
-#     proteins=members.proteins.apply(lambda s: frozenset(s.split(','))),
-# )
-# members = members.assign(
-#     species=members.proteins.apply(lambda s: frozenset(p.split('.')[0] for p in s))
-# )
-# separate protein and taxonID into separate columns
-# members["TaxonID"] = members.Proteins.apply(
-#     for p in Proteins
-#     lambda s: str(p.split('.')[0] for p in s))
-#members["TaxonID"] = members["Proteins"].str.split(".").str[0]
-#members["ProteinID"] = members["ProteinID"].str.split(".").str[1:3].str.join(".")
-
 annotations = pd.read_csv(os.path.join(data_path, 'vog.annotations.tsv'),
                           sep='\t',
                           header=0,
@@ -77,10 +64,8 @@ dfr = members.join(annotations).join(lca).join(virusonly)
 
 # create a table in the database
 dfr.to_sql(name='VOG_profile', con=engine, if_exists='replace', index=True,
-           dtype={'VOG_ID': VARCHAR(dfr.index.get_level_values('VOG_ID').str.len().max()), 'Proteins': LONGTEXT,
-                  'TaxonID': LONGTEXT},
+           dtype={'VOG_ID': VARCHAR(dfr.index.get_level_values('VOG_ID').str.len().max()), 'Proteins': LONGTEXT},
            chunksize=1000)
-
 
 with engine.connect() as con:
     con.execute('ALTER TABLE VOG_profile ADD PRIMARY KEY (`VOG_ID`(8)); ')  # add primary key
@@ -98,7 +83,7 @@ with engine.connect() as con:
     con.execute('ALTER TABLE VOG_profile  MODIFY  Proteins LONGTEXT; ')
     con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);')  # create index
     # con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
-
+    #con.execute('ALTER TABLE VOG_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
 # ToDo: add foreign keys to link to proteins, and species lists.
 print('VOG_table successfully created!')
 
