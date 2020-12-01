@@ -56,7 +56,7 @@ lca = pd.read_csv(os.path.join(data_path, 'vog.lca.tsv.gz'), compression='gzip',
                   names=['VOG_ID', 'GenomesInGroup', 'GenomesTotal', 'Ancestors'],
                   index_col='VOG_ID')
 
-virusonly = pd.read_csv(os.path.join(data_path, 'vog.virusonly.tsv'), compression='gzip',
+virusonly = pd.read_csv(os.path.join(data_path, 'vog.virusonly.tsv.gz'), compression='gzip',
                         sep='\t',
                         header=0,
                         names=['VOG_ID', 'StringencyHigh', 'StringencyMedium', 'StringencyLow'],
