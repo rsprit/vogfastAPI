@@ -23,10 +23,10 @@ class VOG(BaseModel):
     ancestors: Optional[Set[str]]
     genomes_in_group: int
     genomes_total: int
-    # virus_specific: int[3] #high, medium and low stringency
     stringency_high: Optional[bool]
     stringency_medium: Optional[bool]
     stringency_low: Optional[bool]
+    # virus_specific: int[3] #high, medium and low stringency
 
 
 class Protein(BaseModel):
