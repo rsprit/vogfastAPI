@@ -91,31 +91,6 @@ with engine.connect() as con:
 print('VOG_table successfully created!')
 
 
-#
-# #---------------------
-# # VOG_table generation
-# #----------------------
-#
-# df = pd.read_csv(data_path + "vog.annotations.tsv.gz", compression='gzip', sep='\t')
-# df = df.rename(columns={"#GroupName": "VOG_ID"})
-# vog_fun_desc = df.iloc[:, 4].str.split(" ").str[1:].str.join(" ") #trimming consensus functional description
-# df_selected = df.iloc[:, [0,1,2,3]]
-# df_selected.insert(4, "Consensus_func_description", vog_fun_desc)
-#
-# # create a table in the database
-# df_selected.to_sql(name='VOG_profile', con=engine,
-#           if_exists='replace', index=False, chunksize=1000)
-#
-# with engine.connect() as con:
-#     con.execute('ALTER TABLE `VOG_profile` ADD PRIMARY KEY (`VOG_ID`(767));') #add primary key
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  VOG_ID char(30) NOT NULL; ') #convert text to char
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  FunctionalCategory char(30) NOT NULL; ')
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  Consensus_func_description char(100) NOT NULL; ')
-#    # con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);') # create index
-#   #  con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
-#
-# print('VOG_table successfuly created!')
-
 # ---------------------
 # Species_table generation
 # ----------------------
