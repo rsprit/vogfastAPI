@@ -75,10 +75,7 @@ with engine.connect() as con:
     con.execute('ALTER TABLE VOG_profile  MODIFY  VOG_ID char(30) NOT NULL; ')  # convert text to char
     con.execute('ALTER TABLE VOG_profile  MODIFY  FunctionalCategory char(30) NOT NULL; ')
     con.execute('ALTER TABLE VOG_profile  MODIFY  Consensus_func_description char(100) NOT NULL; ')
-<<<<<<<<< Temporary merge branch 1
-    con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);') # create index
-    con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
-=========
+
     con.execute('ALTER TABLE VOG_profile  MODIFY  ProteinCount int(255) NOT NULL; ')
     con.execute('ALTER TABLE VOG_profile  MODIFY  SpeciesCount int(255) NOT NULL; ')
     con.execute('ALTER TABLE VOG_profile  MODIFY  GenomesInGroup int(255) NOT NULL; ')
@@ -93,36 +90,8 @@ with engine.connect() as con:
     #con.execute('ALTER TABLE VOG_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
 # ToDo: add foreign keys to link to proteins, and species lists.
 print('VOG_table successfully created!')
->>>>>>>>> Temporary merge branch 2
 
 
-#
-# #---------------------
-# # VOG_table generation
-# #----------------------
-#
-# df = pd.read_csv(data_path + "vog.annotations.tsv.gz", compression='gzip', sep='\t')
-# df = df.rename(columns={"#GroupName": "VOG_ID"})
-# vog_fun_desc = df.iloc[:, 4].str.split(" ").str[1:].str.join(" ") #trimming consensus functional description
-# df_selected = df.iloc[:, [0,1,2,3]]
-# df_selected.insert(4, "Consensus_func_description", vog_fun_desc)
-#
-# # create a table in the database
-# df_selected.to_sql(name='VOG_profile', con=engine,
-#           if_exists='replace', index=False, chunksize=1000)
-#
-# with engine.connect() as con:
-#     con.execute('ALTER TABLE `VOG_profile` ADD PRIMARY KEY (`VOG_ID`(767));') #add primary key
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  VOG_ID char(30) NOT NULL; ') #convert text to char
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  FunctionalCategory char(30) NOT NULL; ')
-#     con.execute('ALTER TABLE VOG_profile  MODIFY  Consensus_func_description char(100) NOT NULL; ')
-#    # con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);') # create index
-#   #  con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
-#
-# print('VOG_table successfuly created!')
-
-<<<<<<<<< Temporary merge branch 1
-=========
 # ---------------------
 # Species_table generation
 # ----------------------
@@ -148,7 +117,6 @@ with engine.connect() as con:
 
 print('Species_profile table successfully created!')
 
->>>>>>>>> Temporary merge branch 2
 
 #---------------------
 # Protein_table generation
@@ -157,12 +125,6 @@ print('Species_profile table successfully created!')
 # extract proteins for each VOG
 protein_list_df = pd.read_csv(data_path + "vog.members.tsv.gz", compression='gzip', sep='\t').iloc[:, [0,4]]
 
-<<<<<<<<< Temporary merge branch 1
-# subsetting (only for testing purposes)
-protein_list_df = protein_list_df.loc[np.random.choice(protein_list_df.index, 100, replace=False)]
-
-=========
->>>>>>>>> Temporary merge branch 2
 protein_list_df = protein_list_df.rename(columns={"#GroupName": "VOG_ID", "ProteinIDs": "ProteinID"})
 
 
@@ -178,7 +140,6 @@ protein_list_df = (protein_list_df["ProteinID"].str.split(",").apply(lambda x: p
 protein_list_df["TaxonID"] = protein_list_df["ProteinID"].str.split(".").str[0]
 protein_list_df["ProteinID"] = protein_list_df["ProteinID"].str.split(".").str[1:3].str.join(".")
 
-<<<<<<<<< Temporary merge branch 1
 # assign each protein its corresponding species by using NCBI entrez API
 tax_ids = protein_list_df["TaxonID"]
 
