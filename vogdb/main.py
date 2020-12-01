@@ -1,8 +1,7 @@
 import sys
-
 from fastapi import Query, HTTPException
 from typing import Optional, Set, List
-from .functionality import VogService, get_vogs1, get_proteins
+from .functionality import VogService, get_vogs1, get_proteins, vog_get
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
@@ -33,6 +32,26 @@ def read_vog(ids: Optional[List[str]] = Query(None), db: Session = Depends(get_d
     """
     vogs = get_vogs1(db, ids)
 
+    if not vogs:
+        raise HTTPException(status_code=404, detail="No VOGs found")
+    return vogs
+
+
+# VOG FILTERING:
+@api.get("/vog_filter/", response_model=List[VOG_profile])
+def vog_filter(db: Session = Depends(get_db), names: Optional[Set[str]] = Query(None),
+               fct_description: Optional[Set[str]] = Query(None),
+               fct_category: Optional[Set[str]] = Query(None), gmin: Optional[int] = None, gmax: Optional[int] = None,
+               pmin: Optional[int] = None, pmax: Optional[int] = None, species: Optional[Set[str]] = Query(None),
+               protein_names: Optional[Set[str]] = Query(None), mingLCA: Optional[int] = None,
+               maxgLCA: Optional[int] = None,
+               mingGLCA: Optional[int] = None, maxgGLCA: Optional[int] = None,
+               ancestors: Optional[Set[str]] = Query(None),
+               h_stringency: Optional[bool] = None, m_stringency: Optional[bool] = None,
+               l_stringency: Optional[bool] = None,
+               virus_spec: Optional[bool] = None):
+    vogs = vog_get(db, names, fct_description, fct_category, gmin, gmax, pmin, pmax, species, protein_names, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
+                      ancestors, h_stringency, m_stringency, l_stringency, virus_spec)
     if not vogs:
         raise HTTPException(status_code=404, detail="No VOGs found")
     return vogs

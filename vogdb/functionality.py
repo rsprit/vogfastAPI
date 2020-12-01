@@ -5,7 +5,7 @@ import os
 from sqlalchemy.orm import Session
 from . import models, schemas
 from typing import Optional, Set, List
-
+from fastapi import Query, HTTPException
 
 """
 Here we define all the search methods that are used for extracting the data from the database
@@ -24,18 +24,123 @@ if those two criteria are not fulfilled, pydantic will throw an ValidationError
 
 """
 
+
 def get_vogs1(db: Session, ids: Optional[List[str]]):
     results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
     return results
+
+
+# def vog_get(db: Session, *filters):
+#     NAMES = 'id consensus_function function f bat'.split()
+#     gmin gmax
+#     print(NAMES)
+#     print(filters)
+#     res = db.query(models.VOG_profile)
+#     for name, filt in zip(NAMES, filters):
+#         if filt is not None:
+#             d = {filt: name}
+#             res = res.filter(**d)
+#     return res.all()
+
+def vog_get(db: Session, names: Optional[Set[str]],
+               fct_description: Optional[Set[str]],
+               fct_category: Optional[Set[str]], gmin: Optional[int], gmax: Optional[int],
+               pmin: Optional[int], pmax: Optional[int], species: Optional[Set[str]],
+               protein_names: Optional[Set[str]], mingLCA: Optional[int],
+               maxgLCA: Optional[int],
+               mingGLCA: Optional[int], maxgGLCA: Optional[int],
+               ancestors: Optional[Set[str]],
+               h_stringency: Optional[bool], m_stringency: Optional[bool],
+               l_stringency: Optional[bool],
+               virus_spec: Optional[bool]):
+
+    result = db.query(models.VOG_profile)
+
+    if names is not None:
+        result = result.filter(models.VOG_profile.id.in_(names))
+
+    if fct_description is not None:
+        for fct_d in fct_description:
+            d = "%" + fct_d + "%"
+            result = result.filter(models.VOG_profile.consensus_function.like(d))
+
+    if fct_category is not None:
+        for fct_c in fct_category:
+            d = "%" + fct_c + "%"
+            result = result.filter(models.VOG_profile.function.like(d))
+
+    if gmin is not None:
+        result = result.filter(models.VOG_profile.species_count > gmin - 1)
+
+    if gmax is not None:
+        result = result.filter(models.VOG_profile.species_count < gmax + 1)
+
+    if pmin is not None:
+        result = result.filter(models.VOG_profile.protein_count > pmin - 1)
+
+    if pmax is not None:
+        result = result.filter(models.VOG_profile.protein_count < pmax + 1)
+
+    if protein_names is not None:
+        for protein in protein_names:
+            p = "%" + protein + "%"
+            result = result.filter(models.VOG_profile.proteins.like(p))
+
+    if species is not None:
+        for spec in species:
+            result = result[result.species.apply(lambda x: spec in x)]
+
+    if mingLCA is not None:
+        result = result.filter(models.VOG_profile.genomes_total > mingLCA - 1)
+
+    if maxgLCA is not None:
+        result = result.filter(models.VOG_profile.genomes_total < maxgLCA + 1)
+
+    if mingGLCA is not None:
+        result = result.filter(models.VOG_profile.genomes_in_group > mingGLCA - 1)
+
+    if maxgGLCA is not None:
+        result = result.filter(models.VOG_profile.genomes_in_group < maxgGLCA + 1)
+
+    if ancestors is not None:
+        for anc in ancestors:
+            a = "%" + anc + "%"
+            result = result.filter(models.VOG_profile.ancestors.like(a))
+
+    if h_stringency is not None:
+        if h_stringency:
+            result = result.filter(models.VOG_profile.stringency_high)
+        else:
+            result = result.filter(models.VOG_profile.stringency_high==False)
+
+    if m_stringency is not None:
+        if m_stringency:
+            result = result.filter(models.VOG_profile.stringency_medium)
+        else:
+            result = result.filter(models.VOG_profile.stringency_medium==False)
+
+    if l_stringency is not None:
+        if l_stringency:
+            result = result.filter(models.VOG_profile.stringency_low)
+        else:
+            result = result.filter(models.VOG_profile.stringency_low==False)
+
+    if virus_spec is not None:
+        if virus_spec:
+            result = result.filter(models.VOG_profile.stringency_low or models.VOG_profile.stringency_medium or models.VOG_profile.stringency_high)
+        else:
+            result = result.filter(
+                models.VOG_profile.stringency_low==False and models.VOG_profile.stringency_medium==False and models.VOG_profile.stringency_high==False)
+    return result.all()
 
 
 def get_proteins(db: Session, species: str):
     search = "%" + species + "%"
 
     results = db.query().with_entities(models.Protein_profile.protein_id,
-                                     models.Protein_profile.vog_id,
-                                     models.Protein_profile.taxon_id,
-                                     models.Species_profile.species_name).join(models.Species_profile).\
+                                       models.Protein_profile.vog_id,
+                                       models.Protein_profile.taxon_id,
+                                       models.Species_profile.species_name).join(models.Species_profile). \
         filter(models.Species_profile.species_name.like(search)).all()
 
     return results
