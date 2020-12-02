@@ -145,7 +145,6 @@ with engine.connect() as con:
     con.execute('ALTER TABLE Protein_profile  MODIFY  ProteinID char(30) NOT NULL; ')
     con.execute('ALTER TABLE Protein_profile  MODIFY  TaxonID int(30) NOT NULL; ')
     con.execute('ALTER TABLE Protein_profile  MODIFY  VOG_ID char(30) NOT NULL; ')
-    con.execute('CREATE INDEX Protein_profile_by_species ON Protein_profile (Species_name);')
     con.execute('CREATE INDEX VOG_profile_index_by_protein ON Protein_profile (ProteinID);')
     # add foreign key
     con.execute('ALTER TABLE Protein_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
