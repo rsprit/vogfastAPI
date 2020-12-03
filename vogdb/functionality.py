@@ -3,6 +3,7 @@ from .vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from . import models, schemas
 from typing import Optional, Set, List
 from fastapi import Query, HTTPException
@@ -25,114 +26,107 @@ if those two criteria are not fulfilled, pydantic will throw an ValidationError
 """
 
 
-def get_vogs1(db: Session, ids: Optional[List[str]]):
+def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
     results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
     return results
 
 
-# def vog_get(db: Session, *filters):
-#     NAMES = 'id consensus_function function f bat'.split()
-#     gmin gmax
-#     print(NAMES)
-#     print(filters)
-#     res = db.query(models.VOG_profile)
-#     for name, filt in zip(NAMES, filters):
-#         if filt is not None:
-#             d = {filt: name}
-#             res = res.filter(**d)
-#     return res.all()
+def vog_get(db: Session,
+            response_body,
+            id: Optional[Set[str]],
+            pmin: Optional[int],
+            pmax: Optional[int],
+            smax: Optional[int],
+            smin: Optional[int],
+            function: Optional[Set[str]],
+            consensus_function: Optional[Set[str]],
+            mingLCA: Optional[int],
+            maxgLCA: Optional[int],
+            mingGLCA: Optional[int],
+            maxgGLCA: Optional[int],
+            ancestors: Optional[Set[str]],
+            h_stringency: Optional[bool],
+            m_stringency: Optional[bool],
+            l_stringency: Optional[bool],
+            proteins: Optional[Set[str]],
+            species: Optional[Set[str]]
+            ):
+    """
+    This function searches the VOG based on the given query parameters
+    """
 
-def vog_get(db: Session, names: Optional[Set[str]],
-               fct_description: Optional[Set[str]],
-               fct_category: Optional[Set[str]], gmin: Optional[int], gmax: Optional[int],
-               pmin: Optional[int], pmax: Optional[int], species: Optional[Set[str]],
-               protein_names: Optional[Set[str]], mingLCA: Optional[int],
-               maxgLCA: Optional[int],
-               mingGLCA: Optional[int], maxgGLCA: Optional[int],
-               ancestors: Optional[Set[str]],
-               h_stringency: Optional[bool], m_stringency: Optional[bool],
-               l_stringency: Optional[bool],
-               virus_spec: Optional[bool]):
+    result = db.query(response_body)
+    arguments = locals()
+    filters = []
 
-    result = db.query(models.VOG_profile)
+    for key, value in arguments.items():  # type: str, any
+        if value:
+            if key == "id":
+                filters.append(getattr(models.VOG_profile, key).in_(value))
 
-    if names is not None:
-        result = result.filter(models.VOG_profile.id.in_(names))
+            if key == "consensus_function":
+                for fct_d in value:
+                    d = "%" + fct_d + "%"
+                    filters.append(getattr(models.VOG_profile, key).like(d))
 
-    if fct_description is not None:
-        for fct_d in fct_description:
-            d = "%" + fct_d + "%"
-            result = result.filter(models.VOG_profile.consensus_function.like(d))
+            if key == "function":
+                for fct_d in value:
+                    d = "%" + fct_d + "%"
+                    filters.append(getattr(models.VOG_profile, key).like(d))
 
-    if fct_category is not None:
-        for fct_c in fct_category:
-            d = "%" + fct_c + "%"
-            result = result.filter(models.VOG_profile.function.like(d))
+            if key == "smax":
+                filters.append(getattr(models.VOG_profile, "species_count") < value - 1)
 
-    if gmin is not None:
-        result = result.filter(models.VOG_profile.species_count > gmin - 1)
+            if key == "smin":
+                filters.append(getattr(models.VOG_profile, "species_count") > value + 1)
 
-    if gmax is not None:
-        result = result.filter(models.VOG_profile.species_count < gmax + 1)
+            if key == "pmax":
+                filters.append(getattr(models.VOG_profile, "protein_count") < value - 1)
 
-    if pmin is not None:
-        result = result.filter(models.VOG_profile.protein_count > pmin - 1)
+            if key == "pmin":
+                filters.append(getattr(models.VOG_profile, "protein_count") > value + 1)
 
-    if pmax is not None:
-        result = result.filter(models.VOG_profile.protein_count < pmax + 1)
+            if key == "proteins":
+                for protein in value:
+                    p = "%" + protein + "%"
+                    filters.append(getattr(models.VOG_profile, key).like(p))
 
-    if protein_names is not None:
-        for protein in protein_names:
-            p = "%" + protein + "%"
-            result = result.filter(models.VOG_profile.proteins.like(p))
+            if key == "species":
+                vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
+                    filter(models.Species_profile.species_name.in_(species)).group_by(models.Protein_profile.vog_id). \
+                    having(func.count(models.Species_profile.species_name) == len(species)).all()
+                vog_ids = {id[0] for id in vog_ids}  # convert to set
+                filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 
-    if species is not None:
-        for spec in species:
-            s = "%" + spec + '.' + "%"
-            result = result.filter(models.VOG_profile.proteins.like(s))
+            if key == "maxgLCA":
+                filters.append(getattr(models.VOG_profile, "genomes_total") < value - 1)
 
-    if mingLCA is not None:
-        result = result.filter(models.VOG_profile.genomes_total > mingLCA - 1)
+            if key == "mingLCA":
+                filters.append(getattr(models.VOG_profile, "genomes_total") > value + 1)
+                
+            if key == "maxgGLCA":
+                filters.append(getattr(models.VOG_profile, "genomes_in_group") < value - 1)
 
-    if maxgLCA is not None:
-        result = result.filter(models.VOG_profile.genomes_total < maxgLCA + 1)
+            if key == "mingGLCA":
+                filters.append(getattr(models.VOG_profile, "genomes_in_group") > value + 1)
 
-    if mingGLCA is not None:
-        result = result.filter(models.VOG_profile.genomes_in_group > mingGLCA - 1)
+            if key == "ancestors":
+                for anc in value:
+                    a = "%" + anc + "%"
+                    filters.append(getattr(models.VOG_profile, key).like(a))
 
-    if maxgGLCA is not None:
-        result = result.filter(models.VOG_profile.genomes_in_group < maxgGLCA + 1)
+            if key == "h_stringency":
+                filters.append(getattr(models.VOG_profile, key).is_(value))
 
-    if ancestors is not None:
-        for anc in ancestors:
-            a = "%" + anc + "%"
-            result = result.filter(models.VOG_profile.ancestors.like(a))
+            if key == "m_stringency":
+                filters.append(getattr(models.VOG_profile, key).is_(value))
 
-    if h_stringency is not None:
-        if h_stringency:
-            result = result.filter(models.VOG_profile.stringency_high)
-        else:
-            result = result.filter(models.VOG_profile.stringency_high==False)
+            if key == "l_stringency":
+                filters.append(getattr(models.VOG_profile, key).is_(value))
 
-    if m_stringency is not None:
-        if m_stringency:
-            result = result.filter(models.VOG_profile.stringency_medium)
-        else:
-            result = result.filter(models.VOG_profile.stringency_medium==False)
-
-    if l_stringency is not None:
-        if l_stringency:
-            result = result.filter(models.VOG_profile.stringency_low)
-        else:
-            result = result.filter(models.VOG_profile.stringency_low==False)
-
-    if virus_spec is not None:
-        if virus_spec:
-            result = result.filter(models.VOG_profile.stringency_low or models.VOG_profile.stringency_medium or models.VOG_profile.stringency_high)
-        else:
-            result = result.filter(
-                models.VOG_profile.stringency_low==False and models.VOG_profile.stringency_medium==False and models.VOG_profile.stringency_high==False)
+    result = result.filter(*filters)
     return result.all()
+
 
 
 def get_proteins(db: Session, species: str):
@@ -268,10 +262,10 @@ class GroupService:
                 result = result[result.species.apply(lambda x: spec in x)]
 
         if mingLCA is not None:
-            result = result[result.genomes_total > mingLCA - 1]
+            result = result[result.genomes_total_in_LCA > mingLCA - 1]
 
         if maxgLCA is not None:
-            result = result[result.genomes_total < maxgLCA + 1]
+            result = result[result.genomes_total_in_LCA < maxgLCA + 1]
 
         if mingGLCA is not None:
             result = result[result.ggenomes_in_group > mingGLCA - 1]
@@ -284,25 +278,25 @@ class GroupService:
                 result = result[result.ancestors.apply(lambda x: anc.lower() in x.lower())]
 
         if h_stringency is not None:
-            result = result[result.stringency_high == bool(h_stringency)]
+            result = result[result.h_stringency == bool(h_stringency)]
 
         if m_stringency is not None:
-            result = result[result.stringency_medium == bool(m_stringency)]
+            result = result[result.m_stringency == bool(m_stringency)]
 
         if l_stringency is not None:
-            result = result[result.stringency_low == bool(l_stringency)]
+            result = result[result.l_stringency == bool(l_stringency)]
 
         if virus_spec is not None:
             if virus_spec:
                 result = result[
-                    ((result.stringency_high == True) |
-                     (result.stringency_medium == True) |
-                     (result.stringency_low == True))]
+                    ((result.h_stringency == True) |
+                     (result.m_stringency == True) |
+                     (result.l_stringency == True))]
             else:
                 result = result[
-                    ((result.stringency_high == False) &
-                     (result.stringency_medium == False) &
-                     (result.stringency_low == False))]
+                    ((result.h_stringency == False) &
+                     (result.m_stringency == False) &
+                     (result.l_stringency == False))]
 
         # return the result as generator object (more efficient than long list)
         for id, row in result.iterrows():
