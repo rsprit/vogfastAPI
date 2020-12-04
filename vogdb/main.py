@@ -36,7 +36,7 @@ def search_vog(db: Session = Depends(get_db),
                pmax: Optional[int] = None,
                smax: Optional[int] = None,
                smin: Optional[int] = None,
-               function: Optional[Set[str]] = Query(None),
+               functional_category: Optional[Set[str]] = Query(None),
                consensus_function: Optional[Set[str]] = Query(None),
                mingLCA: Optional[int] = None,
                maxgLCA: Optional[int] = None,
@@ -56,7 +56,7 @@ def search_vog(db: Session = Depends(get_db),
     :return:
     """
 
-    vogs = vog_get(db, models.VOG_profile.id , id, pmin, pmax, smax, smin, function, consensus_function, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
+    vogs = vog_get(db, models.VOG_profile.id , id, pmin, pmax, smax, smin, functional_category, consensus_function, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
                    ancestors, h_stringency, m_stringency, l_stringency, virus_specific, proteins, species)
 
     if not vogs:
