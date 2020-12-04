@@ -48,6 +48,7 @@ def vog_get(db: Session,
             h_stringency: Optional[bool],
             m_stringency: Optional[bool],
             l_stringency: Optional[bool],
+            virus_specific: Optional[bool],
             proteins: Optional[Set[str]],
             species: Optional[Set[str]]
             ):
@@ -124,9 +125,18 @@ def vog_get(db: Session,
             if key == "l_stringency":
                 filters.append(getattr(models.VOG_profile, key).is_(value))
 
-    result = result.filter(*filters)
-    return result.all()
+            # if key == "virus_specific":
 
+    result = result.filter(*filters)
+
+    if virus_specific:
+        result = result.filter(
+            models.VOG_profile.l_stringency or models.VOG_profile.m_stringency or models.VOG_profile.h_stringency)
+    else:
+        result = result.filter(
+            models.VOG_profile.l_stringency == False and models.VOG_profile.m_stringency == False and models.VOG_profile.h_stringency == False)
+
+    return result.all()
 
 
 def get_proteins(db: Session, species: str):
