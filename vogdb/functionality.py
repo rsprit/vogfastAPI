@@ -125,8 +125,6 @@ def vog_get(db: Session,
             if key == "l_stringency":
                 filters.append(getattr(models.VOG_profile, key).is_(value))
 
-            # if key == "virus_specific":
-
     result = result.filter(*filters)
 
     if virus_specific:
