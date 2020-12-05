@@ -1,7 +1,7 @@
 import sys
 from fastapi import Query, Path, HTTPException
 from typing import Optional, Set, List
-from .functionality import VogService, find_vogs_by_uid, get_proteins, vog_get
+from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
@@ -56,7 +56,7 @@ def search_vog(db: Session = Depends(get_db),
     :return:
     """
 
-    vogs = vog_get(db, models.VOG_profile.id , id, pmin, pmax, smax, smin, functional_category, consensus_function, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
+    vogs = get_vogs(db, models.VOG_profile.id , id, pmin, pmax, smax, smin, functional_category, consensus_function, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
                    ancestors, h_stringency, m_stringency, l_stringency, virus_specific, proteins, species)
 
     if not vogs:

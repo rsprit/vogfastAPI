@@ -31,7 +31,7 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
     return results
 
 
-def vog_get(db: Session,
+def get_vogs(db: Session,
             response_body,
             id: Optional[Set[str]],
             pmin: Optional[int],
