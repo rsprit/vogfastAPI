@@ -1,7 +1,7 @@
 import sys
 from fastapi import Query, Path, HTTPException
 from typing import Optional, Set, List
-from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species
+from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species, find_species_by_id
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
@@ -46,6 +46,24 @@ def search_species(db: Session = Depends(get_db),
     if not species:
         raise HTTPException(status_code=404, detail="No Species match the search criteria.")
     return species
+
+
+@api.get("/vsummary/species/",
+         response_model=List[Species_profile])
+async def get_summary(taxon_id: List[int] = Query(None), db: Session = Depends(get_db)):
+    """
+    This function returns Species summaries for a list of taxon ids
+    :param taxon_id: Taxon ID
+    :param db: database session dependency
+    :return: Species summary
+    """
+
+    species_summary = find_species_by_id(db, taxon_id)
+
+    if not species_summary:
+        raise HTTPException(status_code=404, detail="No matching Species found")
+
+    return species_summary
 
 
 @api.get("/vsearch/vog/",
