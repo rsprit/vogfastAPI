@@ -1,13 +1,13 @@
 import sys
 from fastapi import Query, Path, HTTPException
 from typing import Optional, Set, List
-from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs
+from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
 
 
-from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID
+from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile
 from . import models
 
 api = FastAPI()
@@ -26,6 +26,26 @@ def get_db():
 @api.get("/")
 async def root():
     return {"message": "Welcome to VOGDB-API"}
+
+
+@api.get("/vsearch/species/",
+         response_model=List[Species_ID])
+def search_species(db: Session = Depends(get_db),
+                   ids: Optional[Set[int]] = Query(None),
+                   name: Optional[str] = None,
+                   phage: Optional[bool] = None,
+                   source: Optional[str] = None,
+                   version: Optional[int] = None):
+    """
+    This functions searches a database and returns a list of species IDs for records in that database
+    which meet the search criteria.
+    :return:
+    """
+    species = get_species(db, models.Species_profile.taxon_id, ids, name, phage, source, version)
+
+    if not species:
+        raise HTTPException(status_code=404, detail="No Species match the search criteria.")
+    return species
 
 
 @api.get("/vsearch/vog/",
@@ -95,11 +115,7 @@ async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db))
     return 0
 
 
-#ToDo: implement the same idea as above, for species and proteins...
-@api.get("/vsearch/species/")
-def search_species():
-    return "No yet implemented"
-
+#ToDo: implement protein search..
 
 @api.get("/vsearch/protein/")
 def search_protein():

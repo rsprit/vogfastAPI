@@ -26,6 +26,43 @@ if those two criteria are not fulfilled, pydantic will throw an ValidationError
 """
 
 
+def get_species(db: Session,
+                response_body,
+                taxon_id: Optional[Set[int]],
+                species_name: Optional[str],
+                phage: Optional[bool],
+                source: Optional[str],
+                version: Optional[int]):
+    """
+    This function searches the Species based on the given query parameters
+    """
+    result = db.query(response_body)
+    arguments = locals()
+    filters = []
+
+    for key, value in arguments.items():  # type: str, any
+        if value:
+            if key == "taxon_id":
+                filters.append(getattr(models.Species_profile, key).in_(value))
+
+            if key == "species_name":
+                value = "%" + value + "%"
+                filters.append(getattr(models.Species_profile, key).like(value))
+
+            if key == "phage":
+                filters.append(getattr(models.Species_profile, key).is_(value))
+
+            if key == "source":
+                value = "%" + value + "%"
+                filters.append(getattr(models.Species_profile, key).in_(value))
+
+            if key == "version":
+                filters.append(getattr(models.Species_profile, key) == value)
+
+    result = result.filter(*filters)
+    return result.all()
+
+
 def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
     results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
     return results
