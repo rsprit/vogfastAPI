@@ -18,6 +18,11 @@ so the pydantic response model (Protein_profile) needs to have the attribute nam
 if those two criteria are not fulfilled, pydantic will throw an ValidationError
 """
 
+class VOG_UID(BaseModel):
+    id: str
+
+    class Config:
+        orm_mode = True
 
 class VOG_profile(BaseModel):
     id: str
@@ -26,11 +31,11 @@ class VOG_profile(BaseModel):
     function: str
     consensus_function: str
     genomes_in_group: int
-    genomes_total: int
-    ancestors: str
-    stringency_high: bool
-    stringency_medium: bool
-    stringency_low: bool
+    genomes_total_in_LCA: int
+    ancestors: str = None
+    h_stringency: bool
+    m_stringency: bool
+    l_stringency: bool
     proteins: str
 
     class Config:
