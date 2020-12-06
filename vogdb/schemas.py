@@ -70,7 +70,7 @@ class Species_profile(BaseModel):
     source: str
     version: int
     #add protein names?
-    #proteins: List[Protein_profile] = []
+    #proteins: List[Protein_profile.protein_id] = []
 
     class Config:
         orm_mode = True
