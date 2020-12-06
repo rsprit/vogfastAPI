@@ -119,6 +119,7 @@ async def get_summary(uid: List[str] = Query(None), db: Session = Depends(get_db
 
     return vog_summary
 
+
 @api.get("/vfetch/vog/")
 async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
     """
