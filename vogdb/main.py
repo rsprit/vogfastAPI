@@ -5,8 +5,6 @@ from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs,
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
-
-
 from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile
 from . import models
 
@@ -50,7 +48,9 @@ def search_species(db: Session = Depends(get_db),
 
 @api.get("/vsummary/species/",
          response_model=List[Species_profile])
-async def get_summary(taxon_id: List[int] = Query(None), db: Session = Depends(get_db)):
+async def get_summary(taxon_id: Optional[List[int]] = Query(None), db: Session = Depends(get_db)):
+    print("Taxon ids")
+    print(taxon_id)
     """
     This function returns Species summaries for a list of taxon ids
     :param taxon_id: Taxon ID

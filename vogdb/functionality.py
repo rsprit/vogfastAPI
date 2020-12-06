@@ -26,12 +26,15 @@ if those two criteria are not fulfilled, pydantic will throw an ValidationError
 """
 
 
-def find_species_by_id(db: Session, taxon_id: Optional[List[int]]):
-    if taxon_id:
-        results = db.query(models.Species_profile).filter(models.Species_profile.taxon_id.in_(taxon_id).all())
-        return results
-    else:
-        print("No ids given")
+def find_species_by_id(db: Session, ids: Optional[List[int]]):
+    print("HERE ARE THE IDS")
+    print(ids)
+    return db.query(models.Species_profile).filter(models.Species_profile.species_name.like("%corona%")).all()
+    # if ids:
+    #     results = db.query(models.Species_profile).filter(models.Species_profile.taxon_id.in_(ids)).all()
+    #     return results
+    # else:
+    #     print("No ids given")
 
 
 def get_species(db: Session,
