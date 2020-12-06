@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, Set, List
 
+
 """
  Here we define the "schemas" i.e. specify what the output response should look like (which columns to select)
 """
@@ -51,22 +52,25 @@ class VOG_profile(BaseModel):
         orm_mode = True
 
 
-class Species_profile(BaseModel):
-    taxon_id = int
-    species_name = str
-    phage = str
-    source = str
-    version = int
-
-    class Config:
-        orm_mode = True
-
-
 class Protein_profile(BaseModel):
     protein_id: str
     vog_id: str
     taxon_id: int
     species_name: str
+
+    class Config:
+        orm_mode = True
+
+
+
+class Species_profile(BaseModel):
+    species_name: str
+    taxon_id : int
+    phage: str
+    source: str
+    version: int
+    #add protein names?
+    proteins: List[Protein_profile] = []
 
     class Config:
         orm_mode = True

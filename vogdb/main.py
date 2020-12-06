@@ -49,8 +49,6 @@ def search_species(db: Session = Depends(get_db),
 @api.get("/vsummary/species/",
          response_model=List[Species_profile])
 async def get_summary(taxon_id: Optional[List[int]] = Query(None), db: Session = Depends(get_db)):
-    print("Taxon ids")
-    print(taxon_id)
     """
     This function returns Species summaries for a list of taxon ids
     :param taxon_id: Taxon ID
