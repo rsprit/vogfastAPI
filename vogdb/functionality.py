@@ -63,7 +63,7 @@ def get_species(db: Session,
 
             if key == "source":
                 value = "%" + value + "%"
-                filters.append(getattr(models.Species_profile, key).in_(value))
+                filters.append(getattr(models.Species_profile, key).like(value))
 
             if key == "version":
                 filters.append(getattr(models.Species_profile, key) == value)
