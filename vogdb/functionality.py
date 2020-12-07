@@ -95,7 +95,7 @@ def get_vogs(db: Session,
              m_stringency: Optional[bool],
              l_stringency: Optional[bool],
              virus_specific: Optional[bool],
-             phages_only: Optional[bool],
+             #phages_only: Optional[bool],
              proteins: Optional[Set[str]],
              species: Optional[Set[str]]
              ):
