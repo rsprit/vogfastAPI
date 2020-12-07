@@ -23,6 +23,7 @@ class VOG_profile(Base):
     h_stringency = Column('StringencyHigh', Boolean)
     m_stringency = Column('StringencyMedium', Boolean)
     l_stringency = Column('StringencyLow', Boolean)
+    virus_specific = Column('VirusSpecific', Boolean)
     proteins = Column('Proteins', String)
 
 
@@ -45,4 +46,5 @@ class Protein_profile(Base):
     protein_id = Column('ProteinID', String, primary_key=True)
     vog_id = Column('VOG_ID', String)
     taxon_id = Column('TaxonID', Integer,  ForeignKey("Species_profile.TaxonID"), index=True)
+    #aa_seq = Column('AASeq', String)
     species_names = relationship("Species_profile", back_populates="protein_names")

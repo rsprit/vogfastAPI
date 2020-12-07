@@ -57,10 +57,10 @@ class Protein_profile(BaseModel):
     vog_id: str
     taxon_id: int
     species_name: str
+    #aa_seq: str
 
     class Config:
         orm_mode = True
-
 
 
 class Species_profile(BaseModel):

@@ -1,7 +1,9 @@
+import gzip
+
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
-from Bio import Entrez
+from Bio import Entrez, SeqIO
 import numpy as np
 import os
 from sqlalchemy import VARCHAR
@@ -63,6 +65,10 @@ virusonly = pd.read_csv(os.path.join(data_path, 'vog.virusonly.tsv.gz'), compres
                         index_col='VOG_ID')
 
 dfr = members.join(annotations).join(lca).join(virusonly)
+dfr['VirusSpecific'] = np.where((dfr['StringencyHigh']
+                                | dfr['StringencyMedium']
+                                | dfr['StringencyLow'])
+                                , True, False)
 
 # create a table in the database
 dfr.to_sql(name='VOG_profile', con=engine, if_exists='replace', index=True,
@@ -82,6 +88,7 @@ with engine.connect() as con:
     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyHigh bool NOT NULL; ')
     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyMedium bool NOT NULL; ')
     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyLow bool NOT NULL; ')
+    con.execute('ALTER TABLE VOG_profile  MODIFY  VirusSpecific bool NOT NULL; ')
     con.execute('ALTER TABLE VOG_profile  MODIFY  Proteins LONGTEXT; ')
     con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);')  # create index
     # con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
@@ -121,10 +128,21 @@ print('Species_profile table successfully created!')
 #----------------------
 
 # extract proteins for each VOG
-protein_list_df = pd.read_csv(data_path + "vog.members.tsv.gz", compression='gzip', sep='\t').iloc[:, [0,4]]
+protein_list_df = pd.read_csv(data_path + "vog.members.tsv.gz", compression='gzip', sep='\t').iloc[:, [0, 4]]
 
 protein_list_df = protein_list_df.rename(columns={"#GroupName": "VOG_ID", "ProteinIDs": "ProteinID"})
 
+# #add AAseq to table...
+# filename = os.path.join(data_path, "vog.proteins.all.fa.gz")
+# f = os.path.join(data_path, "vog.proteins.all.fa")
+# #filename = os.path.join(path, 'faa', '{}.faa'.format(id))
+# aa_seqs = SeqIO.index(f, 'fasta')
+# print(aa_seqs)
+# print(aa_seqs['1000373.YP_005097972.1'])
+# protein_list_df['AAseq'] = protein_list_df['ProteinID'].map(aa_seqs)
+# # aa = pd.DataFrame.from_dict(aa_seqs)
+# # protein_list_df = protein_list_df.append(aa)
+# # protein_list_df[]
 
 # assign each protein a vog
 protein_list_df = (protein_list_df["ProteinID"].str.split(",").apply(lambda x: pd.Series(x))
@@ -133,6 +151,7 @@ protein_list_df = (protein_list_df["ProteinID"].str.split(",").apply(lambda x: p
                    .to_frame("ProteinID")
                    .join(protein_list_df[["VOG_ID"]], how="left")
                    )
+protein_list_df.set_index("ProteinID")
 
 # separate protein and taxonID into separate columns
 protein_list_df["TaxonID"] = protein_list_df["ProteinID"].str.split(".").str[0]
@@ -145,6 +164,7 @@ with engine.connect() as con:
     con.execute('ALTER TABLE Protein_profile  MODIFY  ProteinID char(30) NOT NULL; ')
     con.execute('ALTER TABLE Protein_profile  MODIFY  TaxonID int(30) NOT NULL; ')
     con.execute('ALTER TABLE Protein_profile  MODIFY  VOG_ID char(30) NOT NULL; ')
+    #con.execute('ALTER TABLE Protein_profile  MODIFY  AASeq LONGTEXT; ')
     con.execute('CREATE INDEX VOG_profile_index_by_protein ON Protein_profile (ProteinID);')
     # add foreign key
     con.execute('ALTER TABLE Protein_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')

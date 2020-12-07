@@ -29,7 +29,7 @@ if those two criteria are not fulfilled, pydantic will throw an ValidationError
 def find_species_by_id(db: Session, ids: Optional[List[int]]):
     if ids:
         results = db.query(models.Species_profile).filter(models.Species_profile.taxon_id.in_(ids)).all()
-        #print(results) ...<vogdb.models.Species_profile object at 0x7f9adc985310>, <vogdb.models.Species_profile object at 0x7f9adc985880>]
+        # print(results) ...<vogdb.models.Species_profile object at 0x7f9adc985310>, <vogdb.models.Species_profile object at 0x7f9adc985880>]
         return results
     else:
         print("No ids given")
@@ -78,26 +78,27 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
 
 
 def get_vogs(db: Session,
-            response_body,
-            id: Optional[Set[str]],
-            pmin: Optional[int],
-            pmax: Optional[int],
-            smax: Optional[int],
-            smin: Optional[int],
-            function: Optional[Set[str]],
-            consensus_function: Optional[Set[str]],
-            mingLCA: Optional[int],
-            maxgLCA: Optional[int],
-            mingGLCA: Optional[int],
-            maxgGLCA: Optional[int],
-            ancestors: Optional[Set[str]],
-            h_stringency: Optional[bool],
-            m_stringency: Optional[bool],
-            l_stringency: Optional[bool],
-            virus_specific: Optional[bool],
-            proteins: Optional[Set[str]],
-            species: Optional[Set[str]]
-            ):
+             response_body,
+             id: Optional[Set[str]],
+             pmin: Optional[int],
+             pmax: Optional[int],
+             smax: Optional[int],
+             smin: Optional[int],
+             function: Optional[Set[str]],
+             consensus_function: Optional[Set[str]],
+             mingLCA: Optional[int],
+             maxgLCA: Optional[int],
+             mingGLCA: Optional[int],
+             maxgGLCA: Optional[int],
+             ancestors: Optional[Set[str]],
+             h_stringency: Optional[bool],
+             m_stringency: Optional[bool],
+             l_stringency: Optional[bool],
+             virus_specific: Optional[bool],
+             phages_only: Optional[bool],
+             proteins: Optional[Set[str]],
+             species: Optional[Set[str]]
+             ):
     """
     This function searches the VOG based on the given query parameters
     """
@@ -150,7 +151,7 @@ def get_vogs(db: Session,
 
             if key == "mingLCA":
                 filters.append(getattr(models.VOG_profile, "genomes_total") > value + 1)
-                
+
             if key == "maxgGLCA":
                 filters.append(getattr(models.VOG_profile, "genomes_in_group") < value - 1)
 
@@ -171,15 +172,15 @@ def get_vogs(db: Session,
             if key == "l_stringency":
                 filters.append(getattr(models.VOG_profile, key).is_(value))
 
+            if key == "virus_specific":
+                filters.append(getattr(models.VOG_profile, key).is_(value))
+
+            # if key == "phages_only":
+            #     # ToDo: implement.
+            #     ids = models.VOG_profile.proteins.split(',').split('.')[0]
+            #     print(ids)
+
     result = result.filter(*filters)
-
-    if virus_specific:
-        result = result.filter(
-            models.VOG_profile.l_stringency or models.VOG_profile.m_stringency or models.VOG_profile.h_stringency)
-    else:
-        result = result.filter(
-            models.VOG_profile.l_stringency == False and models.VOG_profile.m_stringency == False and models.VOG_profile.h_stringency == False)
-
     return result.all()
 
 
