@@ -125,7 +125,7 @@ async def get_summary(uid: List[str] = Query(None), db: Session = Depends(get_db
 
 
 @api.get("/vfetch/vog/hmm")
-async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
+async def fetch_vog(uid: List[str] = Query(None)):
     """
     This function returns vog data for a list of unique identifiers (UIDs)
     :param uid: VOGID
@@ -133,6 +133,17 @@ async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db))
     :return: vog data (HMM profile)
     """
     vog_hmm = find_vogs_hmm_by_uid(uid)
+    return vog_hmm
+
+@api.get("/vfetch/vog/mse")
+async def fetch_vog(uid: List[str] = Query(None)):
+    """
+    This function returns vog data for a list of unique identifiers (UIDs)
+    :param uid: VOGID
+    :param db: database session dependency
+    :return: vog data (HMM profile)
+    """
+    vog_hmm = find_vogs_msa_by_uid(uid)
     return vog_hmm
 
 #ToDo: implement protein search..

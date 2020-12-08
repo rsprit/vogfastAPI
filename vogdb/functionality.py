@@ -92,6 +92,22 @@ def find_vogs_hmm_by_uid(uid):
             hmm_response.append(file)
     return hmm_response
 
+def find_vogs_msa_by_uid(uid):
+    file_name = "./data/vog.raw_algs.tar.gz"
+    tar = tarfile.open(file_name, "r:gz")
+    vog_msa_list = []
+    if uid:
+        for vog_id in uid:
+            vog_msa_list.append(vog_id.upper() + ".msa")
+    msa_response = []
+    for vog_msa in vog_msa_list:
+        member = tar.getmember(vog_msa)
+        f = tar.extractfile(member)
+        if f is not None:
+            file = f.read()
+            msa_response.append(file)
+    return msa_response
+
 
 def get_vogs(db: Session,
              response_body,
