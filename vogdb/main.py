@@ -83,7 +83,7 @@ def search_vog(db: Session = Depends(get_db),
                m_stringency: Optional[bool] = None,
                l_stringency: Optional[bool] = None,
                virus_specific: Optional[bool] = None,
-               #phages_only: Optional[bool] = None,
+               phages_nonphages: Optional[str] = None,
                proteins: Optional[Set[str]] = Query(None),
                species: Optional[Set[str]] = Query(None),
                ):
@@ -94,7 +94,7 @@ def search_vog(db: Session = Depends(get_db),
     """
 
     vogs = get_vogs(db, models.VOG_profile.id , id, pmin, pmax, smax, smin, functional_category, consensus_function, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
-                   ancestors, h_stringency, m_stringency, l_stringency, virus_specific, proteins, species)
+                   ancestors, h_stringency, m_stringency, l_stringency, virus_specific, phages_nonphages, proteins, species)
 
     if not vogs:
         raise HTTPException(status_code=404, detail="No VOGs match the search criteria.")

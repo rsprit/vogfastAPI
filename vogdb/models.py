@@ -24,6 +24,9 @@ class VOG_profile(Base):
     m_stringency = Column('StringencyMedium', Boolean)
     l_stringency = Column('StringencyLow', Boolean)
     virus_specific = Column('VirusSpecific', Boolean)
+    num_phages = Column('NumPhages', Integer)
+    num_nonphages = Column('NumNonPhages', Integer)
+    phages_nonphages = Column('PhageNonphage', String)
     proteins = Column('Proteins', String)
 
 

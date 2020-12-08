@@ -95,6 +95,7 @@ def get_vogs(db: Session,
              m_stringency: Optional[bool],
              l_stringency: Optional[bool],
              virus_specific: Optional[bool],
+             phages_nonphages: Optional[str],
              #phages_only: Optional[bool],
              proteins: Optional[Set[str]],
              species: Optional[Set[str]]
@@ -175,10 +176,9 @@ def get_vogs(db: Session,
             if key == "virus_specific":
                 filters.append(getattr(models.VOG_profile, key).is_(value))
 
-            # if key == "phages_only":
-            #     # ToDo: implement.
-            #     ids = models.VOG_profile.proteins.split(',').split('.')[0]
-            #     print(ids)
+            if key == "phages_nonphages":
+                val = "%" + value + "%"
+                filters.append(getattr(models.VOG_profile, key).like(val))
 
     result = result.filter(*filters)
     return result.all()
