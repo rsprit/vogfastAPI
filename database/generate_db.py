@@ -1,5 +1,5 @@
-import gzip
 
+import tarfile
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
@@ -34,67 +34,67 @@ else:
     engine.connect()
 
 
-# ---------------------
-# VOG_table generation
-# ----------------------
-members = pd.read_csv(os.path.join(data_path, 'vog.members.tsv.gz'), compression='gzip',
-                      sep='\t',
-                      header=0,
-                      names=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Proteins'],
-                      usecols=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Proteins'],
-                      index_col='VOG_ID')
-
-annotations = pd.read_csv(os.path.join(data_path, 'vog.annotations.tsv.gz'), compression='gzip',
-                          sep='\t',
-                          header=0,
-                          names=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Consensus_func_description'],
-                          usecols=['VOG_ID', 'Consensus_func_description'],
-                          index_col='VOG_ID')
-
-lca = pd.read_csv(os.path.join(data_path, 'vog.lca.tsv.gz'), compression='gzip',
-                  sep='\t',
-                  header=0,
-                  names=['VOG_ID', 'GenomesInGroup', 'GenomesTotal', 'Ancestors'],
-                  index_col='VOG_ID')
-
-virusonly = pd.read_csv(os.path.join(data_path, 'vog.virusonly.tsv.gz'), compression='gzip',
-                        sep='\t',
-                        header=0,
-                        names=['VOG_ID', 'StringencyHigh', 'StringencyMedium', 'StringencyLow'],
-                        dtype={'StringencyHigh': bool, 'StringencyMedium': bool, 'StringencyLow': bool},
-                        index_col='VOG_ID')
-
-dfr = members.join(annotations).join(lca).join(virusonly)
-dfr['VirusSpecific'] = np.where((dfr['StringencyHigh']
-                                | dfr['StringencyMedium']
-                                | dfr['StringencyLow'])
-                                , True, False)
-
-# create a table in the database
-dfr.to_sql(name='VOG_profile', con=engine, if_exists='replace', index=True,
-           dtype={'VOG_ID': VARCHAR(dfr.index.get_level_values('VOG_ID').str.len().max()), 'Proteins': LONGTEXT},
-           chunksize=1000)
-
-with engine.connect() as con:
-    con.execute('ALTER TABLE VOG_profile ADD PRIMARY KEY (`VOG_ID`(8)); ')  # add primary key
-    con.execute('ALTER TABLE VOG_profile  MODIFY  VOG_ID char(30) NOT NULL; ')  # convert text to char
-    con.execute('ALTER TABLE VOG_profile  MODIFY  FunctionalCategory char(30) NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  Consensus_func_description char(100) NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  ProteinCount int(255) NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  SpeciesCount int(255) NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  GenomesInGroup int(255) NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  GenomesTotal int(255) NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  Ancestors TEXT; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyHigh bool NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyMedium bool NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyLow bool NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  VirusSpecific bool NOT NULL; ')
-    con.execute('ALTER TABLE VOG_profile  MODIFY  Proteins LONGTEXT; ')
-    con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);')  # create index
-    # con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
-    #con.execute('ALTER TABLE VOG_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
-# ToDo: add foreign keys to link to proteins, and species lists.
-print('VOG_table successfully created!')
+# # ---------------------
+# # VOG_table generation
+# # ----------------------
+# members = pd.read_csv(os.path.join(data_path, 'vog.members.tsv.gz'), compression='gzip',
+#                       sep='\t',
+#                       header=0,
+#                       names=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Proteins'],
+#                       usecols=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Proteins'],
+#                       index_col='VOG_ID')
+#
+# annotations = pd.read_csv(os.path.join(data_path, 'vog.annotations.tsv.gz'), compression='gzip',
+#                           sep='\t',
+#                           header=0,
+#                           names=['VOG_ID', 'ProteinCount', 'SpeciesCount', 'FunctionalCategory', 'Consensus_func_description'],
+#                           usecols=['VOG_ID', 'Consensus_func_description'],
+#                           index_col='VOG_ID')
+#
+# lca = pd.read_csv(os.path.join(data_path, 'vog.lca.tsv.gz'), compression='gzip',
+#                   sep='\t',
+#                   header=0,
+#                   names=['VOG_ID', 'GenomesInGroup', 'GenomesTotal', 'Ancestors'],
+#                   index_col='VOG_ID')
+#
+# virusonly = pd.read_csv(os.path.join(data_path, 'vog.virusonly.tsv.gz'), compression='gzip',
+#                         sep='\t',
+#                         header=0,
+#                         names=['VOG_ID', 'StringencyHigh', 'StringencyMedium', 'StringencyLow'],
+#                         dtype={'StringencyHigh': bool, 'StringencyMedium': bool, 'StringencyLow': bool},
+#                         index_col='VOG_ID')
+#
+# dfr = members.join(annotations).join(lca).join(virusonly)
+# dfr['VirusSpecific'] = np.where((dfr['StringencyHigh']
+#                                 | dfr['StringencyMedium']
+#                                 | dfr['StringencyLow'])
+#                                 , True, False)
+#
+# # create a table in the database
+# dfr.to_sql(name='VOG_profile', con=engine, if_exists='replace', index=True,
+#            dtype={'VOG_ID': VARCHAR(dfr.index.get_level_values('VOG_ID').str.len().max()), 'Proteins': LONGTEXT},
+#            chunksize=1000)
+#
+# with engine.connect() as con:
+#     con.execute('ALTER TABLE VOG_profile ADD PRIMARY KEY (`VOG_ID`(8)); ')  # add primary key
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  VOG_ID char(30) NOT NULL; ')  # convert text to char
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  FunctionalCategory char(30) NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  Consensus_func_description char(100) NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  ProteinCount int(255) NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  SpeciesCount int(255) NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  GenomesInGroup int(255) NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  GenomesTotal int(255) NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  Ancestors TEXT; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyHigh bool NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyMedium bool NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  StringencyLow bool NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  VirusSpecific bool NOT NULL; ')
+#     con.execute('ALTER TABLE VOG_profile  MODIFY  Proteins LONGTEXT; ')
+#     con.execute('CREATE UNIQUE INDEX VOG_profile_index ON VOG_profile (VOG_ID, FunctionalCategory);')  # create index
+#     # con.execute('CREATE INDEX VOG_profile_index2 ON VOG_profile (Consensus_func_description);')  # create index
+#     #con.execute('ALTER TABLE VOG_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
+# # ToDo: add foreign keys to link to proteins, and species lists.
+# print('VOG_table successfully created!')
 
 
 # ---------------------

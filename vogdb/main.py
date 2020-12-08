@@ -1,12 +1,17 @@
 import sys
 from fastapi import Query, Path, HTTPException
 from typing import Optional, Set, List
-from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species, find_species_by_id
+
+from starlette.responses import StreamingResponse
+
+from .functionality import *
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
 from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile
 from . import models
+from fastapi.responses import FileResponse, Response
+#from starlette.responses import FileResponse
 
 api = FastAPI()
 svc = VogService('data')
@@ -119,25 +124,23 @@ async def get_summary(uid: List[str] = Query(None), db: Session = Depends(get_db
     return vog_summary
 
 
-@api.get("/vfetch/vog/")
+@api.get("/vfetch/vog/hmm")
 async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns vog data for a list of unique identifiers (UIDs)
     :param uid: VOGID
     :param db: database session dependency
-    :return: vog data (HMM profile, MSE...)
+    :return: vog data (HMM profile)
     """
-
-    #ToDo: implement...
-
-    return 0
-
+    vog_hmm = find_vogs_hmm_by_uid(uid)
+    return vog_hmm
 
 #ToDo: implement protein search..
 
 @api.get("/vsearch/protein/")
 def search_protein():
     return "No yet implemented"
+
 
 
 
