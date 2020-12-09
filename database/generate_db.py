@@ -44,20 +44,20 @@ species_list_df = pd.read_csv(data_path + "vog.species.list",
                               names=['SpeciesName', 'TaxonID', 'Phage', 'Source', 'Version']) \
     .assign(Phage=lambda p: p.Phage == 'phage')
 
-# # create a species table in the database
-# species_list_df.to_sql(name='Species_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
-#
-# with engine.connect() as con:
-#     con.execute('ALTER TABLE `Species_profile` ADD PRIMARY KEY (`TaxonID`);')
-#     con.execute('ALTER TABLE Species_profile  MODIFY  SpeciesName char(100) NOT NULL; ')
-#     con.execute('ALTER TABLE Species_profile  MODIFY  TaxonID int(255) NOT NULL; ')
-#     con.execute('ALTER TABLE Species_profile  MODIFY  Phage bool NOT NULL; ')
-#     con.execute('ALTER TABLE Species_profile  MODIFY  Source char(100) NOT NULL; ')
-#     con.execute('ALTER TABLE Species_profile  MODIFY  Version int(255) NOT NULL; ')
-#
-# # ToDo add foreign key to connect tax_id in protein_profile and species_profile? create index?
-#
-# print('Species_profile table successfully created!')
+# create a species table in the database
+species_list_df.to_sql(name='Species_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
+
+with engine.connect() as con:
+    con.execute('ALTER TABLE `Species_profile` ADD PRIMARY KEY (`TaxonID`);')
+    con.execute('ALTER TABLE Species_profile  MODIFY  SpeciesName char(100) NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  TaxonID int(255) NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  Phage bool NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  Source char(100) NOT NULL; ')
+    con.execute('ALTER TABLE Species_profile  MODIFY  Version int(255) NOT NULL; ')
+
+# ToDo add foreign key to connect tax_id in protein_profile and species_profile? create index?
+
+print('Species_profile table successfully created!')
 
 
 # ---------------------
@@ -97,7 +97,7 @@ dfr['VirusSpecific'] = np.where((dfr['StringencyHigh']
                                 , True, False)
 
 
-#try to create num of phages and non-phages for VOG. also "phages_only" "non_phages_only" or "mixed"
+#create num of phages and non-phages for VOG. also "phages_only" "np_only" or "mixed"
 dfr['NumPhages'] = 0
 dfr['NumNonPhages'] = 0
 dfr['Phage/Nonphage'] = ''
@@ -112,13 +112,10 @@ for index, row in dfr.iterrows():
         # print(protein)
         species_id = protein.split('.')[0]
         species_id = int(species_id)
-        # if (species_list_df.loc[[species_id], ["Phage"]]):
         if (species_list_df.loc[species_id])["Phage"]:
             num_phage = num_phage + 1
-            # print("numphage incremented" + str(num_phage))
         else:
             num_nonphage = num_nonphage + 1
-            # print("numNONphage incremented" + str(num_nonphage))
 
     dfr.at[index, 'NumPhages'] = num_phage
     dfr.at[index, 'NumNonPhages'] = num_nonphage
@@ -161,56 +158,44 @@ with engine.connect() as con:
 # ToDo: add foreign keys to link to proteins, and species lists.
 print('VOG_table successfully created!')
 
-#
-#
-# #---------------------
-# # Protein_table generation
-# #----------------------
-#
-# # extract proteins for each VOG
-# protein_list_df = pd.read_csv(data_path + "vog.members.tsv.gz", compression='gzip', sep='\t').iloc[:, [0, 4]]
-#
-# protein_list_df = protein_list_df.rename(columns={"#GroupName": "VOG_ID", "ProteinIDs": "ProteinID"})
-#
-# # #add AAseq to table...
-# # filename = os.path.join(data_path, "vog.proteins.all.fa.gz")
-# # f = os.path.join(data_path, "vog.proteins.all.fa")
-# # #filename = os.path.join(path, 'faa', '{}.faa'.format(id))
-# # aa_seqs = SeqIO.index(f, 'fasta')
-# # print(aa_seqs)
-# # print(aa_seqs['1000373.YP_005097972.1'])
-# # protein_list_df['AAseq'] = protein_list_df['ProteinID'].map(aa_seqs)
-# # # aa = pd.DataFrame.from_dict(aa_seqs)
-# # # protein_list_df = protein_list_df.append(aa)
-# # # protein_list_df[]
-#
-# # assign each protein a vog
-# protein_list_df = (protein_list_df["ProteinID"].str.split(",").apply(lambda x: pd.Series(x))
-#                    .stack()
-#                    .reset_index(level=1, drop=True)
-#                    .to_frame("ProteinID")
-#                    .join(protein_list_df[["VOG_ID"]], how="left")
-#                    )
-# protein_list_df.set_index("ProteinID")
-#
-# # separate protein and taxonID into separate columns
-# protein_list_df["TaxonID"] = protein_list_df["ProteinID"].str.split(".").str[0]
-# protein_list_df["ProteinID"] = protein_list_df["ProteinID"].str.split(".").str[1:3].str.join(".")
-#
-# # create a protein table in the database
-# protein_list_df.to_sql(name='Protein_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
-#
-# with engine.connect() as con:
-#     con.execute('ALTER TABLE Protein_profile  MODIFY  ProteinID char(30) NOT NULL; ')
-#     con.execute('ALTER TABLE Protein_profile  MODIFY  TaxonID int(30) NOT NULL; ')
-#     con.execute('ALTER TABLE Protein_profile  MODIFY  VOG_ID char(30) NOT NULL; ')
-#     #con.execute('ALTER TABLE Protein_profile  MODIFY  AASeq LONGTEXT; ')
-#     con.execute('CREATE INDEX VOG_profile_index_by_protein ON Protein_profile (ProteinID);')
-#     # add foreign key
-#     con.execute('ALTER TABLE Protein_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
-#     con.execute('ALTER TABLE Protein_profile  ADD FOREIGN KEY (VOG_ID) REFERENCES VOG_profile(VOG_ID); ')
-#
-# print('Protein_profile table successfully created!')
-#
-#
-# #ToDo creating other tables, modifying the existing tables, optimizing the structure
+
+#---------------------
+# Protein_table generation
+#----------------------
+
+# extract proteins for each VOG
+protein_list_df = pd.read_csv(data_path + "vog.members.tsv.gz", compression='gzip', sep='\t').iloc[:, [0, 4]]
+
+protein_list_df = protein_list_df.rename(columns={"#GroupName": "VOG_ID", "ProteinIDs": "ProteinID"})
+
+# assign each protein a vog
+protein_list_df = (protein_list_df["ProteinID"].str.split(",").apply(lambda x: pd.Series(x))
+                   .stack()
+                   .reset_index(level=1, drop=True)
+                   .to_frame("ProteinID")
+                   .join(protein_list_df[["VOG_ID"]], how="left")
+                   )
+protein_list_df.set_index("ProteinID")
+
+# separate protein and taxonID into separate columns
+protein_list_df["TaxonID"] = protein_list_df["ProteinID"].str.split(".").str[0]
+protein_list_df["ProteinID"] = protein_list_df["ProteinID"].str.split(".").str[1:3].str.join(".")
+
+# create a protein table in the database
+protein_list_df.to_sql(name='Protein_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
+
+with engine.connect() as con:
+    con.execute('ALTER TABLE Protein_profile  MODIFY  ProteinID char(30) NOT NULL; ')
+    con.execute('ALTER TABLE Protein_profile  MODIFY  TaxonID int(30) NOT NULL; ')
+    con.execute('ALTER TABLE Protein_profile  MODIFY  VOG_ID char(30) NOT NULL; ')
+    #con.execute('ALTER TABLE Protein_profile  MODIFY  AASeq LONGTEXT; ')
+    con.execute('CREATE INDEX VOG_profile_index_by_protein ON Protein_profile (ProteinID);')
+    # add foreign key
+    con.execute('ALTER TABLE Protein_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
+    con.execute('ALTER TABLE Protein_profile  ADD FOREIGN KEY (VOG_ID) REFERENCES VOG_profile(VOG_ID); ')
+
+print('Protein_profile table successfully created!')
+
+#ToDo add AminoAcid and Nucleotide Sequences to the Table...
+
+#ToDo creating other tables, modifying the existing tables, optimizing the structure
