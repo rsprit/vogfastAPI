@@ -184,16 +184,39 @@ def get_vogs(db: Session,
     return result.all()
 
 
-def get_proteins(db: Session, species: str):
-    search = "%" + species + "%"
+def get_proteins(db: Session,
+                 response_body,
+                 species: Optional[Set[str]],
+                 taxon_ids: Optional[Set[int]],
+                 vog_ids: Optional[Set[str]]):
+    result = db.query(response_body)
+    arguments = locals()
+    filters = []
 
-    results = db.query().with_entities(models.Protein_profile.protein_id,
-                                       models.Protein_profile.vog_id,
-                                       models.Protein_profile.taxon_id,
-                                       models.Species_profile.species_name).join(models.Species_profile). \
-        filter(models.Species_profile.species_name.like(search)).all()
+    for key, value in arguments.items():  # type: str, any
+        if value:
+            if key == "species":
+                for s in species:
+                    search = "%" + s + "%"
+                    filters.append(getattr(models.Protein_profile, key).like(value))
 
+            if key == "taxon_id":
+                for t_id in taxon_ids:
+                    filters.append(getattr(models.Protein_profile, key).in_(value))
+
+            if key == "vog_id":
+                for vog_id in vog_ids:
+                    filters.append(getattr(models.Protein_profile, key).like(value))
+
+    result = result.filter(*filters)
+    return result.all()
+
+
+def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
+    results = db.query(models.Protein_profile).filter(models.Protein_profile.protein_id.in_(pids)).all()
     return results
+
+
 
 
 class SpeciesService:

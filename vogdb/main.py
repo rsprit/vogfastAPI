@@ -1,11 +1,11 @@
 import sys
 from fastapi import Query, Path, HTTPException
 from typing import Optional, Set, List
-from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species, find_species_by_id
+from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species, find_species_by_id, find_proteins_by_id
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
-from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile
+from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile, Protein_no_SpeciesName
 from . import models
 
 api = FastAPI()
@@ -93,7 +93,7 @@ def search_vog(db: Session = Depends(get_db),
     :return:
     """
 
-    vogs = get_vogs(db, models.VOG_profile.id , id, pmin, pmax, smax, smin, functional_category, consensus_function, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
+    vogs = get_vogs(db, models.VOG_profile.id, id, pmin, pmax, smax, smin, functional_category, consensus_function, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
                    ancestors, h_stringency, m_stringency, l_stringency, virus_specific, phages_nonphages, proteins, species)
 
     if not vogs:
@@ -135,11 +135,37 @@ async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db))
 
 #ToDo: implement protein search..
 
-@api.get("/vsearch/protein/")
-def search_protein():
-    return "No yet implemented"
+
+@api.get("/vsearch/protein/",
+         response_model=List[Protein_profile])
+async def search_protein(db: Session = Depends(get_db),
+               species_name: Optional[Set[str]] = Query(None),
+               taxon_id: Optional[Set[int]] = Query(None),
+               VOG_id: Optional[Set[str]] = Query(None)):
+
+    proteins = get_proteins(db, models.Protein_profile.protein_id, species_name, taxon_id, VOG_id)
+    if not proteins:
+        raise HTTPException(status_code=404, detail="No matching Species found")
+
+    return proteins
 
 
+@api.get("/vsummary/protein/",
+         response_model=List[Protein_no_SpeciesName])
+async def get_summary(pids: List[str] = Query(None), db: Session = Depends(get_db)):
+    """
+    This function returns protein summaries for a list of Protein identifiers (pids)
+    :param pids: proteinID
+    :param db: database session dependency
+    :return: protein summary
+    """
+
+    protein_summary = find_proteins_by_id(db, pids)
+
+    if not protein_summary:
+        raise HTTPException(status_code=404, detail="No matching VOGs found")
+
+    return protein_summary
 
 
 

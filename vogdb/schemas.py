@@ -27,6 +27,15 @@ class VOG_UID(BaseModel):
         orm_mode = True
 
 
+class Protein_no_SpeciesName(BaseModel):
+    protein_id: str
+    vog_id: str
+    taxon_id: int
+
+    class Config:
+        orm_mode = True
+
+
 class Species_ID(BaseModel):
     taxon_id: int
 

@@ -181,6 +181,9 @@ protein_list_df.set_index("ProteinID")
 protein_list_df["TaxonID"] = protein_list_df["ProteinID"].str.split(".").str[0]
 protein_list_df["ProteinID"] = protein_list_df["ProteinID"].str.split(".").str[1:3].str.join(".")
 
+
+
+
 # create a protein table in the database
 protein_list_df.to_sql(name='Protein_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
 
