@@ -1,5 +1,3 @@
-import gzip
-
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
@@ -104,12 +102,10 @@ dfr['Phage/Nonphage'] = ''
 
 species_list_df.set_index("TaxonID", inplace=True)
 for index, row in dfr.iterrows():
-    # print(row)
     num_nonphage = 0
     num_phage = 0
     p = row['Proteins'].split(",")
     for protein in p:
-        # print(protein)
         species_id = protein.split('.')[0]
         species_id = int(species_id)
         if (species_list_df.loc[species_id])["Phage"]:
@@ -180,9 +176,6 @@ protein_list_df.set_index("ProteinID")
 # separate protein and taxonID into separate columns
 protein_list_df["TaxonID"] = protein_list_df["ProteinID"].str.split(".").str[0]
 protein_list_df["ProteinID"] = protein_list_df["ProteinID"].str.split(".").str[1:3].str.join(".")
-
-
-
 
 # create a protein table in the database
 protein_list_df.to_sql(name='Protein_profile', con=engine, if_exists='replace', index=False, chunksize=1000)

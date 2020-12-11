@@ -1,11 +1,12 @@
 import sys
 from fastapi import Query, Path, HTTPException
 from typing import Optional, Set, List
-from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species, find_species_by_id, find_proteins_by_id
+from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species, find_species_by_id, \
+    find_proteins_by_id
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
-from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile, Protein_no_SpeciesName
+from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile, ProteinID
 from . import models
 
 api = FastAPI()
@@ -93,8 +94,10 @@ def search_vog(db: Session = Depends(get_db),
     :return:
     """
 
-    vogs = get_vogs(db, models.VOG_profile.id, id, pmin, pmax, smax, smin, functional_category, consensus_function, mingLCA, maxgLCA, mingGLCA, maxgGLCA,
-                   ancestors, h_stringency, m_stringency, l_stringency, virus_specific, phages_nonphages, proteins, species)
+    vogs = get_vogs(db, models.VOG_profile.id, id, pmin, pmax, smax, smin, functional_category, consensus_function,
+                    mingLCA, maxgLCA, mingGLCA, maxgGLCA,
+                    ancestors, h_stringency, m_stringency, l_stringency, virus_specific, phages_nonphages, proteins,
+                    species)
 
     if not vogs:
         raise HTTPException(status_code=404, detail="No VOGs match the search criteria.")
@@ -119,39 +122,21 @@ async def get_summary(uid: List[str] = Query(None), db: Session = Depends(get_db
     return vog_summary
 
 
-@api.get("/vfetch/vog/")
-async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
-    """
-    This function returns vog data for a list of unique identifiers (UIDs)
-    :param uid: VOGID
-    :param db: database session dependency
-    :return: vog data (HMM profile, MSE...)
-    """
-
-    #ToDo: implement...
-
-    return 0
-
-
-#ToDo: implement protein search..
-
-
 @api.get("/vsearch/protein/",
-         response_model=List[Protein_profile])
+         response_model=List[ProteinID])
 async def search_protein(db: Session = Depends(get_db),
-               species_name: Optional[Set[str]] = Query(None),
-               taxon_id: Optional[Set[int]] = Query(None),
-               VOG_id: Optional[Set[str]] = Query(None)):
-
+                         species_name: Optional[Set[str]] = Query(None),
+                         taxon_id: Optional[Set[int]] = Query(None),
+                         VOG_id: Optional[Set[str]] = Query(None)):
     proteins = get_proteins(db, models.Protein_profile.protein_id, species_name, taxon_id, VOG_id)
     if not proteins:
-        raise HTTPException(status_code=404, detail="No matching Species found")
+        raise HTTPException(status_code=404, detail="No matching Proteins found")
 
     return proteins
 
 
 @api.get("/vsummary/protein/",
-         response_model=List[Protein_no_SpeciesName])
+         response_model=List[Protein_profile])
 async def get_summary(pids: List[str] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns protein summaries for a list of Protein identifiers (pids)
@@ -167,6 +152,19 @@ async def get_summary(pids: List[str] = Query(None), db: Session = Depends(get_d
 
     return protein_summary
 
+
+@api.get("/vfetch/vog/")
+async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
+    """
+    This function returns vog data for a list of unique identifiers (UIDs)
+    :param uid: VOGID
+    :param db: database session dependency
+    :return: vog data (HMM profile, MSE...)
+    """
+
+    # ToDo: implement...
+
+    return 0
 
 
 
