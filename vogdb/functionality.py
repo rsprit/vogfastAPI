@@ -206,12 +206,11 @@ def get_proteins(db: Session,
                     filters.append(getattr(models.Protein_profile, "protein_id").in_(res))
 
             if key == "taxon_id":
-                # for tid in taxon_id: # makes this an #AND search
+                # for tid in taxon_id: # this is an OR search
                 filters.append(getattr(models.Protein_profile, key).in_(value))
 
             if key == "vog_id":
-                for v_id in value:
-                    filters.append(getattr(models.Protein_profile, key).like(v_id))
+                filters.append(getattr(models.Protein_profile, key).in_(value))
 
     result = result.filter(*filters)
     return result.all()
