@@ -53,7 +53,7 @@ def search_species(db: Session = Depends(get_db),
 
 @api.get("/vsummary/species/",
          response_model=List[Species_profile])
-async def get_summary(taxon_id: Optional[List[int]] = Query(None), db: Session = Depends(get_db)):
+async def get_summary_species(taxon_id: Optional[List[int]] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns Species summaries for a list of taxon ids
     :param taxon_id: Taxon ID
@@ -108,7 +108,7 @@ def search_vog(db: Session = Depends(get_db),
 
 @api.get("/vsummary/vog/",
          response_model=List[VOG_profile])
-async def get_summary(uid: List[str] = Query(None), db: Session = Depends(get_db)):
+async def get_summary_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns vog summaries for a list of unique identifiers (UIDs)
     :param uid: VOGID
