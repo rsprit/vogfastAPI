@@ -27,9 +27,11 @@ if those two criteria are not fulfilled, pydantic will throw an ValidationError
 
 
 def find_species_by_id(db: Session, ids: Optional[List[int]]):
+    """
+    This function returns the Species information based on the given species IDs
+    """
     if ids:
         results = db.query(models.Species_profile).filter(models.Species_profile.taxon_id.in_(ids)).all()
-        # print(results) ...<vogdb.models.Species_profile object at 0x7f9adc985310>, <vogdb.models.Species_profile object at 0x7f9adc985880>]
         return results
     else:
         print("No ids given")
@@ -73,6 +75,9 @@ def get_species(db: Session,
 
 
 def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
+    """
+    This function returns the VOG information based on the given VOG IDs
+    """
     results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
     return results
 
@@ -188,6 +193,9 @@ def get_proteins(db: Session,
                  species: Optional[Set[str]],
                  taxon_id: Optional[Set[int]],
                  vog_id: Optional[Set[str]]):
+    """
+    This function searches the VOG based on the given query parameters
+    """
     result = db.query(response_body)
     arguments = locals()
     filters = []
@@ -218,7 +226,9 @@ def get_proteins(db: Session,
 
 
 def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
-    # results = db.query(models.Protein_profile).filter(models.Protein_profile.protein_id.in_(pids)).all()
+    """
+    This function returns the Protein information based on the given Protein IDs
+    """
     results = db.query().with_entities(models.Protein_profile.protein_id,
                                        models.Protein_profile.vog_id,
                                        models.Protein_profile.taxon_id,
@@ -226,6 +236,10 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
         filter(models.Protein_profile.protein_id.in_(pids)).all()
 
     return results
+
+
+
+
 
 
 class SpeciesService:
