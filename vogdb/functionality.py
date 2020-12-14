@@ -195,6 +195,7 @@ def get_proteins(db: Session,
     for key, value in arguments.items():  # type: str, any
         if value:
             if key == "species":
+                s_res = []
                 for s in species:
                     search = "%" + s + "%"
                     res = db.query().with_entities(models.Protein_profile.protein_id,
@@ -202,11 +203,11 @@ def get_proteins(db: Session,
                                                    models.Protein_profile.taxon_id,
                                                    models.Species_profile.species_name).join(models.Species_profile). \
                         filter(models.Species_profile.species_name.like(search)).all()
-                    res = {id[0] for id in res}  # convert to set
-                    filters.append(getattr(models.Protein_profile, "protein_id").in_(res))
+                    s_res.extend(res)
+                s_res = {id[0] for id in s_res}  # convert to set
+                filters.append(getattr(models.Protein_profile, "protein_id").in_(s_res))
 
             if key == "taxon_id":
-                # for tid in taxon_id: # this is an OR search
                 filters.append(getattr(models.Protein_profile, key).in_(value))
 
             if key == "vog_id":
