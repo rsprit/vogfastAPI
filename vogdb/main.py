@@ -148,7 +148,7 @@ async def get_summary(pids: List[str] = Query(None), db: Session = Depends(get_d
     protein_summary = find_proteins_by_id(db, pids)
 
     if not protein_summary:
-        raise HTTPException(status_code=404, detail="No matching VOGs found")
+        raise HTTPException(status_code=404, detail="No matching Proteins found")
 
     return protein_summary
 
