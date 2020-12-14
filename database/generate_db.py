@@ -98,7 +98,7 @@ dfr['VirusSpecific'] = np.where((dfr['StringencyHigh']
 #create num of phages and non-phages for VOG. also "phages_only" "np_only" or "mixed"
 dfr['NumPhages'] = 0
 dfr['NumNonPhages'] = 0
-dfr['Phage/Nonphage'] = ''
+dfr['PhageNonphage'] = ''
 
 species_list_df.set_index("TaxonID", inplace=True)
 for index, row in dfr.iterrows():
