@@ -4,10 +4,10 @@ from os import path
 
 sys.path.append('./')
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-from vDirect_demo import *
+from API_requests import *
 
 
-""" Tests for vDirect.py
+""" Tests for API_requests.py
 Test naming convention
 test_MethodName_ExpectedBehavior_StateUnderTest:
 e.g. test_isAdult_False_AgeLessThan18
@@ -74,7 +74,7 @@ def test_vsummary_speciesIds_twoTaxonIds():
 
 
 def test_vsummary_proteinIds_twoProteinIds():
-    response = vsummary(return_object="protein", pids=["11128.NP_150082.1"])
+    response = vsummary(return_object="protein", format="dataframe", pids=["11128.NP_150082.1"])
     expected = ['11128.NP_150082.1']
-
+    print(response)
     assert response["protein_id"].to_list() == expected
