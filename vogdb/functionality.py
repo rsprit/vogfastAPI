@@ -7,7 +7,7 @@ from sqlalchemy import func
 from . import models, schemas
 from typing import Optional, Set, List
 from fastapi import Query, HTTPException
-
+import tarfile
 """
 Here we define all the search methods that are used for extracting the data from the database
 """
@@ -80,6 +80,38 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
     """
     results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
     return results
+
+def find_vogs_hmm_by_uid(uid):
+    file_name = "./data/vog.hmm.tar.gz"
+    tar = tarfile.open(file_name, "r:gz")
+    vog_hmm_list = []
+    if uid:
+        for vog_id in uid:
+            vog_hmm_list.append(vog_id.upper() + ".hmm")
+    hmm_response = []
+    for vog_hmm in vog_hmm_list:
+        member = tar.getmember(vog_hmm)
+        f = tar.extractfile(member)
+        if f is not None:
+            file = f.read()
+            hmm_response.append(file)
+    return hmm_response
+
+def find_vogs_msa_by_uid(uid):
+    file_name = "./data/vog.raw_algs.tar.gz"
+    tar = tarfile.open(file_name, "r:gz")
+    vog_msa_list = []
+    if uid:
+        for vog_id in uid:
+            vog_msa_list.append(vog_id.upper() + ".msa")
+    msa_response = []
+    for vog_msa in vog_msa_list:
+        member = tar.getmember(vog_msa)
+        f = tar.extractfile(member)
+        if f is not None:
+            file = f.read()
+            msa_response.append(file)
+    return msa_response
 
 
 def get_vogs(db: Session,

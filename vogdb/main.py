@@ -3,11 +3,17 @@ from fastapi import Query, Path, HTTPException
 from typing import Optional, Set, List
 from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species, find_species_by_id, \
     find_proteins_by_id
+
+from starlette.responses import StreamingResponse
+
+from .functionality import *
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
 from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile, ProteinID
 from . import models
+from fastapi.responses import FileResponse, Response
+#from starlette.responses import FileResponse
 
 api = FastAPI()
 svc = VogService('data')
@@ -49,7 +55,7 @@ def search_species(db: Session = Depends(get_db),
 
 @api.get("/vsummary/species/",
          response_model=List[Species_profile])
-async def get_summary(taxon_id: Optional[List[int]] = Query(None), db: Session = Depends(get_db)):
+async def get_summary_species(taxon_id: Optional[List[int]] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns Species summaries for a list of taxon ids
     :param taxon_id: Taxon ID
@@ -106,7 +112,7 @@ def search_vog(db: Session = Depends(get_db),
 
 @api.get("/vsummary/vog/",
          response_model=List[VOG_profile])
-async def get_summary(uid: List[str] = Query(None), db: Session = Depends(get_db)):
+async def get_summary_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns vog summaries for a list of unique identifiers (UIDs)
     :param uid: VOGID
@@ -153,18 +159,30 @@ async def get_summary(pids: List[str] = Query(None), db: Session = Depends(get_d
     return protein_summary
 
 
-@api.get("/vfetch/vog/")
-async def fetch_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
+@api.get("/vfetch/vog/hmm")
+async def fetch_vog(uid: List[str] = Query(None)):
     """
     This function returns vog data for a list of unique identifiers (UIDs)
     :param uid: VOGID
     :param db: database session dependency
-    :return: vog data (HMM profile, MSE...)
+    :return: vog data (HMM profile)
     """
+    vog_hmm = find_vogs_hmm_by_uid(uid)
+    return vog_hmm
 
-    # ToDo: implement...
+@api.get("/vfetch/vog/mse")
+async def fetch_vog(uid: List[str] = Query(None)):
+    """
+    This function returns vog data for a list of unique identifiers (UIDs)
+    :param uid: VOGID
+    :param db: database session dependency
+    :return: vog data (HMM profile)
+    """
+    vog_hmm = find_vogs_msa_by_uid(uid)
+    return vog_hmm
 
-    return 0
+
+
 
 
 
