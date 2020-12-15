@@ -81,6 +81,7 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
     results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
     return results
 
+
 def find_vogs_hmm_by_uid(uid):
     file_name = "./data/vog.hmm.tar.gz"
     tar = tarfile.open(file_name, "r:gz")
@@ -96,6 +97,7 @@ def find_vogs_hmm_by_uid(uid):
             file = f.read()
             hmm_response.append(file)
     return hmm_response
+
 
 def find_vogs_msa_by_uid(uid):
     file_name = "./data/vog.raw_algs.tar.gz"

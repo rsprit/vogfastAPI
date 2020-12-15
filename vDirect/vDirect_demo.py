@@ -1,8 +1,9 @@
 import sys
 from os import path
 import pandas as pd
+
 sys.path.append('../vogdb')
-sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from vogdb import schemas, main
 
 try:
@@ -13,9 +14,8 @@ except ImportError:  # Python 2
     from urllib import urlencode
     from urllib2 import urlopen
 
-
-
 base_url = 'http://127.0.0.1:8000/'
+
 
 def vfetch(return_object="hmm", **params):
     """Yield the response of a query."""
@@ -36,6 +36,7 @@ def vfetch(return_object="hmm", **params):
 
     return response
 
+
 def vsummary(return_object="vog", format="json", **params):
     """Yield the response (vog/species/protein summary of a query."""
 
@@ -50,7 +51,7 @@ def vsummary(return_object="vog", format="json", **params):
     elif return_object == "species":
         _valid_params = list(main.get_summary_species.__code__.co_varnames)
     elif return_object == "protein":
-        #ToDo for protein summary
+        # ToDo for protein summary
         return "Not yet implemented"
 
     _valid_formats = ["json", "dataframe"]
@@ -73,7 +74,6 @@ def vsummary(return_object="vog", format="json", **params):
     return response
 
 
-
 # function to save hmm vFetch response objects (for now just hmm, mse)
 def save_object(object, output_path="./test.txt"):
     """Saves the response object to output path"""
@@ -81,5 +81,3 @@ def save_object(object, output_path="./test.txt"):
     with open(output_path, 'a') as file:
         for document in object:
             file.write(document)
-
-

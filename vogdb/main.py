@@ -1,9 +1,6 @@
 import sys
 from fastapi import Query, Path, HTTPException
 from typing import Optional, Set, List
-from .functionality import VogService, find_vogs_by_uid, get_proteins, get_vogs, get_species, find_species_by_id, \
-    find_proteins_by_id
-
 from starlette.responses import StreamingResponse
 
 from .functionality import *
@@ -169,6 +166,7 @@ async def fetch_vog(uid: List[str] = Query(None)):
     """
     vog_hmm = find_vogs_hmm_by_uid(uid)
     return vog_hmm
+
 
 @api.get("/vfetch/vog/mse")
 async def fetch_vog(uid: List[str] = Query(None)):

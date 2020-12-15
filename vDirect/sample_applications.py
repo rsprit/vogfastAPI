@@ -4,10 +4,12 @@ from vDirect_demo import *
 You run this script and then type in the console number of example you want to try out e.g. 1 for example_1()
 """
 
+
 def example_1():
     """Example_1: retrieve hmm profile of two vogs"""
     response = vfetch(return_object='hmm', uid=['VOG00001', 'VOG00002'])
     return response
+
 
 def example_2():
     """Example_2: save text object (hmm,msa)"""
@@ -16,6 +18,7 @@ def example_2():
     save_object(response, output_path="/home/nikicajea/Desktop/vogs.hmm")
 
     return "File saved!"
+
 
 def example_3():
     """Example_2: get summary table of two vogs """
@@ -29,7 +32,6 @@ def example_4():
     response = vsummary(return_object='species', format="dataframe", taxon_id=['2713308', '2591111'])
 
     return response
-
 
 
 if __name__ == "__main__":

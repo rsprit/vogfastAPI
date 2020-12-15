@@ -6,6 +6,7 @@ import numpy as np
 import os
 from sqlalchemy import VARCHAR
 from sqlalchemy.dialects.mysql import LONGTEXT
+import tarfile
 
 """
 Here we create our VOGDB and create all the tables that we are going to use
