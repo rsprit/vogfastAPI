@@ -162,16 +162,16 @@ def get_vogs(db: Session,
                     filters.append(getattr(models.VOG_profile, key).like(d))
 
             if key == "smax":
-                filters.append(getattr(models.VOG_profile, "species_count") < value - 1)
+                filters.append(getattr(models.VOG_profile, "species_count") < value + 1)
 
             if key == "smin":
-                filters.append(getattr(models.VOG_profile, "species_count") > value + 1)
+                filters.append(getattr(models.VOG_profile, "species_count") > value - 1)
 
             if key == "pmax":
-                filters.append(getattr(models.VOG_profile, "protein_count") < value - 1)
+                filters.append(getattr(models.VOG_profile, "protein_count") < value + 1)
 
             if key == "pmin":
-                filters.append(getattr(models.VOG_profile, "protein_count") > value + 1)
+                filters.append(getattr(models.VOG_profile, "protein_count") > value - 1)
 
             if key == "proteins":
                 for protein in value:
@@ -186,16 +186,16 @@ def get_vogs(db: Session,
                 filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 
             if key == "maxgLCA":
-                filters.append(getattr(models.VOG_profile, "genomes_total") < value - 1)
+                filters.append(getattr(models.VOG_profile, "genomes_total") < value + 1)
 
             if key == "mingLCA":
-                filters.append(getattr(models.VOG_profile, "genomes_total") > value + 1)
+                filters.append(getattr(models.VOG_profile, "genomes_total") > value - 1)
 
             if key == "maxgGLCA":
-                filters.append(getattr(models.VOG_profile, "genomes_in_group") < value - 1)
+                filters.append(getattr(models.VOG_profile, "genomes_in_group") < value + 1)
 
             if key == "mingGLCA":
-                filters.append(getattr(models.VOG_profile, "genomes_in_group") > value + 1)
+                filters.append(getattr(models.VOG_profile, "genomes_in_group") > value - 1)
 
             if key == "ancestors":
                 for anc in value:
