@@ -168,7 +168,7 @@ async def fetch_vog(uid: List[str] = Query(None)):
     return vog_hmm
 
 
-@api.get("/vfetch/vog/mse")
+@api.get("/vfetch/vog/msa")
 async def fetch_vog(uid: List[str] = Query(None)):
     """
     This function returns vog data for a list of unique identifiers (UIDs)
