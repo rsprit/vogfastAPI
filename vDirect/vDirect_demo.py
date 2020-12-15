@@ -87,8 +87,7 @@ def vsummary(return_object="vog", format="json", **params):
     elif return_object == "species":
         _valid_params = list(main.get_summary_species.__code__.co_varnames)
     elif return_object == "protein":
-        #ToDo for protein summary
-        return "Not yet implemented"
+        _valid_params = list(main.get_summary_protein.__code__.co_varnames)
 
     _valid_formats = ["json", "dataframe"]
 
@@ -160,5 +159,7 @@ def save_object(object, output_path="./test.txt"):
 
 
 
+print(vsearch(return_object="protein", format="dataframe", species_name = ["corona"],
+              taxon_id = [11128, 290028, 1335626, 1384461, 2569586], VOG_id = ["VOG05566"]))
 
-print(vsummary(return_object="species", format="json", taxon_id=["2599843"]))
+print(vsummary(return_object="species", taxon_id=["290028"]))

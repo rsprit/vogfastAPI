@@ -140,7 +140,7 @@ async def search_protein(db: Session = Depends(get_db),
 
 @api.get("/vsummary/protein/",
          response_model=List[Protein_profile])
-async def get_summary(pids: List[str] = Query(None), db: Session = Depends(get_db)):
+async def get_summary_protein(pids: List[str] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns protein summaries for a list of Protein identifiers (pids)
     :param pids: proteinID
