@@ -23,7 +23,6 @@ def main():
     species_search_parser = vsearch_sps.add_parser('species', help='vsearch subparser for species search')
     protein_search_parser = vsearch_sps.add_parser('protein', help='vsearch subparser for protein search')
 
-    # ToDo: add args here for vog search..many arguments..
     # add arguments for vog_search_parser:
     vog_search_parser.add_argument('-ids', type=str, action='append', nargs='+', dest='ids',
                                    help="VOG ID(s)")
@@ -159,7 +158,6 @@ def main():
                           species_name=args.species_name,
                           VOG_id=args.vog_id))
 
-        # ToDo: Implement for vsearch vogs.
         if args.type == 'vog':
             print(vsearch(return_object=args.type, format=args.format, id=args.ids, pmin=args.pmin, pmax=args.pmax,
                           smin=args.smin, smax=args.smax, mingLCA=args.mingLCA, maxgLCA=args.maxgLCA,
