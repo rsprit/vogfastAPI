@@ -162,16 +162,16 @@ def get_vogs(db: Session,
                     filters.append(getattr(models.VOG_profile, key).like(d))
 
             if key == "smax":
-                filters.append(getattr(models.VOG_profile, "species_count") < value - 1)
+                filters.append(getattr(models.VOG_profile, "species_count") < value + 1)
 
             if key == "smin":
-                filters.append(getattr(models.VOG_profile, "species_count") > value + 1)
+                filters.append(getattr(models.VOG_profile, "species_count") > value - 1)
 
             if key == "pmax":
-                filters.append(getattr(models.VOG_profile, "protein_count") < value - 1)
+                filters.append(getattr(models.VOG_profile, "protein_count") < value + 1)
 
             if key == "pmin":
-                filters.append(getattr(models.VOG_profile, "protein_count") > value + 1)
+                filters.append(getattr(models.VOG_profile, "protein_count") > value - 1)
 
             if key == "proteins":
                 for protein in value:
