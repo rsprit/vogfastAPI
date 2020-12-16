@@ -54,8 +54,7 @@ def vfetch(return_object="vog", return_type="msa", **params):
 
 def vsummary(return_object="vog", format="json", **params):
     """Yield the response (vog/species/protein summary of a query."""
-    if format == 'df':
-        format = 'dataframe'
+
     # First make some basic checks.
     if return_object not in ["vog", "species", "protein"]:
         # return_object does not compare equal to any enum value:
@@ -69,7 +68,7 @@ def vsummary(return_object="vog", format="json", **params):
     elif return_object == "protein":
         _valid_params = list(main.get_summary_protein.__code__.co_varnames)
 
-    _valid_formats = ["json", "dataframe"]
+    _valid_formats = ["json", "df"]
 
     for k in params:
         assert k in _valid_params, 'Unknown parameter: %s' % k
@@ -81,7 +80,7 @@ def vsummary(return_object="vog", format="json", **params):
     response = r.json()
 
     # formatting
-    if format == "dataframe":
+    if format == "df":
         response = pd.DataFrame.from_dict(response)
     elif format == "csv":
         df = pd.DataFrame.from_dict(response)
@@ -91,8 +90,7 @@ def vsummary(return_object="vog", format="json", **params):
 
 def vsearch(return_object="vog", format="json", **params):
     """Yield the response (vog/species/protein summary of a query."""
-    if format == 'df':
-        format = 'dataframe'
+
     # First make some basic checks.
     if return_object not in ["vog", "species", "protein"]:
         # return_object does not compare equal to any enum value:
@@ -108,7 +106,7 @@ def vsearch(return_object="vog", format="json", **params):
     else:
         raise ValueError("No return object given")
 
-    _valid_formats = ["json", "dataframe", "l"]
+    _valid_formats = ["json", "df", "l"]
 
     for k in params:
         assert k in _valid_params, 'Unknown parameter: %s' % k
@@ -120,7 +118,7 @@ def vsearch(return_object="vog", format="json", **params):
     response = r.json()
 
     # formatting
-    if format == "dataframe":
+    if format == "df":
         response = pd.DataFrame.from_dict(response)
     elif format == "csv":
         df = pd.DataFrame.from_dict(response)
@@ -128,6 +126,8 @@ def vsearch(return_object="vog", format="json", **params):
     elif format == "l":
         response = pd.DataFrame.from_dict(response)
         response = response["id"].tolist()
+        response = ' '.join(response)
+
     return response
 
 
@@ -139,8 +139,3 @@ def save_object(object, output_path="./test.txt"):
         for document in object:
             file.write(document)
 
-
-# print(vsearch(return_object="protein", format="dataframe", species_name = ["corona"],
-#               taxon_id = [11128, 290028, 1335626, 1384461, 2569586], VOG_id = ["VOG05566"]))
-
-# print(vsummary(return_object="species", taxon_id=["290028"]))
