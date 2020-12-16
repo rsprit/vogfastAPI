@@ -128,6 +128,7 @@ def vsearch(return_object="vog", format="json", **params):
     elif format == "l":
         response = pd.DataFrame.from_dict(response)
         response = response["id"].tolist()
+        response = ' '.join(response)
     return response
 
 

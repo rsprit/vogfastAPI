@@ -97,7 +97,7 @@ def main():
     protein_summary_parser = vsummary_sps.add_parser('protein', help='vsummary subparser for protein summary')
 
     # add arguments for vog_summary_parser:
-    vog_summary_parser.add_argument('-id', type=str, action='append', nargs='+', dest='id',
+    vog_summary_parser.add_argument('-id', type=str, nargs='+', dest='id', default=sys.stdin,
                                     help="VOG unique ID(s)")
     vog_summary_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                     choices=['json', 'df'], help="specify a format: 'json' or 'df'")
@@ -152,7 +152,12 @@ def main():
             print(vsummary(return_object=args.type, format=args.format, id=args.id))
 
         elif args.type == 'vog':
-            print(vsummary(return_object=args.type, format=args.format, id=args.id))
+            if not sys.stdin.isatty():
+                id = args.id.read().split()
+            else:
+                id = args.id
+            print(vsummary(return_object=args.type, format=args.format, id=id))
+            # print(vsummary(return_object=args.type, format=args.format, id=args.id))
 
 
     elif args.command == 'vsearch':
