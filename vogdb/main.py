@@ -112,7 +112,7 @@ def search_vog(db: Session = Depends(get_db),
 async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns vog summaries for a list of unique identifiers (UIDs)
-    :param uid: VOGID
+    :param id: VOGID
     :param db: database session dependency
     :return: vog summary
     """
