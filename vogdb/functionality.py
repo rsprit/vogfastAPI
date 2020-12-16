@@ -293,9 +293,9 @@ def find_protein_fna_by_id(pid):
     result = []
     for p in pid:
         result.append(genes[p])
-    with open("example.fasta", "w") as handle:
-        for ele in result:
-            SeqIO.write(ele.values(), handle, "fasta")
+    # with open("example.fasta", "w") as handle:
+    #     for ele in result:
+    #         SeqIO.write(ele.values(), handle, "fasta")
     return result
 
 
