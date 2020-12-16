@@ -105,7 +105,7 @@ def vsearch(return_object="vog", format="json", **params):
     else:
         raise ValueError("No return object given")
 
-    _valid_formats = ["json", "df", "l"]
+    _valid_formats = ["json", "df", "stdout"]
 
     for k in params:
         assert k in _valid_params, 'Unknown parameter: %s' % k
@@ -122,10 +122,22 @@ def vsearch(return_object="vog", format="json", **params):
     elif format == "csv":
         df = pd.DataFrame.from_dict(response)
         response = df.to_csv()
-    elif format == "l":
+    elif format == "stdout":
         response = pd.DataFrame.from_dict(response)
-        response = response["id"].tolist()
-        response = ' '.join(response)
+
+        if return_object == "vog":
+            response = response["id"].tolist()
+
+        if return_object == "protein":
+            response = response["id"].tolist()
+
+        if return_object == "species":
+            response = response["taxon_id"].tolist()
+
+        try:
+            response = ' '.join(response)
+        except TypeError:
+            response = ' '.join(str(i) for i in response)
     return response
 
 
