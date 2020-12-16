@@ -109,7 +109,7 @@ def search_vog(db: Session = Depends(get_db),
 
 @api.get("/vsummary/vog/",
          response_model=List[VOG_profile])
-async def get_summary_vog(uid: List[str] = Query(None), db: Session = Depends(get_db)):
+async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns vog summaries for a list of unique identifiers (UIDs)
     :param uid: VOGID
@@ -117,7 +117,7 @@ async def get_summary_vog(uid: List[str] = Query(None), db: Session = Depends(ge
     :return: vog summary
     """
 
-    vog_summary = find_vogs_by_uid(db, uid)
+    vog_summary = find_vogs_by_uid(db, id)
 
     if not vog_summary:
         raise HTTPException(status_code=404, detail="No matching VOGs found")
@@ -131,7 +131,7 @@ async def search_protein(db: Session = Depends(get_db),
                          species_name: Optional[Set[str]] = Query(None),
                          taxon_id: Optional[Set[int]] = Query(None),
                          VOG_id: Optional[Set[str]] = Query(None)):
-    proteins = get_proteins(db, models.Protein_profile.protein_id, species_name, taxon_id, VOG_id)
+    proteins = get_proteins(db, models.Protein_profile.id, species_name, taxon_id, VOG_id)
     if not proteins:
         raise HTTPException(status_code=404, detail="No matching Proteins found")
 
@@ -140,15 +140,15 @@ async def search_protein(db: Session = Depends(get_db),
 
 @api.get("/vsummary/protein/",
          response_model=List[Protein_profile])
-async def get_summary_protein(pids: List[str] = Query(None), db: Session = Depends(get_db)):
+async def get_summary_protein(id: List[str] = Query(None), db: Session = Depends(get_db)):
     """
     This function returns protein summaries for a list of Protein identifiers (pids)
-    :param pids: proteinID
+    :param id: proteinID
     :param db: database session dependency
     :return: protein summary
     """
 
-    protein_summary = find_proteins_by_id(db, pids)
+    protein_summary = find_proteins_by_id(db, id)
 
     if not protein_summary:
         raise HTTPException(status_code=404, detail="No matching Proteins found")

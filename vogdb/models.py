@@ -46,7 +46,7 @@ class Protein_profile(Base):
     # mysql table name
     __tablename__ = "Protein_profile"
 
-    protein_id = Column('ProteinID', String, primary_key=True)
+    id = Column('ProteinID', String, primary_key=True)
     vog_id = Column('VOG_ID', String)
     taxon_id = Column('TaxonID', Integer,  ForeignKey("Species_profile.TaxonID"), index=True)
     #aa_seq = Column('AASeq', String)

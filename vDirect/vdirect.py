@@ -63,7 +63,7 @@ def main():
     vog_search_parser.add_argument('-species', type=str, action='append', nargs='+', dest='species',
                                    help="Species Names")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                   choices=['json', 'df'], help="specify a format: 'json' or 'df'")
+                                   choices=['json', 'df', 'l'], help="specify a format: 'json' or 'df' or 'l'")
 
     # add arguments for species_search_parser:
     species_search_parser.add_argument('-id', type=int, action='append', nargs='+', dest='ids',
@@ -88,7 +88,7 @@ def main():
     protein_search_parser.add_argument('-vid', '-vogid', type=str, action='append', nargs='+', dest='vog_id',
                                        help="search for VOG IDs")
     protein_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                       choices=['json', 'df'], help="specify a format: 'json' or 'df'")
+                                       choices=['json', 'df', 'l'], help="specify a format: 'json' or 'df' or 'l'")
 
     # add subparsers for vSummary:
     vsummary_sps = vsummary_parser.add_subparsers(dest='type', help='subparsers for vsummary_parser')
@@ -97,13 +97,13 @@ def main():
     protein_summary_parser = vsummary_sps.add_parser('protein', help='vsummary subparser for protein summary')
 
     # add arguments for vog_summary_parser:
-    vog_summary_parser.add_argument('-id', type=str, action='append', nargs='+', dest='uid',
+    vog_summary_parser.add_argument('-id', type=str, action='append', nargs='+', dest='id',
                                     help="VOG unique ID(s)")
     vog_summary_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                     choices=['json', 'df'], help="specify a format: 'json' or 'df'")
 
     # add arguments for protein_summary_parser:
-    protein_summary_parser.add_argument('-id', type=str, action='append', nargs='+', dest='pids',
+    protein_summary_parser.add_argument('-id', type=str, action='append', nargs='+', dest='id',
                                         help="protein ID(s)")
     protein_summary_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                         choices=['json', 'df'], help="specify a format: 'json' or 'df'")
@@ -124,13 +124,13 @@ def main():
     # add arguments for vog_fetch_parser:
     vog_fetch_parser.add_argument(type=str, action='store', choices=['hmm', 'msa'],
                                   dest='returntype', help="choose 'hmm' or 'msa'")
-    vog_fetch_parser.add_argument('-id', type=str, action='append', nargs='+', dest='uid',
+    vog_fetch_parser.add_argument('-id', type=str, action='append', nargs='+', dest='id',
                                   help="VOG unique identifiers")
 
     # add arguments for vog_fetch_parser:
     protein_fetch_parser.add_argument(type=str, action='store', choices=['faa', 'fna'],
                                       dest='returntype', help="choose 'faa' or 'fna'")
-    protein_fetch_parser.add_argument('-id', type=str, action='append', nargs='+', dest='pid',
+    protein_fetch_parser.add_argument('-id', type=str, action='append', nargs='+', dest='id',
                                       help="Protein identifiers")
 
     args = parser.parse_args()
@@ -138,10 +138,10 @@ def main():
 
     if args.command == 'vfetch':
         if args.type == 'vog':
-            print(vfetch(return_object=args.type, return_type=args.returntype, uid=args.uid))
+            print(vfetch(return_object=args.type, return_type=args.returntype, uid=args.id))
 
         elif args.type == 'protein':
-            print(vfetch(return_object=args.type, return_type=args.returntype, pid=args.pid))
+            print(vfetch(return_object=args.type, return_type=args.returntype, pid=args.id))
 
 
     elif args.command == 'vsummary':
@@ -149,10 +149,10 @@ def main():
             print(vsummary(return_object=args.type, format=args.format, taxon_id=args.taxon_ids))
 
         elif args.type == 'protein':
-            print(vsummary(return_object=args.type, format=args.format, pids=args.pids))
+            print(vsummary(return_object=args.type, format=args.format, id=args.id))
 
         elif args.type == 'vog':
-            print(vsummary(return_object=args.type, format=args.format, uid=args.uid))
+            print(vsummary(return_object=args.type, format=args.format, id=args.id))
 
 
     elif args.command == 'vsearch':
@@ -162,8 +162,7 @@ def main():
 
         if args.type == 'protein':
             print(vsearch(return_object=args.type, format=args.format, taxon_id=args.taxon_id,
-                          species_name=args.species_name,
-                          VOG_id=args.vog_id))
+                          species_name=args.species_name, VOG_id=args.vog_id))
 
         if args.type == 'vog':
             print(vsearch(return_object=args.type, format=args.format, id=args.ids, pmin=args.pmin, pmax=args.pmax,

@@ -242,14 +242,14 @@ def get_proteins(db: Session,
                 s_res = []
                 for s in species:
                     search = "%" + s + "%"
-                    res = db.query().with_entities(models.Protein_profile.protein_id,
+                    res = db.query().with_entities(models.Protein_profile.id,
                                                    models.Protein_profile.vog_id,
                                                    models.Protein_profile.taxon_id,
                                                    models.Species_profile.species_name).join(models.Species_profile). \
                         filter(models.Species_profile.species_name.like(search)).all()
                     s_res.extend(res)
                 s_res = {id[0] for id in s_res}  # convert to set
-                filters.append(getattr(models.Protein_profile, "protein_id").in_(s_res))
+                filters.append(getattr(models.Protein_profile, "id").in_(s_res))
 
             if key == "taxon_id":
                 filters.append(getattr(models.Protein_profile, key).in_(value))
@@ -265,11 +265,11 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
     """
     This function returns the Protein information based on the given Protein IDs
     """
-    results = db.query().with_entities(models.Protein_profile.protein_id,
+    results = db.query().with_entities(models.Protein_profile.id,
                                        models.Protein_profile.vog_id,
                                        models.Protein_profile.taxon_id,
                                        models.Species_profile.species_name).join(models.Species_profile). \
-        filter(models.Protein_profile.protein_id.in_(pids)).all()
+        filter(models.Protein_profile.id.in_(pids)).all()
 
     return results
 
