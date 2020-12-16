@@ -56,14 +56,13 @@ def main():
     vog_search_parser.add_argument('-vs', type=bool, action='store', nargs='?', dest='vs',
                                    help="Virus specific? '1' for True and '0' for False")
     vog_search_parser.add_argument('-p', '-phage', type=str, action='store', nargs='?', dest='phage',
-                                   choices=['mixed', 'phages_only', 'np_only'],
-                                   help="specify phages_only, nonphages only or mixed")
+                                   choices=['mixed', 'phages_only', 'np_only'], help="specify phages_only, nonphages only or mixed")
     vog_search_parser.add_argument('-prot', type=str, action='append', nargs='+', dest='prot',
                                    help="Protein IDs")
     vog_search_parser.add_argument('-species', type=str, action='append', nargs='+', dest='species',
                                    help="Species Names")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                   choices=['json', 'df', 'l'], help="specify a format: 'json' or 'df' or 'l'")
+                                   choices=['json', 'df', 'l'], help="specify a format: 'json' or 'df'")
 
     # add arguments for species_search_parser:
     species_search_parser.add_argument('-id', type=int, action='append', nargs='+', dest='ids',
@@ -88,7 +87,7 @@ def main():
     protein_search_parser.add_argument('-vid', '-vogid', type=str, action='append', nargs='+', dest='vog_id',
                                        help="search for VOG IDs")
     protein_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                       choices=['json', 'df', 'l'], help="specify a format: 'json' or 'df' or 'l'")
+                                       choices=['json', 'df'], help="specify a format: 'json' or 'df'")
 
     # add subparsers for vSummary:
     vsummary_sps = vsummary_parser.add_subparsers(dest='type', help='subparsers for vsummary_parser')
@@ -156,8 +155,8 @@ def main():
                 id = args.id.read().split()
             else:
                 id = args.id
+
             print(vsummary(return_object=args.type, format=args.format, id=id))
-            # print(vsummary(return_object=args.type, format=args.format, id=args.id))
 
 
     elif args.command == 'vsearch':
