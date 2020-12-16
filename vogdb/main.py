@@ -189,7 +189,12 @@ async def fetch_protein_faa(id: List[str] = Query(None)):
     :return: Amino acid sequences for the proteins
     """
     protein_faa = find_protein_faa_by_id(id)
-    return protein_faa
+    res = ''
+    for ele in protein_faa:
+        res = res + str(ele.format("fasta"))
+    print("RESTUL")
+    return res
+    # return protein_faa
 
 
 @api.get("/vfetch/protein/fna")
