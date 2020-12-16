@@ -52,7 +52,7 @@ def get_species(db: Session,
     filters = []
 
     for key, value in arguments.items():  # type: str, any
-        if value:
+        if value is not None:
             if key == "taxon_id":
                 filters.append(getattr(models.Species_profile, key).in_(value))
 
@@ -147,7 +147,7 @@ def get_vogs(db: Session,
     filters = []
 
     for key, value in arguments.items():  # type: str, any
-        if value:
+        if value is not None:
             if key == "id":
                 filters.append(getattr(models.VOG_profile, key).in_(value))
 
@@ -235,7 +235,7 @@ def get_proteins(db: Session,
     filters = []
 
     for key, value in arguments.items():  # type: str, any
-        if value:
+        if value is not None:
             if key == "species":
                 s_res = []
                 for s in species:
