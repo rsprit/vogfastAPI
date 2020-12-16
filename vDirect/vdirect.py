@@ -8,7 +8,6 @@ This is the implementation of the arg parser
 
 
 def main():
-    print(sys.argv)
     parser = argparse.ArgumentParser(description='Welcome to vDirect!', epilog='Thank you for using vDirect!')
     subparsers = parser.add_subparsers(dest='command', help='Subcommands')
 
