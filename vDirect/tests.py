@@ -55,7 +55,7 @@ def test_vsearch_proteinIds_allParameters():
                        VOG_id = ["VOG05566"])
 
     expected = ["11128.NP_150082.1"]
-    assert response["protein_id"].to_list() == expected
+    assert response["id"].to_list() == expected
 
 
 def test_vsummary_vogIds_twoVogIds():
@@ -77,4 +77,4 @@ def test_vsummary_proteinIds_twoProteinIds():
     response = vsummary(return_object="protein", format="dataframe", pids=["11128.NP_150082.1"])
     expected = ['11128.NP_150082.1']
     print(response)
-    assert response["protein_id"].to_list() == expected
+    assert response["id"].to_list() == expected
