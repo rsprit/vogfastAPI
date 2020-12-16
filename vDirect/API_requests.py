@@ -17,19 +17,36 @@ except ImportError:  # Python 2
 base_url = 'http://127.0.0.1:8000/'
 
 
-def vfetch(return_object="hmm", **params):
+def vfetch(return_object="vog", return_type="msa", **params):
+    print("in VFETCH")
     """Yield the response of a query."""
-    _valid_params = list(main.fetch_vog.__code__.co_varnames)
-
-    # First make some basic checks.
-    if return_object not in ["hmm", "msa"]:
+    if return_object not in ["vog", "protein"]:
         # return_object does not compare equal to any enum value:
         raise ValueError("Invalid return object " + str(return_object))
+
+    _valid_params = []
+    if return_object == "vog":
+        _valid_params = list(main.fetch_vog.__code__.co_varnames)
+    elif return_object == "protein":
+        _valid_params = list(main.fetch_protein_faa.__code__.co_varnames)
+    else:
+        raise ValueError("No return object given")
 
     for k in params:
         assert k in _valid_params, 'Unknown parameter: %s' % k
 
-    url = base_url + 'vfetch/vog/{0}?'.format(return_object)
+    url = base_url + 'vfetch/{0}'.format(return_object) + '/{0}?'.format(return_type)
+    print(url)
+
+    if return_object == "vog":
+        if return_type not in ["msa", "hmm"]:
+            # return_type does not compare equal to any enum value:
+            raise ValueError("Invalid return object " + str(return_object))
+
+    elif return_object == "protein":
+        if return_type not in ["faa", "fna"]:
+            # return_type does not compare equal to any enum value:
+            raise ValueError("Invalid return object " + str(return_object))
 
     r = requests.get(url=url, params=params)
     response = r.json()

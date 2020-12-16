@@ -56,7 +56,8 @@ def main():
     vog_search_parser.add_argument('-vs', type=bool, action='store', nargs='?', dest='vs',
                                    help="Virus specific? '1' for True and '0' for False")
     vog_search_parser.add_argument('-p', '-phage', type=str, action='store', nargs='?', dest='phage',
-                                   choices=['mixed', 'phages_only', 'np_only'], help="specify phages_only, nonphages only or mixed")
+                                   choices=['mixed', 'phages_only', 'np_only'],
+                                   help="specify phages_only, nonphages only or mixed")
     vog_search_parser.add_argument('-prot', type=str, action='append', nargs='+', dest='prot',
                                    help="Protein IDs")
     vog_search_parser.add_argument('-species', type=str, action='append', nargs='+', dest='species',
@@ -116,23 +117,31 @@ def main():
     # add subparsers for vFetch:
     vfetch_sps = vfetch_parser.add_subparsers(dest='type', help='subparsers for vfetch_parser')
     vog_fetch_parser = vfetch_sps.add_parser('vog', help='vfetch subparser for vog fetch')
-    # # species fetch and protein fetch do not exist
+    # # species fetch does not exist
     # species_fetch_parser = vfetch_sps.add_parser('species', help='vfetch subparser for species fetch')
-    # protein_fetch_parser = vfetch_sps.add_parser('protein', help='vfetch subparser for protein fetch')
+    protein_fetch_parser = vfetch_sps.add_parser('protein', help='vfetch subparser for protein fetch')
 
     # add arguments for vog_fetch_parser:
     vog_fetch_parser.add_argument(type=str, action='store', choices=['hmm', 'msa'],
                                   dest='returntype', help="choose 'hmm' or 'msa'")
-    vog_fetch_parser.add_argument('-uid', type=str, action='append', nargs='+', dest='uid',
+    vog_fetch_parser.add_argument('-id', type=str, action='append', nargs='+', dest='uid',
                                   help="VOG unique identifiers")
+
+    # add arguments for vog_fetch_parser:
+    protein_fetch_parser.add_argument(type=str, action='store', choices=['faa', 'fna'],
+                                      dest='returntype', help="choose 'faa' or 'fna'")
+    protein_fetch_parser.add_argument('-id', type=str, action='append', nargs='+', dest='pid',
+                                      help="Protein identifiers")
 
     args = parser.parse_args()
     print(args)
 
     if args.command == 'vfetch':
-        response = vfetch(return_object=args.returntype, uid=args.uid)
-        print(response)
-        return response
+        if args.type == 'vog':
+            print(vfetch(return_object=args.type, return_type=args.returntype, uid=args.uid))
+
+        elif args.type == 'protein':
+            print(vfetch(return_object=args.type, return_type=args.returntype, pid=args.pid))
 
 
     elif args.command == 'vsummary':

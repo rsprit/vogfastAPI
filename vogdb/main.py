@@ -180,8 +180,28 @@ async def fetch_vog(uid: List[str] = Query(None)):
     return vog_hmm
 
 
+@api.get("/vfetch/protein/faa")
+async def fetch_protein_faa(pid: List[str] = Query(None)):
+    """
+    This function returns Amino acid sequences for the proteins specified by the protein IDs
+    :param pid: ProteinID
+    :param db: database session dependency
+    :return: Amino acid sequences for the proteins
+    """
+    protein_faa = find_protein_faa_by_id(pid)
+    return protein_faa
 
 
+@api.get("/vfetch/protein/fna")
+async def fetch_protein_fna(pid: List[str] = Query(None)):
+    """
+    This function returns Nucleotide sequences for the genes specified by the protein IDs
+    :param pid: ProteinID
+    :param db: database session dependency
+    :return: Nucleotide sequences for the proteins
+    """
+    protein_fna = find_protein_fna_by_id(pid)
+    return protein_fna
 
 
 # OLD

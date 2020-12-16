@@ -8,6 +8,8 @@ from . import models, schemas
 from typing import Optional, Set, List
 from fastapi import Query, HTTPException
 import tarfile
+import gzip
+
 """
 Here we define all the search methods that are used for extracting the data from the database
 """
@@ -272,7 +274,26 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
     return results
 
 
+def find_protein_faa_by_id(pid):
+    file_name = "./data/vog.proteins.all.fa"
+    # gunzip files???
+    prots = SeqIO.index(file_name, 'fasta')
+    result = []
+    for p in pid:
+        result.append(prots[p])
+        # result.append(p + " " + prots[p]._seq._data)
+    return result
 
+
+def find_protein_fna_by_id(pid):
+    # gunzip files???
+    file_name = "./data/vog.genes.all.fa"
+    #f = gunzip(file_name)
+    genes = SeqIO.index(file_name, 'fasta')
+    result = []
+    for p in pid:
+        result.append(genes[p])
+    return result
 
 
 
