@@ -1,5 +1,4 @@
-from os import path
-from vDirect_demo import *
+from API_requests import *
 import sys
 import argparse
 
@@ -140,7 +139,6 @@ def main():
         if args.type == 'species':
             print(vsummary(return_object=args.type, format=args.format, taxon_id=args.taxon_ids))
 
-        # ToDo: Implement for Vsummary protein
         elif args.type == 'protein':
             print(vsummary(return_object=args.type, format=args.format, pids=args.pids))
 
