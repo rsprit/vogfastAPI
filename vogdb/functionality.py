@@ -1,4 +1,6 @@
 import pandas as pd
+
+from database.generate_db import ncbi
 from .vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
@@ -138,7 +140,8 @@ def get_vogs(db: Session,
              virus_specific: Optional[bool],
              phages_nonphages: Optional[str],
              proteins: Optional[Set[str]],
-             species: Optional[Set[str]]
+             species: Optional[Set[str]],
+             taxid: Optional[int]
              ):
     """
     This function searches the VOG based on the given query parameters
@@ -219,6 +222,14 @@ def get_vogs(db: Session,
             if key == "phages_nonphages":
                 val = "%" + value + "%"
                 filters.append(getattr(models.VOG_profile, key).like(val))
+
+            if key == "taxid":
+                id_list = ncbi.get_descendant_taxa(taxid, collapse_subspecies=False, intermediate_nodes=True)
+                vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
+                    filter(models.Species_profile.taxon_id.in_(id_list)).group_by(models.Protein_profile.vog_id). \
+                    having(func.count(models.Species_profile.species_name) == len(species)).all()
+                vog_ids = {id[0] for id in vog_ids}  # convert to set
+                filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 
     result = result.filter(*filters)
     return result.all()

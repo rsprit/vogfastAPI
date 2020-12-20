@@ -1,7 +1,3 @@
-import sys
-from fastapi import Query, Path, HTTPException
-from typing import Optional, Set, List
-from starlette.responses import StreamingResponse
 
 from .functionality import *
 from .database import SessionLocal
@@ -9,11 +5,9 @@ from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
 from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile, ProteinID
 from . import models
-from fastapi.responses import FileResponse, Response
-#from starlette.responses import FileResponse
 
 api = FastAPI()
-svc = VogService('data')
+# svc = VogService('data')
 
 
 # Dependency. Connect to the database session
@@ -90,6 +84,7 @@ def search_vog(db: Session = Depends(get_db),
                phages_nonphages: Optional[str] = None,
                proteins: Optional[Set[str]] = Query(None),
                species: Optional[Set[str]] = Query(None),
+               tax_id: Optional[int] = None,
                ):
     """
     This functions searches a database and returns a list of vog unique identifiers (UIDs) for records in that database
