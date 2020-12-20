@@ -9,40 +9,6 @@ from sqlalchemy.dialects.mysql import LONGTEXT
 from ete3 import NCBITaxa
 import tarfile
 
-# from taxadb.parser import TaxaDumpParser
-# from taxadb.taxid import TaxID
-
-# ncbi = NCBITaxa()
-# # print(ncbi.get_rank([9606, 9443]))
-# # # {9443: u'order', 9606: u'species'}
-# # print("looking for descendants")
-# # descendants = ncbi.get_descendant_taxa("Coronaviridae", collapse_subspecies=False, intermediate_nodes=True)
-# # bc = ncbi.get_descendant_taxa("Bovine coronavirus", collapse_subspecies=False, intermediate_nodes=True)
-# bc = ncbi.get_descendant_taxa(11128, collapse_subspecies=False, intermediate_nodes=True)
-# print(ncbi.translate_to_names(bc))
-# print(bc)
-# print("descendants")
-# print(descendants)
-# print(ncbi.translate_to_names(descendants))
-
-# print(ncbi.get_rank([11118, 11128]))
-#
-# de = ncbi.get_descendant_taxa('Homo', collapse_subspecies=False)
-# print(ncbi.translate_to_names(de))
-#
-# tree = ncbi.get_descendant_taxa('Coronaviridae', collapse_subspecies=True, return_tree=True)
-# print(tree.get_ascii(attributes=['sci_name', 'taxid']))
-
-# names = "../new_taxdump_2020-12-01/names.dmp"
-# nodes = "../new_taxdump_2020-12-01/nodes.dmp"
-# taxparser = TaxaDumpParser(names_file=names, nodes_file=nodes)
-# print("taxparsing")
-# taxparser.__init__(nodes, names)
-# taxparser.set_names_file(names)
-# taxparser.set_nodes_file(nodes)
-# print(taxparser.taxdump(nodes, names))
-
-
 
 """
 Here we create our VOGDB and create all the tables that we are going to use
