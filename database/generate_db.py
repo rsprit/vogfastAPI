@@ -6,13 +6,14 @@ import numpy as np
 import os
 from sqlalchemy import VARCHAR
 from sqlalchemy.dialects.mysql import LONGTEXT
+from ete3 import NCBITaxa
+
 import tarfile
 
 # from taxadb.parser import TaxaDumpParser
 # from taxadb.taxid import TaxID
 
-from ete3 import NCBITaxa
-ncbi = NCBITaxa()
+
 
 # print(ncbi.get_rank([9606, 9443]))
 # # {9443: u'order', 9606: u'species'}
@@ -24,6 +25,7 @@ ncbi = NCBITaxa()
 # print("descendants")
 # print(descendants)
 # print(ncbi.translate_to_names(descendants))
+ncbi = NCBITaxa()
 print("SEARch by taxid 11118")
 destax = ncbi.get_descendant_taxa(11118, collapse_subspecies=False, intermediate_nodes=True)
 print(destax)
