@@ -15,6 +15,7 @@ except ImportError:  # Python 2
     from urllib2 import urlopen
 
 base_url = 'http://127.0.0.1:8000/'
+#ToDo: change base URL to new server URL
 
 
 def vfetch(return_object="vog", return_type="msa", **params):

@@ -192,7 +192,6 @@ async def fetch_protein_faa(id: List[str] = Query(None)):
     res = ''
     for ele in protein_faa:
         res = res + str(ele.format("fasta"))
-    print("RESTUL")
     return res
     # return protein_faa
 
@@ -206,7 +205,11 @@ async def fetch_protein_fna(id: List[str] = Query(None)):
     :return: Nucleotide sequences for the proteins
     """
     protein_fna = find_protein_fna_by_id(id)
-    return protein_fna
+    res = ''
+    for ele in protein_fna:
+        res = res + str(ele.format("fasta"))
+    return res
+    # return protein_fna
 
 
 # OLD
