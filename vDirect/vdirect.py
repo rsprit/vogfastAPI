@@ -60,6 +60,8 @@ def main():
                                    help="Protein IDs")
     vog_search_parser.add_argument('-species', type=str, action='append', nargs='+', dest='species',
                                    help="Species Names")
+    vog_search_parser.add_argument('-tid', type=int, action='store', nargs='?', dest='tid',
+                                   help="Taxonomy ID")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                    choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df'")
 
@@ -185,7 +187,7 @@ def main():
                           mingGLCA=args.mingGLCA, maxgGLCA=args.maxgGLCA, functional_category=args.fctcat,
                           consensus_function=args.confct, ancestors=args.anc, h_stringency=args.hs,
                           m_stringency=args.ms, l_stringency=args.ls, virus_specific=args.vs,
-                          phages_nonphages=args.phage, proteins=args.prot, species=args.species))
+                          phages_nonphages=args.phage, proteins=args.prot, species=args.species, tax_id=args.tid))
 
 
 if __name__ == '__main__':

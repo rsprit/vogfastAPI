@@ -1,6 +1,5 @@
 import pandas as pd
-
-from database.generate_db import ncbi
+# from database.generate_db import ncbi
 from .vogdb_api import VOG, Species
 from Bio import SeqIO
 import os
@@ -11,6 +10,9 @@ from typing import Optional, Set, List
 from fastapi import Query, HTTPException
 import tarfile
 import gzip
+from ete3 import NCBITaxa
+
+# ncbi = NCBITaxa()
 
 """
 Here we define all the search methods that are used for extracting the data from the database
@@ -141,7 +143,7 @@ def get_vogs(db: Session,
              phages_nonphages: Optional[str],
              proteins: Optional[Set[str]],
              species: Optional[Set[str]],
-             taxid: Optional[int]
+             tax_id: Optional[int]
              ):
     """
     This function searches the VOG based on the given query parameters
@@ -223,11 +225,15 @@ def get_vogs(db: Session,
                 val = "%" + value + "%"
                 filters.append(getattr(models.VOG_profile, key).like(val))
 
-            if key == "taxid":
-                id_list = ncbi.get_descendant_taxa(taxid, collapse_subspecies=False, intermediate_nodes=True)
+            if key == "tax_id":
+                ncbi = NCBITaxa()
+                try:
+                    id_list = ncbi.get_descendant_taxa(tax_id, collapse_subspecies=False, intermediate_nodes=True)
+                    id_list.append(tax_id)
+                except ValueError:
+                    raise HTTPException(status_code=404, detail="The provided taxonomy ID is invalid.")
                 vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
-                    filter(models.Species_profile.taxon_id.in_(id_list)).group_by(models.Protein_profile.vog_id). \
-                    having(func.count(models.Species_profile.species_name) == len(species)).all()
+                    filter(models.Species_profile.taxon_id.in_(id_list)).group_by(models.Protein_profile.vog_id).all()
                 vog_ids = {id[0] for id in vog_ids}  # convert to set
                 filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 

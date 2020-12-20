@@ -7,34 +7,28 @@ import os
 from sqlalchemy import VARCHAR
 from sqlalchemy.dialects.mysql import LONGTEXT
 from ete3 import NCBITaxa
-
 import tarfile
 
 # from taxadb.parser import TaxaDumpParser
 # from taxadb.taxid import TaxID
 
-
-
-# print(ncbi.get_rank([9606, 9443]))
-# # {9443: u'order', 9606: u'species'}
-# print("looking for descendants")
-# descendants = ncbi.get_descendant_taxa("Coronaviridae", collapse_subspecies=False, intermediate_nodes=True)
-# bc = ncbi.get_descendant_taxa("Bovine coronavirus", collapse_subspecies=False, intermediate_nodes=True)
+# ncbi = NCBITaxa()
+# # print(ncbi.get_rank([9606, 9443]))
+# # # {9443: u'order', 9606: u'species'}
+# # print("looking for descendants")
+# # descendants = ncbi.get_descendant_taxa("Coronaviridae", collapse_subspecies=False, intermediate_nodes=True)
+# # bc = ncbi.get_descendant_taxa("Bovine coronavirus", collapse_subspecies=False, intermediate_nodes=True)
+# bc = ncbi.get_descendant_taxa(11128, collapse_subspecies=False, intermediate_nodes=True)
 # print(ncbi.translate_to_names(bc))
 # print(bc)
 # print("descendants")
 # print(descendants)
 # print(ncbi.translate_to_names(descendants))
-ncbi = NCBITaxa()
-print("SEARch by taxid 11118")
-destax = ncbi.get_descendant_taxa(11118, collapse_subspecies=False, intermediate_nodes=True)
-print(destax)
 
 # print(ncbi.get_rank([11118, 11128]))
 #
 # de = ncbi.get_descendant_taxa('Homo', collapse_subspecies=False)
 # print(ncbi.translate_to_names(de))
-
 #
 # tree = ncbi.get_descendant_taxa('Coronaviridae', collapse_subspecies=True, return_tree=True)
 # print(tree.get_ascii(attributes=['sci_name', 'taxid']))
@@ -47,6 +41,7 @@ print(destax)
 # taxparser.set_names_file(names)
 # taxparser.set_nodes_file(nodes)
 # print(taxparser.taxdump(nodes, names))
+
 
 
 """
