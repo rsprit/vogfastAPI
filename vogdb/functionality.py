@@ -186,11 +186,18 @@ def get_vogs(db: Session,
                     filters.append(getattr(models.VOG_profile, key).like(p))
 
             if key == "species":
-                # vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
-                #     filter(models.Species_profile.species_name.in_(species)).group_by(models.Protein_profile.vog_id). \
-                #     having(func.count(models.Species_profile.species_name) == len(species)).all()
-                vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
-                    filter(models.Species_profile.species_name.in_(species)).group_by(models.Protein_profile.vog_id).all()
+                inclusive = ''
+                while inclusive is not 'a' and inclusive is not 'o':
+                    inclusive = input("Do you want your species search to be an (a)nd or an (o)r search? ")
+                if inclusive == 'a':
+                    # THIS IS THE AND SEARCH:
+                    vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
+                        filter(models.Species_profile.species_name.in_(species)).group_by(models.Protein_profile.vog_id). \
+                        having(func.count(models.Species_profile.species_name) == len(species)).all()
+                else:
+                # OR SEARCH below:
+                    vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
+                        filter(models.Species_profile.species_name.in_(species)).group_by(models.Protein_profile.vog_id).all()
                 vog_ids = {id[0] for id in vog_ids}  # convert to set
                 filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 
