@@ -95,7 +95,8 @@ def search_vog(db: Session = Depends(get_db),
                     mingLCA, maxgLCA, mingGLCA, maxgGLCA,
                     ancestors, h_stringency, m_stringency, l_stringency, virus_specific, phages_nonphages, proteins,
                     species, tax_id)
-
+    print("LEN VOG")
+    print(len(vogs))
     if not vogs:
         raise HTTPException(status_code=404, detail="No VOGs match the search criteria.")
     return vogs

@@ -186,9 +186,11 @@ def get_vogs(db: Session,
                     filters.append(getattr(models.VOG_profile, key).like(p))
 
             if key == "species":
+                # vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
+                #     filter(models.Species_profile.species_name.in_(species)).group_by(models.Protein_profile.vog_id). \
+                #     having(func.count(models.Species_profile.species_name) == len(species)).all()
                 vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
-                    filter(models.Species_profile.species_name.in_(species)).group_by(models.Protein_profile.vog_id). \
-                    having(func.count(models.Species_profile.species_name) == len(species)).all()
+                    filter(models.Species_profile.species_name.in_(species)).group_by(models.Protein_profile.vog_id).all()
                 vog_ids = {id[0] for id in vog_ids}  # convert to set
                 filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 
@@ -227,13 +229,18 @@ def get_vogs(db: Session,
 
             if key == "tax_id":
                 ncbi = NCBITaxa()
+                # ncbi.update_taxonomy_database()
                 try:
                     id_list = ncbi.get_descendant_taxa(tax_id, collapse_subspecies=False, intermediate_nodes=True)
                     id_list.append(tax_id)
+                    print("ID LIST")
+                    print(id_list)
                 except ValueError:
                     raise HTTPException(status_code=404, detail="The provided taxonomy ID is invalid.")
                 vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
+                    filter(models.Species_profile.taxon_id.in_(id_list)).group_by(models.Protein_profile.vog_id) .\
                     filter(models.Species_profile.taxon_id.in_(id_list)).group_by(models.Protein_profile.vog_id).all()
+
                 vog_ids = {id[0] for id in vog_ids}  # convert to set
                 filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 
