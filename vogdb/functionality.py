@@ -143,7 +143,8 @@ def get_vogs(db: Session,
              phages_nonphages: Optional[str],
              proteins: Optional[Set[str]],
              species: Optional[Set[str]],
-             tax_id: Optional[int]
+             tax_id: Optional[int],
+             inclusive: Optional[str]
              ):
     """
     This function searches the VOG based on the given query parameters
@@ -186,9 +187,8 @@ def get_vogs(db: Session,
                     filters.append(getattr(models.VOG_profile, key).like(p))
 
             if key == "species":
-                inclusive = ''
-                while inclusive is not 'a' and inclusive is not 'o':
-                    inclusive = input("Do you want your species search to be an (a)nd or an (o)r search? ")
+                if inclusive is not 'a' and inclusive is not 'o':
+                    raise HTTPException(status_code=404, detail="The parameter for the AND or OR search has to be 'a' or 'o'.")
                 if inclusive == 'a':
                     # THIS IS THE AND SEARCH:
                     vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
