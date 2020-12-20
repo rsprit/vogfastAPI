@@ -60,8 +60,8 @@ def main():
                                    help="Protein IDs")
     vog_search_parser.add_argument('-species', type=str, action='append', nargs='+', dest='species',
                                    help="Species Names")
-    vog_search_parser.add_argument('-tid', type=int, action='store', nargs='?', dest='tid',
-                                   help="Taxonomy ID")
+    vog_search_parser.add_argument('-tid', type=int, action='append', nargs='+', dest='tid',
+                                   help="Taxonomy ID(s)")
     vog_search_parser.add_argument('-and', type=str, action='store', nargs='?', default='a', dest='andor',
                                    help="Do you want an (a)nd or an (o)r search?")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
