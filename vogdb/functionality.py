@@ -9,7 +9,7 @@ from . import models, schemas
 from typing import Optional, Set, List
 from fastapi import Query, HTTPException
 import tarfile
-import gzip
+import gunzip
 from ete3 import NCBITaxa
 
 # ncbi = NCBITaxa()
@@ -298,21 +298,16 @@ def find_protein_faa_by_id(pid):
     result = []
     for p in pid:
         result.append(prots[p])
-        # result.append(p + " " + prots[p]._seq._data)
     return result
 
 
 def find_protein_fna_by_id(pid):
     # gunzip files???
     file_name = "./data/vog.genes.all.fa"
-    #f = gunzip(file_name)
     genes = SeqIO.index(file_name, 'fasta')
     result = []
     for p in pid:
         result.append(genes[p])
-    # with open("example.fasta", "w") as handle:
-    #     for ele in result:
-    #         SeqIO.write(ele.values(), handle, "fasta")
     return result
 
 
