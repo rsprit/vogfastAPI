@@ -149,7 +149,7 @@ def get_vogs(db: Session,
     """
     This function searches the VOG based on the given query parameters
     """
-    print(inclusive)
+    # print(inclusive)
     if inclusive is not 'a' and inclusive is not 'o':
         raise HTTPException(status_code=404,
                             detail="The parameter for the AND or OR search has to be 'a' or 'o'.")

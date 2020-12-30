@@ -142,7 +142,7 @@ def vsearch(return_object="vog", format="json", **params):
     return response
 
 
-# function to save hmm vFetch response objects (for now just hmm, mse)
+# function to save hmm vFetch response objects (for now just hmm, msa)
 def save_object(object, output_path="./test.txt"):
     """Saves the response object to output path"""
 
