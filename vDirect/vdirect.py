@@ -67,13 +67,13 @@ def main():
     vog_search_parser.add_argument('-and', type=str, action='store', nargs='?', default='a', dest='andor',
                                    help="Do you want an (a)nd or an (o)r search? Default = 'a'.")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                   choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df'")
+                                   choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df' or 'stdout'")
 
     # add arguments for species_search_parser:
     species_search_parser.add_argument('-id', type=int, action='append', nargs='+', dest='ids',
                                        help="species ID(s)")
     species_search_parser.add_argument('-n', '-name', type=str, action='store', nargs='?', dest='name',
-                                       help="search for species name or part of species name")
+                                       help="search for species name or part of a species name")
     species_search_parser.add_argument('-p', '-phage', type=int, action='store', nargs='?', dest='phage',
                                        help="Enter '1' for searching for phages only and '0' when wanting to search "
                                             "for nonphages only")
@@ -82,7 +82,7 @@ def main():
     species_search_parser.add_argument('-v', '-version', type=int, action='store', nargs='?', dest='version',
                                        help="search for species found in the specified version")
     species_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                       choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df'")
+                                       choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df' or 'stdout'")
 
     # add arguments for protein_search_parser:
     protein_search_parser.add_argument('-tid', type=int, action='append', nargs='+', dest='taxon_id',
@@ -92,7 +92,7 @@ def main():
     protein_search_parser.add_argument('-vid', '-vogid', type=str, action='append', nargs='+', dest='vog_id',
                                        help="search for VOG IDs")
     protein_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                       choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df'")
+                                       choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df' or 'stdout'")
 
     # add subparsers for vSummary:
     vsummary_sps = vsummary_parser.add_subparsers(dest='type', help='subparsers for vsummary_parser')
