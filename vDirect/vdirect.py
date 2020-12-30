@@ -41,7 +41,9 @@ def main():
     vog_search_parser.add_argument('-maxgGLCA', type=int, action='store', nargs='?', dest='maxgGLCA',
                                    help="maximum number of genomes in the Group of the Last common ancestor")
     vog_search_parser.add_argument('-fctcat', type=str, action='append', nargs='+', dest='fctcat',
-                                   help="functional category: Xu Xh Xr")
+                                   choices=['Xu', 'Xh', 'Xp', 'Xr', 'Xs'],
+                                   help="functional category: Xu, Xh, Xp, Xr, Xs. If providing more than one, separate"
+                                        " them by a space.")
     vog_search_parser.add_argument('-confct', type=str, action='append', nargs='+', dest='confct',
                                    help="Concensus function")
     vog_search_parser.add_argument('-anc', type=str, action='append', nargs='+', dest='anc',
@@ -63,7 +65,7 @@ def main():
     vog_search_parser.add_argument('-tid', type=int, action='append', nargs='+', dest='tid',
                                    help="Taxonomy ID(s)")
     vog_search_parser.add_argument('-and', type=str, action='store', nargs='?', default='a', dest='andor',
-                                   help="Do you want an (a)nd or an (o)r search?")
+                                   help="Do you want an (a)nd or an (o)r search? Default = 'a'.")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                    choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df'")
 
@@ -146,7 +148,6 @@ def main():
         response = vfetch(return_object=args.type, return_type=args.returntype, id=id)
 
         print(response)
-
 
 
     elif args.command == 'vsummary':
