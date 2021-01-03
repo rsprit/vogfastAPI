@@ -22,7 +22,7 @@ class Monitor:
         result = requests.get(self.url).text
         data = pd.read_html(result)[0]["Last modified"].dropna()
         try:
-            if not self.checkequality(self.last_data, data):  # Inefficient but more native way of checking
+            if not self.check_equality(self.last_data, data):  # Inefficient but more native way of checking
                 print("Generating DB")  # TODO: Replace by generate_db function
             else:
                 print("Database already up to date.")
@@ -31,26 +31,25 @@ class Monitor:
         self.last_data = data
 
     @staticmethod  # Maybe not necessary, call self in the function instead
-    def checkequality(dateA, dateB):
+    def check_equality(date_old, date_new):
         """Check if all items in the lists dateA and dateB are identical
             Returns: bool
             Raises: IndexError"""
-        dateA = list(dateA)  # Type safety - putting an error if not type == list probably better practice
-        dateB = list(dateB)
-        for i, item in enumerate(dateA):
+        date_old = list(date_old)  # Type safety - putting an error if not type == list probably better practice
+        date_new = list(date_new)
+        for i, item in enumerate(date_old):
             try:
-                if item != dateB[i]:
+                if item != date_new[i]:
                     return False
             except IndexError:
                 return False
         return True
 
-
-def run(self):
-    """Call indefinitely the updateDB function and suspend execution for the given number of seconds"""
-    while True:
-        self.update()
-        sleep(self.pause_between_requests * 60)
+    def run(self):
+        """Call indefinitely the updateDB function and suspend execution for the given number of seconds"""
+        while True:
+            self.update()
+            sleep(self.pause_between_requests * 60)
 
 
 # Run it------------------------------------------------------------------------
