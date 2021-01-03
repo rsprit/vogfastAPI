@@ -8,7 +8,7 @@ Note: you might need to change the MYSQL login credentials
 
 # MySQL database connection
 username = "root"
-password = "BeMgCa2SrBaRa"
+password = "password"
 server = "localhost"
 database = "VOGDB"
 SQLALCHEMY_DATABASE_URL = ("mysql+pymysql://{0}:{1}@{2}/{3}").format(username, password, server, database)
