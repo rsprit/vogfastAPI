@@ -50,7 +50,9 @@ species_list_df = pd.read_csv(data_path + "vog.species.list",
 
 #engine.execute('ALTER TABLE protein_profile drop FOREIGN KEY protein_profile_ibfk_1;')
 #engine.execute('ALTER TABLE protein_profile drop FOREIGN KEY protein_profile_ibfk_2;')
+'''disable constraints before dropping and newly creating db'''
 engine.execute('SET foreign_key_checks = 0;')
+
 species_list_df.to_sql(name='species_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
 
 with engine.connect() as con:
@@ -83,7 +85,7 @@ annotations = pd.read_csv(data_path + "vog.annotations.tsv.gz", compression='gzi
                           usecols=['VOG_ID', 'Consensus_func_description'],
                           index_col='VOG_ID')
 
-#lca = pd.read_csv(os.path.join(data_path, 'vog.lca.tsv.gz'), compression='gzip',
+
 lca = pd.read_csv(data_path + 'vog.lca.tsv.gz', compression='gzip',
                   sep='\t',
                   header=0,
