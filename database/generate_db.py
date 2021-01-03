@@ -16,7 +16,7 @@ data_path = "../data/"
 
 # MySQL database connection
 username = "root"
-password = "BeMgCa2SrBaRa"
+password = "password"
 server = "localhost"
 database = "vogdb"
 port = "3306"
