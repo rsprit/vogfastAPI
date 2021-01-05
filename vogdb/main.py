@@ -3,7 +3,8 @@ from .functionality import *
 from .database import SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import Depends, FastAPI
-from .schemas import VOG_profile, Protein_profile, Filter, VOG_UID, Species_ID, Species_profile, ProteinID
+from .schemas import VOG_profile, Protein_profile, VOG_UID, Species_ID, Species_profile, ProteinID, AA_seq, NT_seq
+# from .schemas import *
 from . import models
 
 api = FastAPI()
@@ -174,36 +175,44 @@ async def fetch_vog(id: List[str] = Query(None)):
     return vog_hmm
 
 
-@api.get("/vfetch/protein/faa")
-async def fetch_protein_faa(id: List[str] = Query(None)):
+@api.get("/vfetch/protein/faa",
+         response_model=List[AA_seq])
+async def fetch_protein_faa(db: Session = Depends(get_db), id: List[str] = Query(None)):
     """
     This function returns Amino acid sequences for the proteins specified by the protein IDs
     :param id: ProteinID
     :param db: database session dependency
     :return: Amino acid sequences for the proteins
     """
-    protein_faa = find_protein_faa_by_id(id)
-    res = ''
-    for ele in protein_faa:
-        res = res + str(ele.format("fasta"))
-    return res
+    protein_faa = find_protein_faa_by_id(db, id)
+    if not protein_faa:
+        raise HTTPException(status_code=404, detail="No matching Proteins found")
+    print("proteins by aa in main:")
+    print(protein_faa)
     # return protein_faa
 
+    # res = ''
+    # for ele in protein_faa:
+    #     res = res + str(ele.format("fasta"))
+    # return res
 
-@api.get("/vfetch/protein/fna")
-async def fetch_protein_fna(id: List[str] = Query(None)):
+
+@api.get("/vfetch/protein/fna",
+         response_model=List[NT_seq])
+async def fetch_protein_fna(db: Session = Depends(get_db), id: List[str] = Query(None)):
     """
     This function returns Nucleotide sequences for the genes specified by the protein IDs
     :param id: ProteinID
     :param db: database session dependency
     :return: Nucleotide sequences for the proteins
     """
-    protein_fna = find_protein_fna_by_id(id)
-    res = ''
-    for ele in protein_fna:
-        res = res + str(ele.format("fasta"))
-    return res
-    # return protein_fna
+    protein_fna = find_protein_fna_by_id(db, id)
+    if not protein_fna:
+        raise HTTPException(status_code=404, detail="No matching Proteins found")
+    print("proteins by aa in main:")
+    print(protein_fna)
+    return protein_fna
+
 
 
 # OLD

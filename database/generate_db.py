@@ -195,6 +195,41 @@ with engine.connect() as con:
 
 print('Protein_profile table successfully created!')
 
+
 #ToDo add AminoAcid and Nucleotide Sequences to the Table...
+#---------------------
+# AA_NT_sequence Table generation
+#----------------------
+
+proteinfile = data_path + "vog.proteins.all.fa"
+genefile = data_path + "vog.genes.all.fa"
+prot = []
+for seq_record in SeqIO.parse(proteinfile, "fasta"):
+    prot.append([seq_record.id, str(seq_record.seq)])
+df = pd.DataFrame(prot, columns=['ID', 'AAseq'])
+df.set_index("ID")
+# print(df)
+print('AASeq table successfully created!')
+
+genes = []
+for seq_record in SeqIO.parse(genefile, "fasta"):
+    genes.append([seq_record.id, str(seq_record.seq)])
+dfg = pd.DataFrame(genes, columns=['ID', 'NTseq'])
+dfg.set_index('ID')
+# print(dfg)
+print('NTSeq table successfully created!')
+
+# convert dataframe to DB Table:
+df.to_sql(name='AA_seq', con=engine, if_exists='replace', index=False, chunksize=1000)
+dfg.to_sql(name='NT_seq', con=engine, if_exists='replace', index=False, chunksize=1000)
+
+with engine.connect() as con:
+    con.execute('ALTER TABLE AA_seq  MODIFY  ID char(30) NOT NULL; ')
+    con.execute('ALTER TABLE AA_seq  MODIFY  AASeq LONGTEXT; ')
+    con.execute('CREATE INDEX ID ON AA_seq (ID);')
+
+    con.execute('ALTER TABLE NT_seq  MODIFY  ID char(30) NOT NULL; ')
+    con.execute('ALTER TABLE NT_seq  MODIFY  NTSeq LONGTEXT; ')
+    con.execute('CREATE INDEX ID ON NT_seq (ID);')
 
 #ToDo creating other tables, modifying the existing tables, optimizing the structure

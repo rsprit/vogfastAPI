@@ -47,9 +47,14 @@ def vfetch(return_object="vog", return_type="msa", **params):
             # return_type does not compare equal to any enum value:
             raise ValueError("Invalid return object " + str(return_object))
 
+    # API GET request
     r = requests.get(url=url, params=params)
+    print(r)
+    print("PARAMETERS")
+    print(params)
+    print("reponose in api request")
     response = r.json()
-
+    print(response)
     return response
 
 

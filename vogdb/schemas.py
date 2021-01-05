@@ -64,7 +64,6 @@ class Protein_profile(BaseModel):
     vog_id: str
     taxon_id: int
     species_name: str
-    #aa_seq: str
 
     class Config:
         orm_mode = True
@@ -72,34 +71,50 @@ class Protein_profile(BaseModel):
 
 class Species_profile(BaseModel):
     species_name: str
-    taxon_id : int
+    taxon_id: int
     phage: str
     source: str
     version: int
-    #add protein names?
-    #proteins: List[Protein_profile.protein_id] = []
 
     class Config:
         orm_mode = True
 
 
-# here all the filter options are listed
-class Filter(BaseModel):
-    sid: Optional[Set[int]] = None
-    sn: Optional[Set[str]] = None
-    # tx: Optional[str] = None
-    p: Optional[bool] = None
-    src: Optional[str] = None
-    gmin: Optional[int] = None
-    gmax: Optional[int] = None
-    pmin: Optional[int] = None
-    pmax: Optional[int] = None
-    fc: Optional[str] = None
-    pid: Optional[str] = None
-    gn: Optional[str] = None
-    fct: Optional[str] = None
-    lca: Optional[str] = None
-    vs: Optional[bool] = None  # high, medium, or low stringency
-    h_stringency: Optional[bool] = None
-    m_stringency: Optional[bool] = None
-    l_stringency: Optional[bool] = None
+class AA_seq(BaseModel):
+    id = str
+    seq = str
+
+    class Config:
+        orm_mode = True
+
+
+class NT_seq(BaseModel):
+    id = str
+    seq = str
+
+    class Config:
+        orm_mode = True
+
+
+
+#
+# # here all the filter options are listed
+# class Filter(BaseModel):
+#     sid: Optional[Set[int]] = None
+#     sn: Optional[Set[str]] = None
+#     # tx: Optional[str] = None
+#     p: Optional[bool] = None
+#     src: Optional[str] = None
+#     gmin: Optional[int] = None
+#     gmax: Optional[int] = None
+#     pmin: Optional[int] = None
+#     pmax: Optional[int] = None
+#     fc: Optional[str] = None
+#     pid: Optional[str] = None
+#     gn: Optional[str] = None
+#     fct: Optional[str] = None
+#     lca: Optional[str] = None
+#     vs: Optional[bool] = None  # high, medium, or low stringency
+#     h_stringency: Optional[bool] = None
+#     m_stringency: Optional[bool] = None
+#     l_stringency: Optional[bool] = None

@@ -338,24 +338,34 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
     return results
 
 
-def find_protein_faa_by_id(pid):
-    file_name = "./data/vog.proteins.all.fa"
-    # gunzip files???
-    prots = SeqIO.index(file_name, 'fasta')
-    result = []
-    for p in pid:
-        result.append(prots[p])
-    return result
+def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
+    # results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
+    results = db.query().with_entities(models.AA_seq.id, models.AA_seq.seq).filter(models.AA_seq.id.in_(id)).all()
+    print("result in faunctionality")
+    print(results)
+    return results
+    #
+    #
+    # file_name = "./data/vog.proteins.all.fa"
+    # # gunzip files???
+    # prots = SeqIO.index(file_name, 'fasta')
+    # result = []
+    # for p in pid:
+    #     result.append(prots[p])
+    # return result
 
 
-def find_protein_fna_by_id(pid):
+def find_protein_fna_by_id(db: Session, pid):
+    results = db.query().with_entities(models.NT_seq.id,
+                                       models.NT_seq.seq).filter(models.NT_seq.id.in_(pid)).all()
+    return results
     # gunzip files???
-    file_name = "./data/vog.genes.all.fa"
-    genes = SeqIO.index(file_name, 'fasta')
-    result = []
-    for p in pid:
-        result.append(genes[p])
-    return result
+    # file_name = "./data/vog.genes.all.fa"
+    # genes = SeqIO.index(file_name, 'fasta')
+    # result = []
+    # for p in pid:
+    #     result.append(genes[p])
+    # return result
 
 
 class SpeciesService:
