@@ -81,16 +81,16 @@ class Species_profile(BaseModel):
 
 
 class AA_seq(BaseModel):
-    id = str
-    seq = str
+    id: str
+    seq: str
 
     class Config:
         orm_mode = True
 
 
 class NT_seq(BaseModel):
-    id = str
-    seq = str
+    id: str
+    seq: str
 
     class Config:
         orm_mode = True

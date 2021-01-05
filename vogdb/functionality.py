@@ -339,20 +339,8 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
 
 
 def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
-    # results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
-    results = db.query().with_entities(models.AA_seq.id, models.AA_seq.seq).filter(models.AA_seq.id.in_(id)).all()
-    print("result in faunctionality")
-    print(results)
+    results = db.query(models.AA_seq).filter(models.AA_seq.id.in_(id)).all()
     return results
-    #
-    #
-    # file_name = "./data/vog.proteins.all.fa"
-    # # gunzip files???
-    # prots = SeqIO.index(file_name, 'fasta')
-    # result = []
-    # for p in pid:
-    #     result.append(prots[p])
-    # return result
 
 
 def find_protein_fna_by_id(db: Session, pid):

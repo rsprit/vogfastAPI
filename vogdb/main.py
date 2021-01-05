@@ -113,7 +113,8 @@ async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get
     """
 
     vog_summary = find_vogs_by_uid(db, id)
-
+    print(type(vog_summary))
+    print(type(vog_summary[0]))
     if not vog_summary:
         raise HTTPException(status_code=404, detail="No matching VOGs found")
 
@@ -187,15 +188,8 @@ async def fetch_protein_faa(db: Session = Depends(get_db), id: List[str] = Query
     protein_faa = find_protein_faa_by_id(db, id)
     if not protein_faa:
         raise HTTPException(status_code=404, detail="No matching Proteins found")
-    print("proteins by aa in main:")
-    print(protein_faa)
-    # return protein_faa
 
-    # res = ''
-    # for ele in protein_faa:
-    #     res = res + str(ele.format("fasta"))
-    # return res
-
+    return protein_faa
 
 @api.get("/vfetch/protein/fna",
          response_model=List[NT_seq])
