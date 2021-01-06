@@ -8,7 +8,10 @@ from .schemas import VOG_profile, Protein_profile, VOG_UID, Species_ID, Species_
 from . import models
 
 api = FastAPI()
-# svc = VogService('data')
+
+# uncommend when we have a domain
+# redirected_app = HTTPToHTTPSRedirectMiddleware(api, host="example_domain.com")
+
 
 # Dependency. Connect to the database session
 def get_db():
