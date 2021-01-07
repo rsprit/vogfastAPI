@@ -61,11 +61,11 @@ def main():
     vog_search_parser.add_argument('-prot', type=str, action='append', nargs='+', dest='prot',
                                    help="Protein IDs")
     vog_search_parser.add_argument('-species', type=str, action='append', nargs='+', dest='species',
-                                   help="Species Names")
+                                   help="Species Names, enclose names in quotes")
     vog_search_parser.add_argument('-tid', type=int, action='append', nargs='+', dest='tid',
                                    help="Taxonomy ID(s)")
-    vog_search_parser.add_argument('-and', type=str, action='store', nargs='?', default='a', dest='andor',
-                                   help="Do you want an (a)nd or an (o)r search? Default = 'a'.")
+    vog_search_parser.add_argument('-u', type=str, action='store', default='i', nargs='+', dest='andor',
+                                   help="Do you want an (u)nion or an (i)ntersection search? Default = 'i'.")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                    choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df' or 'stdout'")
 

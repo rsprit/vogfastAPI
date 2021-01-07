@@ -144,15 +144,15 @@ def get_vogs(db: Session,
              proteins: Optional[Set[str]],
              species: Optional[Set[str]],
              tax_id: Optional[Set[int]],
-             inclusive: Optional[str] = 'a'
+             inclusive: Optional[str] = 'i'
              ):
     """
     This function searches the VOG based on the given query parameters
     """
     # print(inclusive)
-    if inclusive is not 'a' and inclusive is not 'o':
+    if inclusive is not 'i' and inclusive is not 'u':
         raise HTTPException(status_code=404,
-                            detail="The parameter for the AND or OR search has to be 'a' or 'o'.")
+                            detail="The parameter for the Intersecion or Union search has to be 'i' or 'u'.")
 
     result = db.query(response_body)
     arguments = locals()
@@ -191,14 +191,14 @@ def get_vogs(db: Session,
                     filters.append(getattr(models.VOG_profile, key).like(p))
 
             if key == "species":
-                if inclusive == 'a':
-                    # THIS IS THE AND SEARCH:
+                if inclusive == 'i':
+                    # THIS IS THE INTERSECTION SEARCH:
                     vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
                         filter(models.Species_profile.species_name.in_(species)).group_by(
                         models.Protein_profile.vog_id). \
                         having(func.count(models.Species_profile.species_name) == len(species)).all()
                 else:
-                    # OR SEARCH below:
+                    # UNION SEARCH below:
                     vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
                         filter(models.Species_profile.species_name.in_(species)).group_by(
                         models.Protein_profile.vog_id).all()
@@ -244,8 +244,8 @@ def get_vogs(db: Session,
 
                 try:
                     id_list = []
-                    if inclusive == 'o':
-                        # OR SEARCH:
+                    if inclusive == 'u':
+                        # UNION SEARCH:
                         for id in tax_id:
                             id_list.extend(
                                 ncbi.get_descendant_taxa(id, collapse_subspecies=False, intermediate_nodes=True))
@@ -261,7 +261,7 @@ def get_vogs(db: Session,
                         print("ID LIST")
                         print(id_list)
                     else:
-                        # AND SEARCH:
+                        # INTERSECTION SEARCH:
                         for id in tax_id:
                             id_list.extend(
                                 ncbi.get_descendant_taxa(id, collapse_subspecies=False, intermediate_nodes=True))
@@ -278,11 +278,6 @@ def get_vogs(db: Session,
                 except ValueError:
                     raise HTTPException(status_code=404, detail="The provided taxonomy ID is invalid.")
 
-                # vog_ids = db.query().with_entities(models.Protein_profile.vog_id).join(models.Species_profile). \
-                #     filter(models.Species_profile.taxon_id.in_(id_list)).group_by(models.Protein_profile.vog_id). \
-                #     filter(models.Species_profile.taxon_id.in_(id_list)).group_by(models.Protein_profile.vog_id).all()
-                # vog_ids = {id[0] for id in vog_ids}  # convert to set
-                # filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 
     result = result.filter(*filters)
     return result.all()
