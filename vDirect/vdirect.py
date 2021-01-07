@@ -48,13 +48,13 @@ def main():
                                    help="Concensus function")
     vog_search_parser.add_argument('-anc', type=str, action='append', nargs='+', dest='anc',
                                    help="Ancestors")
-    vog_search_parser.add_argument('-hs', type=bool, action='store', nargs='?', dest='hs',
+    vog_search_parser.add_argument('-hs', type=int, action='store', nargs='?', dest='hs',
                                    help="High stringency? '1' for True and '0' for False")
-    vog_search_parser.add_argument('-ms', type=bool, action='store', nargs='?', dest='ms',
+    vog_search_parser.add_argument('-ms', type=int, action='store', nargs='?', dest='ms',
                                    help="Medium stringency? '1' for True and '0' for False")
-    vog_search_parser.add_argument('-ls', type=bool, action='store', nargs='?', dest='ls',
+    vog_search_parser.add_argument('-ls', type=int, action='store', nargs='?', dest='ls',
                                    help="Low stringency? '1' for True and '0' for False")
-    vog_search_parser.add_argument('-vs', type=bool, action='store', nargs='?', dest='vs',
+    vog_search_parser.add_argument('-vs', type=int, action='store', nargs='?', dest='vs',
                                    help="Virus specific? '1' for True and '0' for False")
     vog_search_parser.add_argument('-p', '-phage', type=str, action='store', nargs='?', dest='phage',
                                    choices=['mixed', 'phages_only', 'np_only'], help="specify phages_only, nonphages only or mixed")
