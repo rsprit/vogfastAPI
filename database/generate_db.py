@@ -64,6 +64,8 @@ print('Species_profile table successfully created!')
 # ---------------------
 # VOG_table generation
 # ----------------------
+
+# read in the data files
 members = pd.read_csv(os.path.join(data_path, 'vog.members.tsv.gz'), compression='gzip',
                       sep='\t',
                       header=0,
@@ -98,7 +100,7 @@ dfr['VirusSpecific'] = np.where((dfr['StringencyHigh']
                                 , True, False)
 
 
-#create num of phages and non-phages for VOG. also "phages_only" "np_only" or "mixed"
+#create number of phages and non-phages for VOG. also "phages_only" "np_only" or "mixed"
 dfr['NumPhages'] = 0
 dfr['NumNonPhages'] = 0
 dfr['PhageNonphage'] = ''
@@ -119,9 +121,9 @@ for index, row in dfr.iterrows():
     dfr.at[index, 'NumPhages'] = num_phage
     dfr.at[index, 'NumNonPhages'] = num_nonphage
 
-    if ((num_phage > 0) and (num_nonphage > 0)):
+    if (num_phage > 0) and (num_nonphage > 0):
         dfr.at[index, 'PhageNonphage'] = "mixed"
-    elif (num_phage > 0):
+    elif num_phage > 0:
         dfr.at[index, 'PhageNonphage'] = "phages_only"
     else:
         dfr.at[index, 'PhageNonphage'] = "np_only"
@@ -176,9 +178,8 @@ protein_list_df = (protein_list_df["ProteinID"].str.split(",").apply(lambda x: p
                    )
 protein_list_df.set_index("ProteinID")
 
-# separate protein and taxonID into separate columns
+# save the taxon ID in a separate column
 protein_list_df["TaxonID"] = protein_list_df["ProteinID"].str.split(".").str[0]
-#protein_list_df["ProteinID"] = protein_list_df["ProteinID"].str.split(".").str[1:3].str.join(".")
 
 # create a protein table in the database
 protein_list_df.to_sql(name='Protein_profile', con=engine, if_exists='replace', index=False, chunksize=1000)
@@ -187,7 +188,6 @@ with engine.connect() as con:
     con.execute('ALTER TABLE Protein_profile  MODIFY  ProteinID char(30) NOT NULL; ')
     con.execute('ALTER TABLE Protein_profile  MODIFY  TaxonID int(30) NOT NULL; ')
     con.execute('ALTER TABLE Protein_profile  MODIFY  VOG_ID char(30) NOT NULL; ')
-    #con.execute('ALTER TABLE Protein_profile  MODIFY  AASeq LONGTEXT; ')
     con.execute('CREATE INDEX VOG_profile_index_by_protein ON Protein_profile (ProteinID);')
     # add foreign key
     con.execute('ALTER TABLE Protein_profile  ADD FOREIGN KEY (TaxonID) REFERENCES Species_profile(TaxonID); ')
@@ -196,30 +196,27 @@ with engine.connect() as con:
 print('Protein_profile table successfully created!')
 
 
-#ToDo add AminoAcid and Nucleotide Sequences to the Table...
 #---------------------
-# AA_NT_sequence Table generation
+# Amino Acid and Nucleotide Sequence Table Generation
 #----------------------
 
 proteinfile = data_path + "vog.proteins.all.fa"
 genefile = data_path + "vog.genes.all.fa"
+
 prot = []
 for seq_record in SeqIO.parse(proteinfile, "fasta"):
     prot.append([seq_record.id, str(seq_record.seq)])
 df = pd.DataFrame(prot, columns=['ID', 'AAseq'])
 df.set_index("ID")
-# print(df)
-print('AASeq table successfully created!')
 
 genes = []
 for seq_record in SeqIO.parse(genefile, "fasta"):
     genes.append([seq_record.id, str(seq_record.seq)])
 dfg = pd.DataFrame(genes, columns=['ID', 'NTseq'])
 dfg.set_index('ID')
-# print(dfg)
-print('NTSeq table successfully created!')
 
-# convert dataframe to DB Table:
+
+# convert dataframes to DB Tables:
 df.to_sql(name='AA_seq', con=engine, if_exists='replace', index=False, chunksize=1000)
 dfg.to_sql(name='NT_seq', con=engine, if_exists='replace', index=False, chunksize=1000)
 
@@ -231,5 +228,7 @@ with engine.connect() as con:
     con.execute('ALTER TABLE NT_seq  MODIFY  ID char(30) NOT NULL; ')
     con.execute('ALTER TABLE NT_seq  MODIFY  NTSeq LONGTEXT; ')
     con.execute('CREATE INDEX ID ON NT_seq (ID);')
+
+print('AASeq and NTSeq tables successfully created!')
 
 #ToDo creating other tables, modifying the existing tables, optimizing the structure

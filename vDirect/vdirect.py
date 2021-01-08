@@ -46,25 +46,25 @@ def main():
                                         " them by a space.")
     vog_search_parser.add_argument('-confct', type=str, action='append', nargs='+', dest='confct',
                                    help="Concensus function")
-    vog_search_parser.add_argument('-anc', type=str, action='append', nargs='+', dest='anc',
+    vog_search_parser.add_argument('-anc', '-ancestors', type=str, action='append', nargs='+', dest='anc',
                                    help="Ancestors")
-    vog_search_parser.add_argument('-hs', type=int, action='store', nargs='?', dest='hs',
+    vog_search_parser.add_argument('-hs', '-highstringency', type=int, action='store', nargs='?', dest='hs', choices=[0, 1],
                                    help="High stringency? '1' for True and '0' for False")
-    vog_search_parser.add_argument('-ms', type=int, action='store', nargs='?', dest='ms',
+    vog_search_parser.add_argument('-ms', '-mediumstringency', type=int, action='store', nargs='?', dest='ms', choices=[0, 1],
                                    help="Medium stringency? '1' for True and '0' for False")
-    vog_search_parser.add_argument('-ls', type=int, action='store', nargs='?', dest='ls',
+    vog_search_parser.add_argument('-ls', '-lowstringency', type=int, action='store', nargs='?', dest='ls', choices=[0, 1],
                                    help="Low stringency? '1' for True and '0' for False")
-    vog_search_parser.add_argument('-vs', type=int, action='store', nargs='?', dest='vs',
+    vog_search_parser.add_argument('-vs', '-virusspecific', type=int, action='store', nargs='?', dest='vs', choices=[0, 1],
                                    help="Virus specific? '1' for True and '0' for False")
     vog_search_parser.add_argument('-p', '-phage', type=str, action='store', nargs='?', dest='phage',
                                    choices=['mixed', 'phages_only', 'np_only'], help="specify phages_only, nonphages only or mixed")
-    vog_search_parser.add_argument('-prot', type=str, action='append', nargs='+', dest='prot',
+    vog_search_parser.add_argument('-prot', '-proteins', type=str, action='append', nargs='+', dest='prot',
                                    help="Protein IDs")
     vog_search_parser.add_argument('-species', type=str, action='append', nargs='+', dest='species',
                                    help="Species Names, enclose names in quotes")
-    vog_search_parser.add_argument('-tid', type=int, action='append', nargs='+', dest='tid',
+    vog_search_parser.add_argument('-tid', '-taxonid', type=int, action='append', nargs='+', dest='tid',
                                    help="Taxonomy ID(s)")
-    vog_search_parser.add_argument('-u', type=str, action='store', default='i', nargs='+', dest='andor',
+    vog_search_parser.add_argument('-u', '-union', type=str, action='store', default='i', nargs='+', dest='union',
                                    help="Do you want an (u)nion or an (i)ntersection search? Default = 'i'.")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                    choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df' or 'stdout'")
@@ -85,14 +85,14 @@ def main():
                                        choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df' or 'stdout'")
 
     # add arguments for protein_search_parser:
-    protein_search_parser.add_argument('-tid', type=int, action='append', nargs='+', dest='taxon_id',
-                                       help="taxon ID(s)")
+    protein_search_parser.add_argument('-tid', '-taxonid', type=int, action='append', nargs='+', dest='taxon_id',
+                                       help="taxon ID(s) of the species")
     protein_search_parser.add_argument('-n', '-name', type=str, action='append', nargs='+', dest='species_name',
                                        help="search for species name or part of species name")
     protein_search_parser.add_argument('-vid', '-vogid', type=str, action='append', nargs='+', dest='vog_id',
                                        help="search for VOG IDs")
     protein_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                       choices=['json', 'df', 'stdout'], help="specify a format: 'json' or 'df' or 'stdout'")
+                                       choices=['json', 'df', 'stdout'], help="specify a format: 'json', 'df' or 'stdout'")
 
     # add subparsers for vSummary:
     vsummary_sps = vsummary_parser.add_subparsers(dest='type', help='subparsers for vsummary_parser')
@@ -191,7 +191,7 @@ def main():
                           consensus_function=args.confct, ancestors=args.anc, h_stringency=args.hs,
                           m_stringency=args.ms, l_stringency=args.ls, virus_specific=args.vs,
                           phages_nonphages=args.phage, proteins=args.prot, species=args.species, tax_id=args.tid,
-                          inclusive=args.andor))
+                          inclusive=args.union))
 
 
 if __name__ == '__main__':

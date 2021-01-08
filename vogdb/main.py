@@ -2,7 +2,7 @@
 from .functionality import *
 from .database import SessionLocal
 from sqlalchemy.orm import Session
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Query
 from .schemas import VOG_profile, Protein_profile, VOG_UID, Species_ID, Species_profile, ProteinID, AA_seq, NT_seq
 # from .schemas import *
 from . import models
