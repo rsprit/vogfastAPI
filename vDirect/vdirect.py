@@ -3,7 +3,7 @@ import sys
 import argparse
 
 """
-This is the implementation of the arg parser
+This is the implementation of the Argument Parser
 """
 
 
