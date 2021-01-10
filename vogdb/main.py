@@ -9,7 +9,7 @@ from . import models
 
 api = FastAPI()
 
-# uncommend when we have a domain
+# uncomment when we have a domain
 # redirected_app = HTTPToHTTPSRedirectMiddleware(api, host="example_domain.com")
 
 
@@ -206,8 +206,6 @@ async def fetch_protein_fna(db: Session = Depends(get_db), id: List[str] = Query
     protein_fna = find_protein_fna_by_id(db, id)
     if not protein_fna:
         raise HTTPException(status_code=404, detail="No matching Proteins found")
-    print("proteins by aa in main:")
-    print(protein_fna)
     return protein_fna
 
 

@@ -332,6 +332,5 @@ def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
 
 
 def find_protein_fna_by_id(db: Session, pid):
-    results = db.query().with_entities(models.NT_seq.id,
-                                       models.NT_seq.seq).filter(models.NT_seq.id.in_(pid)).all()
+    results = db.query(models.NT_seq).filter(models.NT_seq.id.in_(pid)).all()
     return results
