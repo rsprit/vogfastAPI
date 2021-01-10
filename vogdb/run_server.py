@@ -10,6 +10,13 @@ sys.path.append('../vogdb')
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from vogdb import main
 import signal
+import logging
+import os
+
+# logger
+log = logging.getLogger(__name__) #this logger works in any module
+# configuring logging
+logging.basicConfig(level=logging.DEBUG) # add later filename='vogapi.log'
 
 
 # Configuration

@@ -6,6 +6,7 @@ from fastapi import Depends, FastAPI, Query
 from .schemas import VOG_profile, Protein_profile, VOG_UID, Species_ID, Species_profile, ProteinID, AA_seq, NT_seq
 # from .schemas import *
 from . import models
+import logging
 
 api = FastAPI()
 
@@ -56,8 +57,10 @@ async def get_summary_species(taxon_id: Optional[List[int]] = Query(None), db: S
     :param db: database session dependency
     :return: Species summary
     """
-
+    logging.info("GET request vsummary/Species")
+    logging.debug("Recieved a vsummary/species request with parameters: taxon_id = {0}".format(taxon_id))
     species_summary = find_species_by_id(db, taxon_id)
+
 
     if not species_summary:
         raise HTTPException(status_code=404, detail="No matching Species found")
