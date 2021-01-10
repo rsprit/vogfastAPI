@@ -142,7 +142,7 @@ def main():
     # add arguments for protein_fetch_parser:
     protein_fetch_parser.add_argument(type=str, action='store', choices=['faa', 'fna'],
                                       dest='returntype', help="choose 'faa' or 'fna'")
-    protein_fetch_parser.add_argument('-id', type=str, action='append', nargs='+', dest='id',
+    protein_fetch_parser.add_argument('-id', type=str, nargs='+', dest='id', default=sys.stdin,  #action='append',
                                       help="Protein identifiers")
 
     args = parser.parse_args()
