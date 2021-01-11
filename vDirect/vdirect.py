@@ -142,8 +142,9 @@ def main():
     # add arguments for protein_fetch_parser:
     protein_fetch_parser.add_argument(type=str, action='store', choices=['faa', 'fna'],
                                       dest='returntype', help="choose 'faa' or 'fna'")
-    protein_fetch_parser.add_argument('-id', type=str, nargs='+', dest='id', default=sys.stdin,  #action='append',
+    protein_fetch_parser.add_argument('-id', type=str, nargs='+', dest='id', default=sys.stdin,
                                       help="Protein identifiers")
+
 
     args = parser.parse_args()
 
@@ -153,9 +154,7 @@ def main():
         else:
             id = args.id
 
-        response = vfetch(return_object=args.type, return_type=args.returntype, id=id)
-
-        print(response)
+        print(vfetch(return_object=args.type, return_type=args.returntype, id=id))
 
 
     elif args.command == 'vsummary':
@@ -199,7 +198,7 @@ def main():
                           consensus_function=args.confct, ancestors=args.anc, h_stringency=args.hs,
                           m_stringency=args.ms, l_stringency=args.ls, virus_specific=args.vs,
                           phages_nonphages=args.phage, proteins=args.prot, species=args.species, tax_id=args.tid,
-                          inclusive=args.union))
+                          union=args.union))
 
 
 if __name__ == '__main__':
