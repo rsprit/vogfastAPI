@@ -199,6 +199,19 @@ def get_vogs(db: Session,
     arguments = locals()
     filters = []
 
+    # make checks for validity:
+    if(smin is not None) and (smax is not None) and (smax < smin):
+        raise Exception("smin is greater than smax.")
+
+    if(pmin is not None) and (pmax is not None) and (pmax < pmin):
+        raise Exception("pmin is greater than pmax.")
+
+    if(mingLCA is not None) and (maxgLCA is not None) and (maxgLCA < mingLCA):
+        raise Exception("mingLCA is greater than maxgLCA.")
+
+    if(mingGLCA is not None) and (maxgGLCA is not None) and (maxgGLCA < maxgGLCA):
+        raise Exception("mingGLCA is greater than maxgGLCA.")
+
     try:
         for key, value in arguments.items():  # type: str, any
             if value is not None:
@@ -314,12 +327,14 @@ def get_vogs(db: Session,
                                     models.Protein_profile.vog_id).all()
                                 vog_ids = {id[0] for id in vog_ids}  # convert to set
                                 filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
-
                     except ValueError:
                         raise ValueError("The provided taxonomy ID is invalid.")
                         # raise HTTPException(status_code=404, detail="The provided taxonomy ID is invalid.")
     except Exception as ex:
-        if ex == ValueError:
+        if ex.args == "MinMaxError":
+            logging.error(ex.args)
+            raise Exception("Max number smaller than the minimum number.")
+        elif ex == ValueError:
             raise ValueError("The provided taxonomy ID is invalid.")
         else:
             raise Exception("Invalid key/value pair")
