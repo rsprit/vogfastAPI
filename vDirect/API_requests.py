@@ -15,32 +15,46 @@ except ImportError:  # Python 2
     from urllib2 import urlopen
 
 base_url = 'http://127.0.0.1:8000/'
+#ToDo: change base URL to new server URL
 
 
-def vfetch(return_object="hmm", **params):
+def vfetch(return_object="vog", return_type="msa", **params):
     """Yield the response of a query."""
-    _valid_params = list(main.fetch_vog.__code__.co_varnames)
-
-    # First make some basic checks.
-    if return_object not in ["hmm", "msa"]:
+    if return_object not in ["vog", "protein"]:
         # return_object does not compare equal to any enum value:
         raise ValueError("Invalid return object " + str(return_object))
+
+    _valid_params = []
+    if return_object == "vog":
+        _valid_params = list(main.fetch_vog.__code__.co_varnames)
+    elif return_object == "protein":
+        _valid_params = list(main.fetch_protein_faa.__code__.co_varnames)
+    else:
+        raise ValueError("No return object given")
 
     for k in params:
         assert k in _valid_params, 'Unknown parameter: %s' % k
 
-    url = base_url + 'vfetch/vog/{0}?'.format(return_object)
+    url = base_url + 'vfetch/{0}'.format(return_object) + '/{0}?'.format(return_type)
+    print(url)
+    if return_object == "vog":
+        if return_type not in ["msa", "hmm"]:
+            # return_type does not compare equal to any enum value:
+            raise ValueError("Invalid return object " + str(return_object))
 
+    elif return_object == "protein":
+        if return_type not in ["faa", "fna"]:
+            # return_type does not compare equal to any enum value:
+            raise ValueError("Invalid return object " + str(return_object))
+
+    # API GET request
     r = requests.get(url=url, params=params)
     response = r.json()
-
     return response
 
 
 def vsummary(return_object="vog", format="json", **params):
     """Yield the response (vog/species/protein summary of a query."""
-    if format == 'df':
-        format = 'dataframe'
     # First make some basic checks.
     if return_object not in ["vog", "species", "protein"]:
         # return_object does not compare equal to any enum value:
@@ -54,7 +68,7 @@ def vsummary(return_object="vog", format="json", **params):
     elif return_object == "protein":
         _valid_params = list(main.get_summary_protein.__code__.co_varnames)
 
-    _valid_formats = ["json", "dataframe"]
+    _valid_formats = ["json", "df"]
 
     for k in params:
         assert k in _valid_params, 'Unknown parameter: %s' % k
@@ -66,7 +80,7 @@ def vsummary(return_object="vog", format="json", **params):
     response = r.json()
 
     # formatting
-    if format == "dataframe":
+    if format == "df":
         response = pd.DataFrame.from_dict(response)
     elif format == "csv":
         df = pd.DataFrame.from_dict(response)
@@ -76,8 +90,7 @@ def vsummary(return_object="vog", format="json", **params):
 
 def vsearch(return_object="vog", format="json", **params):
     """Yield the response (vog/species/protein summary of a query."""
-    if format == 'df':
-        format = 'dataframe'
+
     # First make some basic checks.
     if return_object not in ["vog", "species", "protein"]:
         # return_object does not compare equal to any enum value:
@@ -93,7 +106,7 @@ def vsearch(return_object="vog", format="json", **params):
     else:
         raise ValueError("No return object given")
 
-    _valid_formats = ["json", "dataframe"]
+    _valid_formats = ["json", "df", "stdout"]
 
     for k in params:
         assert k in _valid_params, 'Unknown parameter: %s' % k
@@ -105,15 +118,31 @@ def vsearch(return_object="vog", format="json", **params):
     response = r.json()
 
     # formatting
-    if format == "dataframe":
+    if format == "df":
         response = pd.DataFrame.from_dict(response)
     elif format == "csv":
         df = pd.DataFrame.from_dict(response)
         response = df.to_csv()
+    elif format == "stdout":
+        response = pd.DataFrame.from_dict(response)
+
+        if return_object == "vog":
+            response = response["id"].tolist()
+
+        if return_object == "protein":
+            response = response["id"].tolist()
+
+        if return_object == "species":
+            response = response["taxon_id"].tolist()
+
+        try:
+            response = ' '.join(response)
+        except TypeError:
+            response = ' '.join(str(i) for i in response)
     return response
 
 
-# function to save hmm vFetch response objects (for now just hmm, mse)
+# function to save hmm vFetch response objects (for now just hmm, msa)
 def save_object(object, output_path="./test.txt"):
     """Saves the response object to output path"""
 
@@ -121,8 +150,3 @@ def save_object(object, output_path="./test.txt"):
         for document in object:
             file.write(document)
 
-
-# print(vsearch(return_object="protein", format="dataframe", species_name = ["corona"],
-#               taxon_id = [11128, 290028, 1335626, 1384461, 2569586], VOG_id = ["VOG05566"]))
-
-# print(vsummary(return_object="species", taxon_id=["290028"]))

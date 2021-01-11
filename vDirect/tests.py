@@ -19,7 +19,7 @@ If there is no "test" prefix, pytest will not execute this test function.
 
 def test_vsearch_vogIds_allParameters():
     response = vsearch(return_object='vog',
-                       format="dataframe",
+                       format="df",
                        id=[],
                        pmin=23,
                        pmax=100,
@@ -36,7 +36,7 @@ def test_vsearch_vogIds_allParameters():
 
 def test_vsearch_speciesIds_allParameters():
     response = vsearch(return_object="species",
-                       format="dataframe",
+                       format="df",
                        ids = [],
                        name=["corona"],
                        phage= False,
@@ -49,17 +49,17 @@ def test_vsearch_speciesIds_allParameters():
 
 def test_vsearch_proteinIds_allParameters():
     response = vsearch(return_object="protein",
-                       format="dataframe",
+                       format="df",
                        species_name = ["corona"],
                        taxon_id = [11128, 290028, 1335626, 1384461, 2569586],
                        VOG_id = ["VOG05566"])
 
     expected = ["11128.NP_150082.1"]
-    assert response["protein_id"].to_list() == expected
+    assert response["id"].to_list() == expected
 
 
 def test_vsummary_vogIds_twoVogIds():
-    response = vsummary(return_object='vog', format="dataframe", uid=['VOG00001', 'VOG00002'])
+    response = vsummary(return_object='vog', format="df", id=['VOG00001', 'VOG00002'])
 
     expected = ['VOG00001', 'VOG00002']
     assert response["id"].to_list() == expected
@@ -67,14 +67,14 @@ def test_vsummary_vogIds_twoVogIds():
 
 
 def test_vsummary_speciesIds_twoTaxonIds():
-    response = vsummary(return_object='species', format="dataframe", taxon_id=['2713308', '2591111'])
+    response = vsummary(return_object='species', format="df", taxon_id=['2713308', '2591111'])
 
     expected = [2591111, 2713308]
     assert response["taxon_id"].to_list() == expected
 
 
 def test_vsummary_proteinIds_twoProteinIds():
-    response = vsummary(return_object="protein", format="dataframe", pids=["11128.NP_150082.1"])
+    response = vsummary(return_object="protein", format="df", id=["11128.NP_150082.1"])
     expected = ['11128.NP_150082.1']
     print(response)
-    assert response["protein_id"].to_list() == expected
+    assert response["id"].to_list() == expected

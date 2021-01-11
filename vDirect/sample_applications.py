@@ -1,4 +1,4 @@
-from vDirect_demo import *
+from API_requests import *
 
 """ Here we are trying different use cases. Those examples (and many others) will eventually be used for testing
 You run this script and then type in the console number of example you want to try out e.g. 1 for example_1()

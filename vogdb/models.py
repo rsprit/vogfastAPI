@@ -46,8 +46,23 @@ class Protein_profile(Base):
     # mysql table name
     __tablename__ = "Protein_profile"
 
-    protein_id = Column('ProteinID', String, primary_key=True)
+    id = Column('ProteinID', String, primary_key=True)
     vog_id = Column('VOG_ID', String)
     taxon_id = Column('TaxonID', Integer,  ForeignKey("Species_profile.TaxonID"), index=True)
-    #aa_seq = Column('AASeq', String)
     species_names = relationship("Species_profile", back_populates="protein_names")
+
+
+class AA_seq(Base):
+    # mysql table name
+    __tablename__ = "AA_seq"
+
+    id = Column('ID', String, primary_key=True)
+    seq = Column('AAseq', String)
+
+
+class NT_seq(Base):
+    # mysql table name
+    __tablename__ = "NT_seq"
+
+    id = Column('ID', String, primary_key=True)
+    seq = Column('NTseq', String)
