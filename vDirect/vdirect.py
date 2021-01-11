@@ -1,6 +1,7 @@
 from API_requests import *
 import sys
 import argparse
+import logging
 
 """
 This is the implementation of the Argument Parser
@@ -145,60 +146,64 @@ def main():
     protein_fetch_parser.add_argument('-id', type=str, nargs='+', dest='id', default=sys.stdin,
                                       help="Protein identifiers")
 
+    try:
+        args = parser.parse_args()
+        logging.info("Arguments parsed: {0}".format(args))
 
-    args = parser.parse_args()
-
-    if args.command == 'vfetch':
-        if not sys.stdin.isatty():
-            id = args.id.read().split()
-        else:
-            id = args.id
-
-        print(vfetch(return_object=args.type, return_type=args.returntype, id=id))
-
-
-    elif args.command == 'vsummary':
-        if args.type == 'species':
-            if not sys.stdin.isatty():
-                id = args.taxon_ids.read().split()
-            else:
-                id = args.taxon_ids
-
-            print(vsummary(return_object=args.type, format=args.format, taxon_id=id))
-
-        elif args.type == 'protein':
-            if not sys.stdin.isatty():
-                id = args.id.read().split()
-            else:
-                id = args.id
-            print(vsummary(return_object=args.type, format=args.format, id=id))
-
-        elif args.type == 'vog':
+        if args.command == 'vfetch':
             if not sys.stdin.isatty():
                 id = args.id.read().split()
             else:
                 id = args.id
 
-            print(vsummary(return_object=args.type, format=args.format, id=id))
+            print(vfetch(return_object=args.type, return_type=args.returntype, id=id))
 
 
-    elif args.command == 'vsearch':
-        if args.type == 'species':
-            print(vsearch(return_object=args.type, format=args.format, ids=args.ids, name=args.name,
-                          phage=args.phage, source=args.source, version=args.version))
+        elif args.command == 'vsummary':
+            if args.type == 'species':
+                if not sys.stdin.isatty():
+                    id = args.taxon_ids.read().split()
+                else:
+                    id = args.taxon_ids
 
-        if args.type == 'protein':
-            print(vsearch(return_object=args.type, format=args.format, taxon_id=args.taxon_id,
-                          species_name=args.species_name, VOG_id=args.vog_id))
+                print(vsummary(return_object=args.type, format=args.format, taxon_id=id))
 
-        if args.type == 'vog':
-            print(vsearch(return_object=args.type, format=args.format, id=args.ids, pmin=args.pmin, pmax=args.pmax,
-                          smin=args.smin, smax=args.smax, mingLCA=args.mingLCA, maxgLCA=args.maxgLCA,
-                          mingGLCA=args.mingGLCA, maxgGLCA=args.maxgGLCA, functional_category=args.fctcat,
-                          consensus_function=args.confct, ancestors=args.anc, h_stringency=args.hs,
-                          m_stringency=args.ms, l_stringency=args.ls, virus_specific=args.vs,
-                          phages_nonphages=args.phage, proteins=args.prot, species=args.species, tax_id=args.tid,
-                          union=args.union))
+            elif args.type == 'protein':
+                if not sys.stdin.isatty():
+                    id = args.id.read().split()
+                else:
+                    id = args.id
+                print(vsummary(return_object=args.type, format=args.format, id=id))
+
+            elif args.type == 'vog':
+                if not sys.stdin.isatty():
+                    id = args.id.read().split()
+                else:
+                    id = args.id
+
+                print(vsummary(return_object=args.type, format=args.format, id=id))
+
+
+        elif args.command == 'vsearch':
+            if args.type == 'species':
+                print(vsearch(return_object=args.type, format=args.format, ids=args.ids, name=args.name,
+                              phage=args.phage, source=args.source, version=args.version))
+
+            if args.type == 'protein':
+                print(vsearch(return_object=args.type, format=args.format, taxon_id=args.taxon_id,
+                              species_name=args.species_name, VOG_id=args.vog_id))
+
+            if args.type == 'vog':
+                print(vsearch(return_object=args.type, format=args.format, id=args.ids, pmin=args.pmin, pmax=args.pmax,
+                              smin=args.smin, smax=args.smax, mingLCA=args.mingLCA, maxgLCA=args.maxgLCA,
+                              mingGLCA=args.mingGLCA, maxgGLCA=args.maxgGLCA, functional_category=args.fctcat,
+                              consensus_function=args.confct, ancestors=args.anc, h_stringency=args.hs,
+                              m_stringency=args.ms, l_stringency=args.ls, virus_specific=args.vs,
+                              phages_nonphages=args.phage, proteins=args.prot, species=args.species, tax_id=args.tid,
+                              union=args.union))
+    except Exception as exc:
+        logging.error("The following exception occurred: {0}".format(exc))
+    logging.info("Thank you for using vDirect.")
 
 
 if __name__ == '__main__':
