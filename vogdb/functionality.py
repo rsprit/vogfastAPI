@@ -200,17 +200,18 @@ def get_vogs(db: Session,
     filters = []
 
     # make checks for validity:
-    if(smin is not None) and (smax is not None) and (smax < smin):
-        raise Exception("smin is greater than smax.")
+    def check_validity(pair):
+        min = pair[0]
+        max = pair[1]
+        if (min is not None) and (max is not None):
+            if max < min:
+                raise Exception("The provided min is greater than the provided max.")
+            elif min < 0 or max < 0:
+                raise Exception("Number for min or max cannot be negative!")
 
-    if(pmin is not None) and (pmax is not None) and (pmax < pmin):
-        raise Exception("pmin is greater than pmax.")
+    for pair in [[smin, smax], [pmin, pmax], [mingLCA, maxgLCA], [mingGLCA, maxgGLCA]]:
+        check_validity(pair)
 
-    if(mingLCA is not None) and (maxgLCA is not None) and (maxgLCA < mingLCA):
-        raise Exception("mingLCA is greater than maxgLCA.")
-
-    if(mingGLCA is not None) and (maxgGLCA is not None) and (maxgGLCA < maxgGLCA):
-        raise Exception("mingGLCA is greater than maxgGLCA.")
 
     try:
         for key, value in arguments.items():  # type: str, any
