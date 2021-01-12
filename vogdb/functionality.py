@@ -110,7 +110,6 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
 
 
 def find_vogs_hmm_by_uid(uid):
-
     logging.info("Searching for Hidden Markov Models (HMM) in the data files...")
 
     file_name = "./data/vog.hmm.tar.gz"
@@ -138,7 +137,6 @@ def find_vogs_hmm_by_uid(uid):
 
 
 def find_vogs_msa_by_uid(uid):
-
     logging.info("Searching for Multiple Sequence Alignments (MSA) in the data files...")
 
     file_name = "./data/vog.raw_algs.tar.gz"
@@ -199,7 +197,7 @@ def get_vogs(db: Session,
     arguments = locals()
     filters = []
 
-    # make checks for validity:
+    # make checks for validity of user input:
     def check_validity(pair):
         min = pair[0]
         max = pair[1]
@@ -211,6 +209,15 @@ def get_vogs(db: Session,
 
     for pair in [[smin, smax], [pmin, pmax], [mingLCA, maxgLCA], [mingGLCA, maxgGLCA]]:
         check_validity(pair)
+
+    # create a warning in the log file if "union" is specified but no species/taxIDs given to use the parameter
+    if union is not None:
+        if species is None and tax_id is None:
+            logging.warning("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")
+        elif species is not None and len(species) < 2:
+            logging.warning("The 'Union' Parameter was provided, but the number of species is smaller than 2.")
+        elif tax_id is not None and len(tax_id) < 2:
+            logging.warning("The 'Union' Parameter was provided, but the number of taxonomy IDs is smaller than 2.")
 
 
     try:
@@ -372,7 +379,8 @@ def get_proteins(db: Session,
                         res = db.query().with_entities(models.Protein_profile.id,
                                                        models.Protein_profile.vog_id,
                                                        models.Protein_profile.taxon_id,
-                                                       models.Species_profile.species_name).join(models.Species_profile). \
+                                                       models.Species_profile.species_name).join(
+                            models.Species_profile). \
                             filter(models.Species_profile.species_name.like(search)).all()
                         s_res.extend(res)
                     s_res = {id[0] for id in s_res}  # convert to set
