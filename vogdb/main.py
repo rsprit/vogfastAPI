@@ -51,6 +51,7 @@ def search_species(db: Session = Depends(get_db),
         logging.error(exc)
         raise HTTPException(status_code=404, detail="Species search not successful. Error: {0}".format(exc))
 
+    # this if should not be called, because exception already thrown in functionality, if there are no species.
     if not species:
         logging.error("No Species match the search criteria.")
         raise HTTPException(status_code=404, detail="No Species match the search criteria.")
@@ -76,12 +77,13 @@ async def get_summary_species(taxon_id: Optional[List[int]] = Query(None), db: S
     except Exception as exc:
         logging.error("Retrieving summary information for Species was not successful. Species IDs: {0}".format(taxon_id))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="Vsummary not successful. Check log file for details.")
+        raise HTTPException(status_code=404, detail="Vsummary not successful. Error: {0}".format(exc))
 
     if not len(species_summary) == len(taxon_id):
         logging.warning("At least one of the species was not found, or there were duplicates.\n"
                         "IDs given: {0}".format(taxon_id))
 
+    # this execption also not needed, because already checked in functionality.
     if not species_summary:
         logging.error("No matching Species found")
         raise HTTPException(status_code=404, detail="No matching Species found")
@@ -133,6 +135,7 @@ def search_vog(db: Session = Depends(get_db),
         logging.error(exc)
         raise HTTPException(status_code=404, detail="VOG search not successful. Error: {0}".format(exc))
 
+    # this should also have been checked in functionality.
     if not vogs:
         logging.error("No VOGs match the search criteria.")
         raise HTTPException(status_code=404, detail="No VOGs match the search criteria.")
@@ -160,6 +163,11 @@ async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get
         logging.error(exc)
         raise HTTPException(status_code=404, detail="Vsummary not successful. Error: {0}".format(exc))
 
+    if not len(vog_summary) == len(id):
+        logging.warning("At least one of the VOGs was not found, or there were duplicates.\n"
+                        "IDs given: {0}".format(id))
+
+    # this should also have been checked in functionality.
     if not vog_summary:
         logging.error("No matching VOGs found")
         raise HTTPException(status_code=404, detail="No matching VOGs found")
@@ -193,6 +201,7 @@ async def search_protein(db: Session = Depends(get_db),
         logging.error(exc)
         raise HTTPException(status_code=404, detail="Protein search not successful. Error: {0}".format(exc))
 
+    # this should also have been checked in functionality.
     if not proteins:
         logging.error("No Proteins match the search criteria.")
         raise HTTPException(status_code=404, detail="No Proteins match the search criteria.")
@@ -226,6 +235,7 @@ async def get_summary_protein(id: List[str] = Query(None), db: Session = Depends
         logging.warning("At least one of the proteins was not found, or there were duplicates.\n"
                         "IDs given: {0}".format(id))
 
+    # this should also have been checked in functionality.
     if not protein_summary:
         logging.error("No matching Proteins found")
         raise HTTPException(status_code=404, detail="No matching Proteins found")
@@ -310,6 +320,8 @@ async def fetch_protein_faa(db: Session = Depends(get_db), id: List[str] = Query
     if not len(protein_faa) == len(id):
         logging.warning("At least one of the proteins was not found, or there were duplicates.\n"
                         "IDs given: {0}".format(id))
+        # dont raise this exception, because there could be duplicate inputs when piping something to FNA or FAA fetch??
+        #
         # raise HTTPException(status_code=404, detail="At least one of the protein IDs was not found, "
         #                                             "or there might be duplicates")
 

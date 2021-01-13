@@ -210,7 +210,8 @@ def get_vogs(db: Session,
     for pair in [[smin, smax], [pmin, pmax], [mingLCA, maxgLCA], [mingGLCA, maxgGLCA]]:
         check_validity(pair)
 
-    # create a warning in the log file if "union" is specified but no species/taxIDs given to use the parameter
+    # create a warning in the log file if "union" is specified but no species/taxIDs given to use the parameter,
+    # and return an exception to the user.
     if union is not None:
         if species is None and tax_id is None:
             logging.warning("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")
