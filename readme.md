@@ -1,5 +1,9 @@
 # VOGDB-API
 
+## Introduction
+```bash
+The vDirect is a tool providing various filtering options for the VOGDB-data. 
+```
 ## Setting up
 
 ### Starting a MYSQL Server
@@ -60,4 +64,32 @@ mysql> describe Protein_profile;
 ```bash
 cd vogfastAPI
 hypercorn vogdb:api --reload
+```
+
+## Using the VOGDB-API with vDirect
+```bash
+Below is the search hierarchy: first specify vsearch, vsummary or vfetch, then the subsequent parameters.
+'-h' provides a list of the parameters that can be used for filtering.
+
+python vdirect.py vsearch     species   species_search_parameters
+                              protein   protein_search_parameters
+                              vog       vog_search_parameters
+                  vsummary    species   species_ids
+                              protein   protein_ids
+                              vog       vog_ids
+                  vfetch      protein   faa
+                                        fna
+                              vog       hmm
+                                        msa
+```
+
+## Docker
+
+## Dependencies
+
+## Authors
+```bash
+Monika Fink*, Nikola Vinko*, Sigi Koizar*
+
+*University of Vienna
 ```
