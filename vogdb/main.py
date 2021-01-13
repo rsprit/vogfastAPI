@@ -131,7 +131,7 @@ def search_vog(db: Session = Depends(get_db),
     except Exception as exc:
         logging.error("Retrieving VOGs was not successful. Parameters: {0}".format(locals()))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="VOG search not successful. Check log file for details.")
+        raise HTTPException(status_code=404, detail="VOG search not successful. Error: {0}".format(exc))
 
     if not vogs:
         logging.error("No VOGs match the search criteria.")
@@ -158,7 +158,7 @@ async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get
     except Exception as exc:
         logging.error("Retrieving summary information for VOG was not successful. Parameters: {0}".format(id))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="Vsummary not successful. Check log file for details.")
+        raise HTTPException(status_code=404, detail="Vsummary not successful. Error: {0}".format(exc))
 
     if not vog_summary:
         logging.error("No matching VOGs found")
@@ -191,7 +191,7 @@ async def search_protein(db: Session = Depends(get_db),
     except Exception as exc:
         logging.error("Retrieving Proteins was not successful. Parameters: {0}".format(locals()))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="Protein search not successful. Check log file for details.")
+        raise HTTPException(status_code=404, detail="Protein search not successful. Error: {0}".format(exc))
 
     if not proteins:
         logging.error("No Proteins match the search criteria.")
@@ -219,7 +219,7 @@ async def get_summary_protein(id: List[str] = Query(None), db: Session = Depends
     except Exception as exc:
         logging.error("Retrieving summary information for Proteins was not successful. Protein IDs: {0}".format(id))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="Vsummary not successful. Check log file for details.")
+        raise HTTPException(status_code=404, detail="Vsummary not successful. Error: {0}".format(exc))
 
     if not len(protein_summary) == len(id):
         logging.warning(len(protein_summary))
@@ -250,7 +250,7 @@ async def fetch_vog(id: List[str] = Query(None)):
     except Exception as exc:
         logging.error("MSA fetching not successful. Parameters: {0}".format(id))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="MSA search not successful. Check log file for details.")
+        raise HTTPException(status_code=404, detail="MSA search not successful. Error: {0}".format(exc))
 
     if not vog_hmm:
         logging.error("No HMM found.")
@@ -277,7 +277,7 @@ async def fetch_vog(id: List[str] = Query(None)):
     except Exception as exc:
         logging.error("MSA fetching not successful. Parameters: {0}".format(id))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="MSA search not successful. Check log file for details.")
+        raise HTTPException(status_code=404, detail="MSA search not successful. Error: {0}".format(exc))
 
     if not vog_msa:
         logging.error("No HMM found.")
@@ -300,17 +300,19 @@ async def fetch_protein_faa(db: Session = Depends(get_db), id: List[str] = Query
     logging.info("GET request vfetch/protein/faa")
     logging.debug("Received a vfetch/protein/faa request with parameters: {0}".format(locals()))
 
-    protein_faa = find_protein_faa_by_id(db, id)
+    try:
+        protein_faa = find_protein_faa_by_id(db, id)
+    except Exception as exc:
+        logging.error("AA fetching not successful. IDs: {0}".format(id))
+        logging.error(exc)
+        raise HTTPException(status_code=404, detail="Amino Acid retrieval not successful. Error: {0}".format(exc))
 
-    #ToDo: how to check if all proteins were found..do "assert", throw exception
-    #check if all proteins were found:
-    # assert(len(protein_faa) == len(id)), "Not all protein IDs were found."
 
     if not len(protein_faa) == len(id):
         logging.warning("At least one of the proteins was not found, or there were duplicates.\n"
                         "IDs given: {0}".format(id))
-        # raise HTTPException(status_code=404, detail="At least one of the protein IDs was not found,"
-        #                                             "or there might be duplicates")
+        raise HTTPException(status_code=404, detail="At least one of the protein IDs was not found, "
+                                                    "or there might be duplicates")
 
     if not protein_faa:
         logging.error("No Proteins found with the given IDs")

@@ -214,10 +214,13 @@ def get_vogs(db: Session,
     if union is not None:
         if species is None and tax_id is None:
             logging.warning("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")
+            raise Exception("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")
         elif species is not None and len(species) < 2:
             logging.warning("The 'Union' Parameter was provided, but the number of species is smaller than 2.")
+            raise Exception("The 'Union' Parameter was provided, but the number of species is smaller than 2.")
         elif tax_id is not None and len(tax_id) < 2:
             logging.warning("The 'Union' Parameter was provided, but the number of taxonomy IDs is smaller than 2.")
+            raise Exception("The 'Union' Parameter was provided, but the number of taxonomy IDs is smaller than 2.")
 
 
     try:
@@ -436,7 +439,7 @@ def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
         return results
     else:
         logging.error("No IDs were given.")
-        # raise HTTPException(status_code=404, detail="no ids")
+        raise HTTPException(status_code=404, detail="No IDs were given.")
 
 
 def find_protein_fna_by_id(db: Session, pid):
