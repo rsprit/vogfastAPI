@@ -446,5 +446,13 @@ def find_protein_fna_by_id(db: Session, pid):
     """
     This function returns the Nucleotide sequences of the proteins based on the given Protein IDs
     """
-    results = db.query(models.NT_seq).filter(models.NT_seq.id.in_(pid)).all()
-    return results
+    if id:
+        logging.info("Searching NT sequence by ProteinIDs in the database...")
+        results = db.query(models.NT_seq).filter(models.NT_seq.id.in_(id)).all()
+        if not results:
+            logging.info("None of the given IDs were found in the Database.")
+        return results
+    else:
+        logging.error("No IDs were given.")
+        raise HTTPException(status_code=404, detail="No IDs were given.")
+

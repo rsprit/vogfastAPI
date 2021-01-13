@@ -310,8 +310,8 @@ async def fetch_protein_faa(db: Session = Depends(get_db), id: List[str] = Query
     if not len(protein_faa) == len(id):
         logging.warning("At least one of the proteins was not found, or there were duplicates.\n"
                         "IDs given: {0}".format(id))
-        raise HTTPException(status_code=404, detail="At least one of the protein IDs was not found, "
-                                                    "or there might be duplicates")
+        # raise HTTPException(status_code=404, detail="At least one of the protein IDs was not found, "
+        #                                             "or there might be duplicates")
 
     if not protein_faa:
         logging.error("No Proteins found with the given IDs")
