@@ -49,7 +49,7 @@ def search_species(db: Session = Depends(get_db),
     except Exception as exc:
         logging.error("Retrieving Species was not successful. Parameters: {0}".format(locals()))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="Species search not successful. Check log file for details.")
+        raise HTTPException(status_code=404, detail="Species search not successful. Error: {0}".format(exc))
 
     if not species:
         logging.error("No Species match the search criteria.")
