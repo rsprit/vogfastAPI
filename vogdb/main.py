@@ -303,10 +303,9 @@ async def fetch_protein_faa(db: Session = Depends(get_db), id: List[str] = Query
     try:
         protein_faa = find_protein_faa_by_id(db, id)
     except Exception as exc:
-        logging.error("AA fetching not successful. IDs: {0}".format(id))
+        logging.error("AA sequence fetching not successful. IDs: {0}".format(id))
         logging.error(exc)
-        raise HTTPException(status_code=404, detail="Amino Acid retrieval not successful. Error: {0}".format(exc))
-
+        raise HTTPException(status_code=404, detail="Aminoacid sequence retrieval not successful. Error: {0}".format(exc))
 
     if not len(protein_faa) == len(id):
         logging.warning("At least one of the proteins was not found, or there were duplicates.\n"
@@ -321,6 +320,7 @@ async def fetch_protein_faa(db: Session = Depends(get_db), id: List[str] = Query
         logging.info("Aminoacid sequences have been retrieved.")
     return protein_faa
 
+
 @api.get("/vfetch/protein/fna",
          response_model=List[NT_seq])
 async def fetch_protein_fna(db: Session = Depends(get_db), id: List[str] = Query(None)):
@@ -334,7 +334,12 @@ async def fetch_protein_fna(db: Session = Depends(get_db), id: List[str] = Query
     logging.info("GET request vfetch/protein/fna")
     logging.debug("Received a vfetch/protein/fna request with parameters: {0}".format(locals()))
 
-    protein_fna = find_protein_fna_by_id(db, id)
+    try:
+        protein_fna = find_protein_fna_by_id(db, id)
+    except Exception as exc:
+        logging.error("NT sequence fetching not successful. IDs: {0}".format(id))
+        logging.error(exc)
+        raise HTTPException(status_code=404, detail="Nucleotide sequence retrieval not successful. Error: {0}".format(exc))
 
     if not len(protein_fna) == len(id):
         logging.warning("At least one of the proteins was not found, or there were duplicates.\n"
