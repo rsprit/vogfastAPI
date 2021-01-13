@@ -85,7 +85,7 @@ def get_species(db: Session,
     result = result.filter(*filters)
 
     if not result.all():
-        raise Exception("No species were found.")
+        raise Exception("No Species match the search criteria.")
     else:
         logging.info("Species were found.")
 
