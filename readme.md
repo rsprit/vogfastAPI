@@ -77,10 +77,10 @@ python vdirect.py vsearch     species   species_search_parameters
                   vsummary    species   species_ids
                               protein   protein_ids
                               vog       vog_ids
-                  vfetch      protein   faa
-                                        fna
-                              vog       hmm
-                                        msa
+                  vfetch      protein   faa   protein_ids
+                                        fna   protein_ids
+                              vog       hmm   vog_ids
+                                        msa   vog_ids
 ```
 
 ## Docker
