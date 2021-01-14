@@ -36,7 +36,6 @@ def vfetch(return_object="vog", return_type="msa", **params):
         assert k in _valid_params, 'Unknown parameter: %s' % k
 
     url = base_url + 'vfetch/{0}'.format(return_object) + '/{0}?'.format(return_type)
-    print(url)
     if return_object == "vog":
         if return_type not in ["msa", "hmm"]:
             # return_type does not compare equal to any enum value:
