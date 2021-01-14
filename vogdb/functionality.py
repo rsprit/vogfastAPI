@@ -272,10 +272,10 @@ def get_vogs(db: Session,
                     filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
 
                 if key == "maxgLCA":
-                    filters.append(getattr(models.VOG_profile, "genomes_total") < value + 1)
+                    filters.append(getattr(models.VOG_profile, "genomes_total_in_LCA") < value + 1)
 
                 if key == "mingLCA":
-                    filters.append(getattr(models.VOG_profile, "genomes_total") > value - 1)
+                    filters.append(getattr(models.VOG_profile, "genomes_total_in_LCA") > value - 1)
 
                 if key == "maxgGLCA":
                     filters.append(getattr(models.VOG_profile, "genomes_in_group") < value + 1)
