@@ -35,9 +35,9 @@ def find_species_by_id(db: Session, ids: Optional[List[int]]):
     if ids:
         logging.info("Searching Species by IDs in the database...")
         results = db.query(models.Species_profile).filter(models.Species_profile.taxon_id.in_(ids)).all()
-        if not results:
-            logging.info("The given IDs were not found in the Database.")
-            raise Exception("IDs not found in the database.")
+        # if not results:
+        #     logging.info("The given IDs were not found in the Database.")
+        #     raise Exception("IDs not found in the database.")
         return results
     else:
         logging.info("No IDs were given.")
@@ -84,10 +84,10 @@ def get_species(db: Session,
 
     result = result.filter(*filters)
 
-    if not result.all():
-        raise Exception("No species were found.")
-    else:
-        logging.info("Species were found.")
+    # if not result.all():
+    #     raise Exception("No species were found.")
+    # else:
+    #     logging.info("Species were found.")
 
     return result.all()
 
@@ -100,9 +100,9 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
     if ids:
         logging.info("Searching VOGs by IDs in the database...")
         results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
-        if not results:
-            logging.info("The given IDs were not found in the Database.")
-            raise Exception("IDs not found in the database.")
+        # if not results:
+        #     logging.info("The given IDs were not found in the Database.")
+        #     raise Exception("IDs not found in the database.")
         return results
     else:
         logging.error("No IDs were given.")
@@ -123,6 +123,10 @@ def find_vogs_hmm_by_uid(uid):
     if uid:
         for vog_id in uid:
             vog_hmm_list.append(vog_id.upper() + ".hmm")
+    else:
+        logging.info("No IDs were given.")
+        raise Exception("No IDs.")
+
     hmm_response = []
     for vog_hmm in vog_hmm_list:
         member = tar.getmember(vog_hmm)
@@ -149,6 +153,10 @@ def find_vogs_msa_by_uid(uid):
     if uid:
         for vog_id in uid:
             vog_msa_list.append(vog_id.upper() + ".msa")
+    else:
+        logging.info("No IDs were given.")
+        raise Exception("No IDs.")
+
     msa_response = []
     for vog_msa in vog_msa_list:
         member = tar.getmember(vog_msa)
@@ -341,21 +349,17 @@ def get_vogs(db: Session,
                     except ValueError:
                         raise ValueError("The provided taxonomy ID is invalid.")
                         # raise HTTPException(status_code=404, detail="The provided taxonomy ID is invalid.")
-    except Exception as ex:
-        if ex.args == "MinMaxError":
-            logging.error(ex.args)
-            raise Exception("Max number smaller than the minimum number.")
-        elif ex == ValueError:
-            raise ValueError("The provided taxonomy ID is invalid.")
-        else:
-            raise Exception("Invalid key/value pair")
+    except ValueError:
+        raise ValueError("The provided taxonomy ID is invalid.")
+    except Exception:
+        raise Exception("Invalid key/value pair")
 
     result = result.filter(*filters)
 
-    if not result.all():
-        raise Exception("No VOGs were found.")
-    else:
-        logging.info("VOGs were found.")
+    # if not result.all():
+    #     raise Exception("No VOGs were found.")
+    # else:
+    #     logging.info("VOGs were found.")
 
     return result.all()
 
@@ -368,6 +372,8 @@ def get_proteins(db: Session,
     """
     This function searches the for proteins based on the given query parameters
     """
+    logging.info("Searching Proteins in the database...")
+
     result = db.query(response_body)
     arguments = locals()
     filters = []
@@ -399,10 +405,10 @@ def get_proteins(db: Session,
 
     result = result.filter(*filters)
 
-    if not result.all():
-        raise Exception("No Proteins were found.")
-    else:
-        logging.info("Proteins were found.")
+    # if not result.all():
+    #     raise Exception("No Proteins were found.")
+    # else:
+    #     logging.info("Proteins were found.")
 
     return result.all()
 
@@ -418,9 +424,9 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
                                            models.Protein_profile.taxon_id,
                                            models.Species_profile.species_name).join(models.Species_profile). \
             filter(models.Protein_profile.id.in_(pids)).all()
-        if not results:
-            logging.info("The given IDs were not found in the Database.")
-            raise Exception("IDs not found in the database.")
+        # if not results:
+        #     logging.info("The given IDs were not found in the Database.")
+        #     raise Exception("IDs not found in the database.")
         return results
     else:
         logging.error("No IDs were given.")
@@ -434,17 +440,25 @@ def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
     if id:
         logging.info("Searching AA sequence by ProteinIDs in the database...")
         results = db.query(models.AA_seq).filter(models.AA_seq.id.in_(id)).all()
-        if not results:
-            logging.info("None of the given IDs were found in the Database.")
+        # if not results:
+        #     logging.info("None of the given IDs were found in the Database.")
         return results
     else:
         logging.error("No IDs were given.")
-        raise HTTPException(status_code=404, detail="No IDs were given.")
+        raise Exception("No IDs.")
 
 
 def find_protein_fna_by_id(db: Session, pid):
     """
     This function returns the Nucleotide sequences of the proteins based on the given Protein IDs
     """
-    results = db.query(models.NT_seq).filter(models.NT_seq.id.in_(pid)).all()
-    return results
+    if id:
+        logging.info("Searching NT sequence by ProteinIDs in the database...")
+        results = db.query(models.AA_seq).filter(models.AA_seq.id.in_(id)).all()
+        return results
+    else:
+        logging.error("No IDs were given.")
+        raise Exception("No IDs.")
+
+    # results = db.query(models.NT_seq).filter(models.NT_seq.id.in_(pid)).all()
+    # return results
