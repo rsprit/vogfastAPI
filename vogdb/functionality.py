@@ -211,7 +211,7 @@ def get_vogs(db: Session,
         check_validity(pair)
 
     # create a warning in the log file if "union" is specified but no species/taxIDs given to use the parameter
-    if union is not None:
+    if union is 'u':
         if species is None and tax_id is None:
             logging.warning("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")
             raise Exception("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")

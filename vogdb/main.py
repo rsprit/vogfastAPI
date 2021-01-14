@@ -113,7 +113,7 @@ def search_vog(db: Session = Depends(get_db),
                proteins: Optional[Set[str]] = Query(None),
                species: Optional[Set[str]] = Query(None),
                tax_id: Optional[Set[int]] = Query(None),
-               union: Optional[str] = 'i'
+               union: Optional[str] = None
                ):
     """
     This functions searches a database and returns a list of vog unique identifiers (UIDs) for records in that database
