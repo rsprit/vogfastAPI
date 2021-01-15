@@ -19,7 +19,7 @@ Note: you may need to change the path of the data folder and your MYSQL credenti
 
 def generate_db():
     
-    data_path = "data/"
+    data_path = "../data/"
 
     # MySQL database connection
     username = "root"
@@ -214,45 +214,37 @@ def generate_db():
     #----------------------
 
     proteinfile = data_path + "vog.proteins.all.fa"
-    genefile = data_path + "vog.genes.all.fa"
-
     prot = []
     for seq_record in SeqIO.parse(proteinfile, "fasta"):
         prot.append([seq_record.id, str(seq_record.seq)])
     df = pd.DataFrame(prot, columns=['ID', 'AAseq'])
-    df.set_index("ID")
-
+    df.set_index("ID") 
+    
+    # convert dataframe to DB Table:
+    df.to_sql(name='AA_seq', con=engine, if_exists='replace', index=False, chunksize=1000)    
+    
+    with engine.connect() as con:
+        con.execute('ALTER TABLE `vogdb`.`AA_seq` MODIFY ID char(30) NOT NULL;')
+        con.execute('ALTER TABLE `vogdb`.`AA_seq` MODIFY AASeq LONGTEXT;')
+        con.execute('CREATE INDEX ID ON AA_seq (ID);')
+        
+    print('Amino-acid sequences table successfully created!')     
+        
+    
+    genefile = data_path + "vog.genes.all.fa"
     genes = []
     for seq_record in SeqIO.parse(genefile, "fasta"):
         genes.append([seq_record.id, str(seq_record.seq)])
     dfg = pd.DataFrame(genes, columns=['ID', 'NTseq'])
     dfg.set_index('ID')
-
-
-    # convert dataframes to DB Tables:
-    df.to_sql(name='aa_seq', con=engine, if_exists='replace', index=False, chunksize=1000)
-    dfg.to_sql(name='nt_seq', con=engine, if_exists='replace', index=False, chunksize=1000)
+    
+    # convert dataframe to DB table:
+    dfg.to_sql(name='NT_seq', con=engine, if_exists='replace', index=False, chunksize=1000)
 
     with engine.connect() as con:
-        con.execute('ALTER TABLE aa_seq  MODIFY  ID char(30) NOT NULL; ')
-        con.execute('ALTER TABLE aa_seq  MODIFY  AASeq LONGTEXT; ')
-        con.execute('CREATE INDEX ID ON aa_seq (ID);')
+        con.execute('ALTER TABLE `vogdb`.`NT_seq` MODIFY ID char(30) NOT NULL;')
+        con.execute('ALTER TABLE `vogdb`.`NT_seq` MODIFY NTSeq LONGTEXT;')
+        con.execute('CREATE INDEX ID ON NT_seq (ID);')
 
-        con.execute('ALTER TABLE nt_seq  MODIFY  ID char(30) NOT NULL; ')
-        con.execute('ALTER TABLE nt_seq  MODIFY  NTSeq LONGTEXT; ')
-        con.execute('CREATE INDEX ID ON nt_seq (ID);')
-
+    print('Nucleotide sequences table successfully created!')     
     
-    #engine.execute('SET foreign_key_checks = 1;')
-
-    print('aaSeq and ntSeq tables successfully created!')     
-    
-
-    #ToDo add AminoAcid and Nucleotide Sequences to the Table...
-
-    #ToDo creating other tables, modifying the existing tables, optimizing the structure
-
-
-
-
-
