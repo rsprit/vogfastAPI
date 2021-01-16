@@ -8,7 +8,9 @@ import tarfile
 from ete3 import NCBITaxa
 import logging
 
-log = logging.getLogger(__name__)  # this logger works in any module
+# get logger:
+log = logging.getLogger(__name__)
+
 # ncbi = NCBITaxa()
 
 """

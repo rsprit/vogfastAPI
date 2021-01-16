@@ -8,7 +8,8 @@ from .schemas import VOG_profile, Protein_profile, VOG_UID, Species_ID, Species_
 from . import models
 import logging
 
-log = logging.getLogger(__name__)  # this logger works in any module
+# get logger:
+log = logging.getLogger(__name__)
 
 api = FastAPI()
 
