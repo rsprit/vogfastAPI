@@ -8,6 +8,7 @@ import tarfile
 from ete3 import NCBITaxa
 import logging
 
+log = logging.getLogger(__name__)  # this logger works in any module
 # ncbi = NCBITaxa()
 
 """
@@ -33,14 +34,14 @@ def find_species_by_id(db: Session, ids: Optional[List[int]]):
     This function returns the Species information based on the given species IDs
     """
     if ids:
-        logging.info("Searching Species by IDs in the database...")
+        log.info("Searching Species by IDs in the database...")
         results = db.query(models.Species_profile).filter(models.Species_profile.taxon_id.in_(ids)).all()
         # if not results:
-        #     logging.info("The given IDs were not found in the Database.")
+        #     log.info("The given IDs were not found in the Database.")
         #     raise Exception("IDs not found in the database.")
         return results
     else:
-        logging.info("No IDs were given.")
+        log.info("No IDs were given.")
         raise Exception("No IDs.")
 
 
@@ -54,7 +55,7 @@ def get_species(db: Session,
     """
     This function searches the Species based on the given query parameters
     """
-    logging.info("Searching Species in the database...")
+    log.info("Searching Species in the database...")
 
     result = db.query(response_body)
     arguments = locals()
@@ -87,7 +88,7 @@ def get_species(db: Session,
     # if not result.all():
     #     raise Exception("No species were found.")
     # else:
-    #     logging.info("Species were found.")
+    #     log.info("Species were found.")
 
     return result.all()
 
@@ -98,19 +99,19 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
     """
 
     if ids:
-        logging.info("Searching VOGs by IDs in the database...")
+        log.info("Searching VOGs by IDs in the database...")
         results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
         # if not results:
-        #     logging.info("The given IDs were not found in the Database.")
+        #     log.info("The given IDs were not found in the Database.")
         #     raise Exception("IDs not found in the database.")
         return results
     else:
-        logging.error("No IDs were given.")
+        log.error("No IDs were given.")
         raise Exception("No IDs.")
 
 
 def find_vogs_hmm_by_uid(uid):
-    logging.info("Searching for Hidden Markov Models (HMM) in the data files...")
+    log.info("Searching for Hidden Markov Models (HMM) in the data files...")
 
     file_name = "./data/vog.hmm.tar.gz"
 
@@ -124,7 +125,7 @@ def find_vogs_hmm_by_uid(uid):
         for vog_id in uid:
             vog_hmm_list.append(vog_id.upper() + ".hmm")
     else:
-        logging.info("No IDs were given.")
+        log.info("No IDs were given.")
         raise Exception("No IDs.")
 
     hmm_response = []
@@ -141,7 +142,7 @@ def find_vogs_hmm_by_uid(uid):
 
 
 def find_vogs_msa_by_uid(uid):
-    logging.info("Searching for Multiple Sequence Alignments (MSA) in the data files...")
+    log.info("Searching for Multiple Sequence Alignments (MSA) in the data files...")
 
     file_name = "./data/vog.raw_algs.tar.gz"
     try:
@@ -154,7 +155,7 @@ def find_vogs_msa_by_uid(uid):
         for vog_id in uid:
             vog_msa_list.append(vog_id.upper() + ".msa")
     else:
-        logging.info("No IDs were given.")
+        log.info("No IDs were given.")
         raise Exception("No IDs.")
 
     msa_response = []
@@ -196,7 +197,7 @@ def get_vogs(db: Session,
     """
     This function searches the VOG based on the given query parameters
     """
-    logging.info("Searching VOGs in the database...")
+    log.info("Searching VOGs in the database...")
 
     if union is not 'i' and union is not 'u':
         raise Exception("The parameter for the Intersection or Union search has to be 'i' or 'u'.")
@@ -221,13 +222,13 @@ def get_vogs(db: Session,
     # create a warning in the log file if "union" is specified but no species/taxIDs given to use the parameter
     if union is 'u':
         if species is None and tax_id is None:
-            logging.warning("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")
+            log.warning("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")
             raise Exception("The 'Union' Parameter was provided, but no species or taxonomy IDs were provided.")
         elif species is not None and len(species) < 2:
-            logging.warning("The 'Union' Parameter was provided, but the number of species is smaller than 2.")
+            log.warning("The 'Union' Parameter was provided, but the number of species is smaller than 2.")
             raise Exception("The 'Union' Parameter was provided, but the number of species is smaller than 2.")
         elif tax_id is not None and len(tax_id) < 2:
-            logging.warning("The 'Union' Parameter was provided, but the number of taxonomy IDs is smaller than 2.")
+            log.warning("The 'Union' Parameter was provided, but the number of taxonomy IDs is smaller than 2.")
             raise Exception("The 'Union' Parameter was provided, but the number of taxonomy IDs is smaller than 2.")
 
 
@@ -359,7 +360,7 @@ def get_vogs(db: Session,
     # if not result.all():
     #     raise Exception("No VOGs were found.")
     # else:
-    #     logging.info("VOGs were found.")
+    #     log.info("VOGs were found.")
 
     return result.all()
 
@@ -372,7 +373,7 @@ def get_proteins(db: Session,
     """
     This function searches the for proteins based on the given query parameters
     """
-    logging.info("Searching Proteins in the database...")
+    log.info("Searching Proteins in the database...")
 
     result = db.query(response_body)
     arguments = locals()
@@ -408,7 +409,7 @@ def get_proteins(db: Session,
     # if not result.all():
     #     raise Exception("No Proteins were found.")
     # else:
-    #     logging.info("Proteins were found.")
+    #     log.info("Proteins were found.")
 
     return result.all()
 
@@ -418,18 +419,18 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
     This function returns the Protein information based on the given Protein IDs
     """
     if pids:
-        logging.info("Searching Proteins by ProteinIDs in the database...")
+        log.info("Searching Proteins by ProteinIDs in the database...")
         results = db.query().with_entities(models.Protein_profile.id,
                                            models.Protein_profile.vog_id,
                                            models.Protein_profile.taxon_id,
                                            models.Species_profile.species_name).join(models.Species_profile). \
             filter(models.Protein_profile.id.in_(pids)).all()
         # if not results:
-        #     logging.info("The given IDs were not found in the Database.")
+        #     log.info("The given IDs were not found in the Database.")
         #     raise Exception("IDs not found in the database.")
         return results
     else:
-        logging.error("No IDs were given.")
+        log.error("No IDs were given.")
         raise Exception("No IDs.")
 
 
@@ -438,13 +439,13 @@ def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
     This function returns the Aminoacid sequences of the proteins based on the given Protein IDs
     """
     if id:
-        logging.info("Searching AA sequence by ProteinIDs in the database...")
+        log.info("Searching AA sequence by ProteinIDs in the database...")
         results = db.query(models.AA_seq).filter(models.AA_seq.id.in_(id)).all()
         # if not results:
-        #     logging.info("None of the given IDs were found in the Database.")
+        #     log.info("None of the given IDs were found in the Database.")
         return results
     else:
-        logging.error("No IDs were given.")
+        log.error("No IDs were given.")
         raise Exception("No IDs.")
 
 
@@ -453,11 +454,11 @@ def find_protein_fna_by_id(db: Session, pid):
     This function returns the Nucleotide sequences of the proteins based on the given Protein IDs
     """
     if id:
-        logging.info("Searching NT sequence by ProteinIDs in the database...")
+        log.info("Searching NT sequence by ProteinIDs in the database...")
         results = db.query(models.AA_seq).filter(models.AA_seq.id.in_(id)).all()
         return results
     else:
-        logging.error("No IDs were given.")
+        log.error("No IDs were given.")
         raise Exception("No IDs.")
 
     # results = db.query(models.NT_seq).filter(models.NT_seq.id.in_(pid)).all()
