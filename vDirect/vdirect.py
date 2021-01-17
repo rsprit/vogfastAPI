@@ -6,7 +6,10 @@ import logging
 """
 This is the implementation of the Argument Parser
 """
-
+# logger
+v_direct_log = logging.getLogger(__name__)  # this logger works in any module
+# configuring logging
+logging.basicConfig(level=logging.DEBUG, filename="vdir.log", filemode='w')
 
 def main():
     parser = argparse.ArgumentParser(description='Welcome to vDirect!', epilog='Thank you for using vDirect!')
@@ -71,7 +74,8 @@ def main():
     vog_search_parser.add_argument('-tid', '-taxonid', type=int, action='append', nargs='+', dest='tid',
                                    help="Taxonomy ID(s)")
     vog_search_parser.add_argument('-u', '-union', type=str, action='store', default='i', nargs='+', dest='union',
-                                   help="Do you want an (u)nion or an (i)ntersection search? Default = 'i'.")
+                                   help="Do you want an (u)nion or an (i)ntersection search when searching VOGs by "
+                                        "Species names or Taxonomy IDs? Default = 'i'.")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                    choices=['json', 'df', 'stdout'],
                                    help="specify a format: 'json' or 'df' or 'stdout'")
@@ -148,7 +152,7 @@ def main():
 
     try:
         args = parser.parse_args()
-        logging.info("Arguments parsed: {0}".format(args))
+        v_direct_log.info("Arguments parsed: {0}".format(args))
 
         if args.command == 'vfetch':
             if not sys.stdin.isatty():
@@ -202,8 +206,8 @@ def main():
                               phages_nonphages=args.phage, proteins=args.prot, species=args.species, tax_id=args.tid,
                               union=args.union))
     except Exception as exc:
-        logging.error("The following exception occurred: {0}".format(exc))
-    logging.info("Thank you for using vDirect.")
+        v_direct_log.error("The following exception occurred: {0}".format(exc))
+    v_direct_log.info("Thank you for using vDirect.")
 
 
 if __name__ == '__main__':

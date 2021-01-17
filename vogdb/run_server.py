@@ -17,7 +17,7 @@ import os
 # logger
 log = logging.getLogger(__name__)  # this logger works in any module
 # configuring logging
-logging.basicConfig(level=logging.DEBUG, filename="vogapi.log", filemode='w')  # add later filename='vogapi.log'
+logging.basicConfig(level=logging.DEBUG, filename="../vogdb/vogapi.log", filemode='w')
 
 # Configuration
 config = Config()

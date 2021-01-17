@@ -1,9 +1,7 @@
-# from database.generate_db import ncbi
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from . import models
 from typing import Optional, Set, List
-from fastapi import HTTPException
 import tarfile
 from ete3 import NCBITaxa
 import logging
@@ -38,9 +36,6 @@ def find_species_by_id(db: Session, ids: Optional[List[int]]):
     if ids:
         log.info("Searching Species by IDs in the database...")
         results = db.query(models.Species_profile).filter(models.Species_profile.taxon_id.in_(ids)).all()
-        # if not results:
-        #     log.info("The given IDs were not found in the Database.")
-        #     raise Exception("IDs not found in the database.")
         return results
     else:
         log.info("No IDs were given.")
@@ -87,11 +82,6 @@ def get_species(db: Session,
 
     result = result.filter(*filters)
 
-    # if not result.all():
-    #     raise Exception("No species were found.")
-    # else:
-    #     log.info("Species were found.")
-
     return result.all()
 
 
@@ -103,9 +93,6 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
     if ids:
         log.info("Searching VOGs by IDs in the database...")
         results = db.query(models.VOG_profile).filter(models.VOG_profile.id.in_(ids)).all()
-        # if not results:
-        #     log.info("The given IDs were not found in the Database.")
-        #     raise Exception("IDs not found in the database.")
         return results
     else:
         log.error("No IDs were given.")
@@ -351,18 +338,13 @@ def get_vogs(db: Session,
                                 filters.append(getattr(models.VOG_profile, "id").in_(vog_ids))
                     except ValueError:
                         raise ValueError("The provided taxonomy ID is invalid.")
-                        # raise HTTPException(status_code=404, detail="The provided taxonomy ID is invalid.")
+
     except ValueError:
         raise ValueError("The provided taxonomy ID is invalid.")
     except Exception:
         raise Exception("Invalid key/value pair")
 
     result = result.filter(*filters)
-
-    # if not result.all():
-    #     raise Exception("No VOGs were found.")
-    # else:
-    #     log.info("VOGs were found.")
 
     return result.all()
 
@@ -408,11 +390,6 @@ def get_proteins(db: Session,
 
     result = result.filter(*filters)
 
-    # if not result.all():
-    #     raise Exception("No Proteins were found.")
-    # else:
-    #     log.info("Proteins were found.")
-
     return result.all()
 
 
@@ -427,9 +404,6 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
                                            models.Protein_profile.taxon_id,
                                            models.Species_profile.species_name).join(models.Species_profile). \
             filter(models.Protein_profile.id.in_(pids)).all()
-        # if not results:
-        #     log.info("The given IDs were not found in the Database.")
-        #     raise Exception("IDs not found in the database.")
         return results
     else:
         log.error("No IDs were given.")
@@ -443,8 +417,6 @@ def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
     if id:
         log.info("Searching AA sequence by ProteinIDs in the database...")
         results = db.query(models.AA_seq).filter(models.AA_seq.id.in_(id)).all()
-        # if not results:
-        #     log.info("None of the given IDs were found in the Database.")
         return results
     else:
         log.error("No IDs were given.")
@@ -463,5 +435,3 @@ def find_protein_fna_by_id(db: Session, pid):
         log.error("No IDs were given.")
         raise Exception("No IDs.")
 
-    # results = db.query(models.NT_seq).filter(models.NT_seq.id.in_(pid)).all()
-    # return results
