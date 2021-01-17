@@ -210,7 +210,8 @@ def get_vogs(db: Session,
 
     for number in smin, smax, pmin, pmax, mingLCA, maxgLCA, mingGLCA, maxgGLCA:
         if number is not None:
-            raise Exception('Number not > 0: Provided number: %s' % number)
+            if number < 1:
+                raise Exception('Number not > 0: Provided number: %s' % number)
 
     # create a warning in the log file if "union" is specified but no species/taxIDs given to use the parameter
     if union is 'u':
