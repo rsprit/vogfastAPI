@@ -210,6 +210,7 @@ def main():
                               union=args.union))
     except Exception as exc:
         v_direct_log.error("The following exception occurred: {0}".format(exc))
+        print("No success, check log file for details.")
     v_direct_log.info("Thank you for using vDirect.")
 
 
