@@ -77,7 +77,7 @@ def main():
                                    help="Do you want an (u)nion or an (i)ntersection search when searching VOGs by "
                                         "Species names or Taxonomy IDs? Default = 'i'.")
     vog_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                   choices=['json', 'df', 'stdout'],
+                                   choices=['json', 'df', 'stdout'], default='df',
                                    help="specify a format: 'json' or 'df' or 'stdout'")
 
     # add arguments for species_search_parser:
@@ -93,7 +93,7 @@ def main():
     species_search_parser.add_argument('-v', '-version', type=int, action='store', nargs='?', dest='version',
                                        help="search for species found in the specified version")
     species_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                       choices=['json', 'df', 'stdout'],
+                                       choices=['json', 'df', 'stdout'], default='df',
                                        help="specify a format: 'json' or 'df' or 'stdout'")
 
     # add arguments for protein_search_parser:
@@ -104,7 +104,7 @@ def main():
     protein_search_parser.add_argument('-vid', '-vogid', type=str, action='append', nargs='+', dest='vog_id',
                                        help="search for VOG IDs")
     protein_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                       choices=['json', 'df', 'stdout'],
+                                       choices=['json', 'df', 'stdout'], default='df',
                                        help="specify a format: 'json', 'df' or 'stdout'")
 
     # add subparsers for vSummary:
