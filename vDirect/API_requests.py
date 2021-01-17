@@ -83,7 +83,10 @@ def vsummary(return_object="vog", format="json", **params):
     try:
         r.raise_for_status()
     except requests.exceptions.HTTPError as e:
-        raise Exception(e.response.text)
+        if e.response.text:
+            raise Exception(e.response.text)
+        else:
+            raise Exception("Undefined error. Check log file for details.")
     response = r.json()
 
     # formatting
