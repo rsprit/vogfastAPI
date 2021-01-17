@@ -93,7 +93,7 @@ def main():
     species_search_parser.add_argument('-v', '-version', type=int, action='store', nargs='?', dest='version',
                                        help="search for species found in the specified version")
     species_search_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
-                                       choices=['json', 'df', 'stdout'], default='df',
+                                       choices=['json', 'df', 'stdout'], default='stdout',
                                        help="specify a format: 'json' or 'df' or 'stdout'")
 
     # add arguments for protein_search_parser:
@@ -126,7 +126,7 @@ def main():
                                         choices=['json', 'df'], help="specify a format: 'json' or 'df'")
 
     # add arguments for species_summary_parser:
-    species_summary_parser.add_argument('-id', type=int, nargs='+', dest='taxon_ids', default=sys.stdin,
+    species_summary_parser.add_argument('-id', type=int, nargs='+', dest='id', default=sys.stdin,
                                         help="taxon ID(s)")
     species_summary_parser.add_argument('-f', '-format', type=str, action='store', nargs='?', dest='format',
                                         choices=['json', 'df'], help="specify a format: 'json' or 'df'")
@@ -166,9 +166,12 @@ def main():
         elif args.command == 'vsummary':
             if args.type == 'species':
                 if not sys.stdin.isatty():
-                    id = args.taxon_ids.read().split()
+                    input = args.id.read().split()
+                    id = []
+                    for ele in input:
+                        id.append(int(ele))
                 else:
-                    id = args.taxon_ids
+                    id = args.id
 
                 print(vsummary(return_object=args.type, format=args.format, taxon_id=id))
 
