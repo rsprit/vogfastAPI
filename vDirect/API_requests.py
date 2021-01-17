@@ -48,6 +48,10 @@ def vfetch(return_object="vog", return_type="msa", **params):
 
     # API GET request
     r = requests.get(url=url, params=params)
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise Exception(e.response.text)
     response = r.json()
     return response
 
@@ -76,6 +80,10 @@ def vsummary(return_object="vog", format="json", **params):
 
     # API GET request
     r = requests.get(url=url, params=params)
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise Exception(e.response.text)
     response = r.json()
 
     # formatting
@@ -114,6 +122,10 @@ def vsearch(return_object="vog", format="json", **params):
 
     # API GET request
     r = requests.get(url=url, params=params)
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise Exception(e.response.text)
     response = r.json()
 
     # formatting
