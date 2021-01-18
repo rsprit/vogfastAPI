@@ -98,7 +98,7 @@ def vsummary(return_object="vog", format="json", **params):
     return response
 
 
-def vsearch(return_object="vog", format="json", **params):
+def vsearch(command='vsearch', return_object="vog", format="json", **params):
     """Yield the response (vog/species/protein summary of a query."""
 
     # First make some basic checks.

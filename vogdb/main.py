@@ -38,7 +38,8 @@ def search_species(db: Session = Depends(get_db),
                    name: Optional[str] = None,
                    phage: Optional[bool] = None,
                    source: Optional[str] = None,
-                   version: Optional[int] = None):
+                   version: Optional[int] = None,
+                   sort: Optional[str] = 'SpeciesName'):
     """
     This functions searches a database and returns a list of species IDs for records in that database
     which meet the search criteria.
@@ -48,7 +49,7 @@ def search_species(db: Session = Depends(get_db),
     log.debug("Received a vsearch/species request with parameters: {0}".format(locals()))
 
     try:
-        species = get_species(db, models.Species_profile.taxon_id, ids, name, phage, source, version)
+        species = get_species(db, models.Species_profile.taxon_id, ids, name, phage, source, version, sort)
     except Exception as exc:
         log.error("Retrieving Species was not successful. Parameters: {0}".format(locals()))
         log.error(exc)
@@ -116,8 +117,10 @@ def search_vog(db: Session = Depends(get_db),
                proteins: Optional[Set[str]] = Query(None),
                species: Optional[Set[str]] = Query(None),
                tax_id: Optional[Set[int]] = Query(None),
-               union: Optional[str] = 'i'
-               ):
+               union: Optional[str] = 'i',
+               sort: Optional[str] = 'VOG_ID'):
+
+
     """
     This functions searches a database and returns a list of vog unique identifiers (UIDs) for records in that database
     which meet the search criteria.
@@ -130,7 +133,7 @@ def search_vog(db: Session = Depends(get_db),
     try:
         vogs = get_vogs(db, models.VOG_profile.id, id, pmin, pmax, smax, smin, functional_category, consensus_function,
                         mingLCA, maxgLCA, mingGLCA, maxgGLCA, ancestors, h_stringency, m_stringency, l_stringency,
-                        virus_specific, phages_nonphages, proteins, species, tax_id, union)
+                        virus_specific, phages_nonphages, proteins, species, tax_id, union, sort)
     except Exception as exc:
         log.error("Retrieving VOGs was not successful. Parameters: {0}".format(locals()))
         log.error(exc)
@@ -176,7 +179,8 @@ async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get
 async def search_protein(db: Session = Depends(get_db),
                          species_name: Optional[Set[str]] = Query(None),
                          taxon_id: Optional[Set[int]] = Query(None),
-                         VOG_id: Optional[Set[str]] = Query(None)):
+                         VOG_id: Optional[Set[str]] = Query(None),
+                         sort: Optional[str] = 'ProteinID'):
     """
     This functions searches a database and returns a list of Protein IDs for records in the database
     matching the search criteria.
@@ -187,10 +191,10 @@ async def search_protein(db: Session = Depends(get_db),
     """
 
     log.info("GET request vsearch/protein")
-    log.debug("Received a vsummary/protein request with parameters: {0}".format(locals()))
+    log.debug("Received a vsearch/protein request with parameters: {0}".format(locals()))
 
     try:
-        proteins = get_proteins(db, models.Protein_profile.id, species_name, taxon_id, VOG_id)
+        proteins = get_proteins(db, models.Protein_profile.id, species_name, taxon_id, VOG_id, sort)
     except Exception as exc:
         log.error("Retrieving Proteins was not successful. Parameters: {0}".format(locals()))
         log.error(exc)

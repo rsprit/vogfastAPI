@@ -48,7 +48,8 @@ def get_species(db: Session,
                 species_name: Optional[str],
                 phage: Optional[bool],
                 source: Optional[str],
-                version: Optional[int]):
+                version: Optional[int],
+                sort: Optional[str]):
     """
     This function searches the Species based on the given query parameters
     """
@@ -80,7 +81,7 @@ def get_species(db: Session,
     except Exception:
         raise Exception("Invalid key/value pair")
 
-    result = result.filter(*filters)
+    result = result.filter(*filters).order_by(sort)
 
     return result.all()
 
@@ -181,7 +182,8 @@ def get_vogs(db: Session,
              proteins: Optional[Set[str]],
              species: Optional[Set[str]],
              tax_id: Optional[Set[int]],
-             union: Optional[str] = 'i'
+             sort: Optional[str],
+             union: Optional[str] = 'i',
              ):
     """
     This function searches the VOG based on the given query parameters
@@ -349,7 +351,7 @@ def get_vogs(db: Session,
     except Exception:
         raise Exception("Invalid key/value pair")
 
-    result = result.filter(*filters)
+    result = result.filter(*filters).order_by(sort)
 
     return result.all()
 
@@ -358,7 +360,8 @@ def get_proteins(db: Session,
                  response_body,
                  species: Optional[Set[str]],
                  taxon_id: Optional[Set[int]],
-                 vog_id: Optional[Set[str]]):
+                 vog_id: Optional[Set[str]],
+                 sort: Optional[str]):
     """
     This function searches the for proteins based on the given query parameters
     """
@@ -393,7 +396,7 @@ def get_proteins(db: Session,
     except Exception:
         raise Exception("Invalid key/value pair")
 
-    result = result.filter(*filters)
+    result = result.filter(*filters).order_by(sort)
 
     return result.all()
 
