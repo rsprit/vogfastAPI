@@ -7,9 +7,9 @@ import logging
 This is the implementation of the Argument Parser
 """
 # logger
-v_direct_log = logging.getLogger(__name__)  # this logger works in any module
+v_direct_log = logging.getLogger()  # this logger works in any module
 # configuring logging
-logging.basicConfig(level=logging.DEBUG, filename="vdir.log", filemode='w')
+logging.basicConfig(level=logging.INFO, filename="vdir.log", filemode='w')
 
 def main():
     parser = argparse.ArgumentParser(description='Welcome to vDirect!', epilog='Thank you for using vDirect!')
@@ -172,7 +172,7 @@ def main():
                     try:
                         int(input[0])
                     except Exception:
-                        raise Exception("Please specify '-f stdout' in the species search.")
+                        raise Exception("Please specify '-f stdout' in the species search when piping.")
                     id = []
                     for ele in input:
                         id.append(int(ele))
@@ -220,9 +220,12 @@ def main():
                               union=args.union))
     except Exception as exc:
         v_direct_log.error("The following exception occurred: {0}".format(exc))
-        print("No success. The following exception occurred: {0}".format(exc))
-    v_direct_log.info("Thank you for using vDirect.")
+        raise Exception(exc)
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+        v_direct_log.info("Request successful. Thank you for using vDirect.")
+    except Exception as ex:
+        print("Request has failed. Detail: {0}".format(ex))
