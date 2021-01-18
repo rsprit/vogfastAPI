@@ -157,6 +157,8 @@ def main():
         if args.command == 'vfetch':
             if not sys.stdin.isatty():
                 id = args.id.read().split()
+                if id[0][0] == '[':
+                    raise Exception("The search output cannot be 'json' when piping.")
             else:
                 id = args.id
 
@@ -167,6 +169,10 @@ def main():
             if args.type == 'species':
                 if not sys.stdin.isatty():
                     input = args.id.read().split()
+                    try:
+                        int(input[0])
+                    except Exception:
+                        raise Exception("Please specify '-f stdout' in the species search.")
                     id = []
                     for ele in input:
                         id.append(int(ele))
@@ -178,6 +184,8 @@ def main():
             elif args.type == 'protein':
                 if not sys.stdin.isatty():
                     id = args.id.read().split()
+                    if id[0][0] == '[':
+                        raise Exception("The search output cannot be 'json' when piping.")
                 else:
                     id = args.id
                 print(vsummary(return_object=args.type, format=args.format, id=id))
@@ -185,6 +193,8 @@ def main():
             elif args.type == 'vog':
                 if not sys.stdin.isatty():
                     id = args.id.read().split()
+                    if id[0][0] == '[':
+                        raise Exception("The search output cannot be 'json' when piping.")
                 else:
                     id = args.id
 
