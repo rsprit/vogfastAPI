@@ -189,6 +189,7 @@ def get_vogs(db: Session,
     This function searches the VOG based on the given query parameters
     """
     log.info("Searching VOGs in the database...")
+    log.info("UNION IS {0}".format(union))
 
     if union is not 'i' and union is not 'u':
         raise Exception("The parameter for the Intersection or Union search has to be 'i' or 'u'.")

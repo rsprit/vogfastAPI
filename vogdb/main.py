@@ -117,8 +117,8 @@ def search_vog(db: Session = Depends(get_db),
                proteins: Optional[Set[str]] = Query(None),
                species: Optional[Set[str]] = Query(None),
                tax_id: Optional[Set[int]] = Query(None),
-               union: Optional[str] = 'i',
-               sort: Optional[str] = 'VOG_ID'):
+               sort: Optional[str] = 'VOG_ID',
+               union: Optional[str] = 'i'):
 
 
     """
@@ -133,7 +133,7 @@ def search_vog(db: Session = Depends(get_db),
     try:
         vogs = get_vogs(db, models.VOG_profile.id, id, pmin, pmax, smax, smin, functional_category, consensus_function,
                         mingLCA, maxgLCA, mingGLCA, maxgGLCA, ancestors, h_stringency, m_stringency, l_stringency,
-                        virus_specific, phages_nonphages, proteins, species, tax_id, union, sort)
+                        virus_specific, phages_nonphages, proteins, species, tax_id, sort, union)
     except Exception as exc:
         log.error("Retrieving VOGs was not successful. Parameters: {0}".format(locals()))
         log.error(exc)
