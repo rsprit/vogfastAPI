@@ -1,3 +1,5 @@
+import json
+
 from API_requests import *
 import sys
 import argparse
@@ -6,10 +8,6 @@ import logging
 """
 This is the implementation of the Argument Parser
 """
-# # logger
-# v_direct_log = logging.getLogger()  # this logger works in any module
-# # configuring logging
-# logging.basicConfig(level=logging.INFO, filename="vdir.log", filemode='w')
 
 stdout = sys.stdout
 stderr = sys.stderr
@@ -170,6 +168,14 @@ def main():
         args = parser.parse_args()
         # v_direct_log.info("Arguments parsed: {0}".format(args))
 
+        #write json and df to output:
+        def json_to_stdout(input):
+            json.dump(input, stdout)
+
+        def df_to_stdout(input):
+            input.to_csv(stdout, sep='\t')
+
+
         if args.command == 'vfetch':
             if not sys.stdin.isatty():
                 id = args.id.read().split()
@@ -194,10 +200,9 @@ def main():
                         id.append(int(ele))
                 else:
                     id = args.id
-
                 stdout.write(str(vsummary(return_object=args.return_object, format=args.format, taxon_id=id)))
 
-            elif args.return_object == 'protein':
+            elif args.return_object == 'protein' or args.return_object == 'vog':
                 if not sys.stdin.isatty():
                     id = args.id.read().split()
                     if id[0][0] == '[':
@@ -205,36 +210,35 @@ def main():
                 else:
                     id = args.id
                 stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)))
+            else:
+                raise Exception("unknown return object")
 
-            elif args.return_object == 'vog':
-                if not sys.stdin.isatty():
-                    id = args.id.read().split()
-                    if id[0][0] == '[':
-                        raise Exception("The search output cannot be 'json' when piping.")
-                else:
-                    id = args.id
-
-                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)))
+            # elif args.return_object == 'vog':
+            #     if not sys.stdin.isatty():
+            #         id = args.id.read().split()
+            #         if id[0][0] == '[':
+            #             raise Exception("The search output cannot be 'json' when piping.")
+            #     else:
+            #         id = args.id
+            #     stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)))
 
 
         elif args.command == 'vsearch':
-            if args.return_object == 'species':
-                stdout.write(str(vsearch(**vars(args))))
+            # ToDo: remove (fastapi) from output and add newline
+            result = vsearch(**vars(args))
+            if args.format == 'df':
+                df_to_stdout(result)
+            elif args.format == 'json':
+                json_to_stdout(result)
+            else:
+                stdout.write(result)
 
-            if args.return_object == 'protein':
-                # stdout.write(vsearch(**vars(args)).to_csv(stdout, sep='\t'))
-                vsearch(**vars(args)).to_csv(stdout, sep='\t')
-
-            if args.return_object == 'vog':
-                stdout.write(str(vsearch(**vars(args))))
     except Exception as exc:
-        # v_direct_log.error("The following exception occurred: {0}".format(exc))
         raise Exception(exc)
 
 
 if __name__ == '__main__':
     try:
         main()
-        # v_direct_log.info("Request successful. Thank you for using vDirect.")
     except Exception as ex:
         stderr.write("Request has failed. Detail: {0}".format(ex))
