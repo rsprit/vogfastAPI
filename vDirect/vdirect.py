@@ -6,10 +6,13 @@ import logging
 """
 This is the implementation of the Argument Parser
 """
-# logger
-v_direct_log = logging.getLogger()  # this logger works in any module
-# configuring logging
-logging.basicConfig(level=logging.INFO, filename="vdir.log", filemode='w')
+# # logger
+# v_direct_log = logging.getLogger()  # this logger works in any module
+# # configuring logging
+# logging.basicConfig(level=logging.INFO, filename="vdir.log", filemode='w')
+
+stdout = sys.stdout
+stderr = sys.stderr
 
 def main():
     parser = argparse.ArgumentParser(description='Welcome to vDirect!', epilog='Thank you for using vDirect!')
@@ -165,7 +168,7 @@ def main():
 
     try:
         args = parser.parse_args()
-        v_direct_log.info("Arguments parsed: {0}".format(args))
+        # v_direct_log.info("Arguments parsed: {0}".format(args))
 
         if args.command == 'vfetch':
             if not sys.stdin.isatty():
@@ -175,7 +178,7 @@ def main():
             else:
                 id = args.id
 
-            print(vfetch(return_object=args.return_object, return_type=args.return_type, id=id))
+            stdout.write(str(vfetch(return_object=args.return_object, return_type=args.return_type, id=id)))
 
 
         elif args.command == 'vsummary':
@@ -192,7 +195,7 @@ def main():
                 else:
                     id = args.id
 
-                print(vsummary(return_object=args.return_object, format=args.format, taxon_id=id))
+                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, taxon_id=id)))
 
             elif args.return_object == 'protein':
                 if not sys.stdin.isatty():
@@ -201,7 +204,7 @@ def main():
                         raise Exception("The search output cannot be 'json' when piping.")
                 else:
                     id = args.id
-                print(vsummary(return_object=args.return_object, format=args.format, id=id))
+                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)))
 
             elif args.return_object == 'vog':
                 if not sys.stdin.isatty():
@@ -211,26 +214,27 @@ def main():
                 else:
                     id = args.id
 
-                print(vsummary(return_object=args.return_object, format=args.format, id=id))
+                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)))
 
 
         elif args.command == 'vsearch':
             if args.return_object == 'species':
-                print(vsearch(**vars(args)))
+                stdout.write(str(vsearch(**vars(args))))
 
             if args.return_object == 'protein':
-                print(vsearch(**vars(args)))
+                # stdout.write(vsearch(**vars(args)).to_csv(stdout, sep='\t'))
+                vsearch(**vars(args)).to_csv(stdout, sep='\t')
 
             if args.return_object == 'vog':
-                print(vsearch(**vars(args)))
+                stdout.write(str(vsearch(**vars(args))))
     except Exception as exc:
-        v_direct_log.error("The following exception occurred: {0}".format(exc))
+        # v_direct_log.error("The following exception occurred: {0}".format(exc))
         raise Exception(exc)
 
 
 if __name__ == '__main__':
     try:
         main()
-        v_direct_log.info("Request successful. Thank you for using vDirect.")
+        # v_direct_log.info("Request successful. Thank you for using vDirect.")
     except Exception as ex:
-        print("Request has failed. Detail: {0}".format(ex))
+        stderr.write("Request has failed. Detail: {0}".format(ex))
