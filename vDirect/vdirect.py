@@ -145,7 +145,7 @@ def main():
     #                                    help="Parameter sort results by")
 
     # add subparsers for vFetch:
-    vfetch_sps = vfetch_parser.add_subparsers(dest='type', help='subparsers for vfetch_parser')
+    vfetch_sps = vfetch_parser.add_subparsers(dest='return_object', help='subparsers for vfetch_parser')
     vog_fetch_parser = vfetch_sps.add_parser('vog', help='vfetch subparser for vog fetch')
     # # species fetch does not exist
     # species_fetch_parser = vfetch_sps.add_parser('species', help='vfetch subparser for species fetch')
@@ -165,14 +165,15 @@ def main():
 
     try:
         args = parser.parse_args()
-        # v_direct_log.info("Arguments parsed: {0}".format(args))
 
-        #write json and df to output:
+        # write json and df to output:
         def json_to_stdout(input):
             json.dump(input, stdout)
+            stdout.write("\n")
 
         def df_to_stdout(input):
             input.to_csv(stdout, sep='\t')
+            stdout.write("\n")
 
 
         if args.command == 'vfetch':
@@ -183,7 +184,7 @@ def main():
             else:
                 id = args.id
 
-            stdout.write(str(vfetch(return_object=args.return_object, return_type=args.return_type, id=id)))
+            stdout.write(str(vfetch(return_object=args.return_object, return_type=args.return_type, id=id)) + '\n')
 
 
         elif args.command == 'vsummary':
@@ -199,7 +200,7 @@ def main():
                         id.append(int(ele))
                 else:
                     id = args.id
-                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, taxon_id=id)))
+                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, taxon_id=id)) + '\n')
 
             elif args.return_object == 'protein' or args.return_object == 'vog':
                 if not sys.stdin.isatty():
@@ -208,7 +209,7 @@ def main():
                         raise Exception("The search output cannot be 'json' when piping.")
                 else:
                     id = args.id
-                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)))
+                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)) + '\n')
             else:
                 raise Exception("unknown return object")
 
@@ -223,14 +224,13 @@ def main():
 
 
         elif args.command == 'vsearch':
-            # ToDo: remove (fastapi) from output and add newline
             result = vsearch(**vars(args))
             if args.format == 'df':
                 df_to_stdout(result)
             elif args.format == 'json':
                 json_to_stdout(result)
             else:
-                stdout.write(result)
+                stdout.write(result + '\n')
 
     except Exception as exc:
         raise Exception(exc)
@@ -241,3 +241,4 @@ if __name__ == '__main__':
         main()
     except Exception as ex:
         stderr.write("Request has failed. Detail: {0}".format(ex))
+        stderr.write('\n')
