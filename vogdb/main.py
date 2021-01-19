@@ -1,4 +1,6 @@
+import pymysql
 from fastapi import HTTPException
+
 from .functionality import *
 from .database import SessionLocal
 from sqlalchemy.orm import Session
@@ -53,6 +55,9 @@ def search_species(db: Session = Depends(get_db),
     except Exception as exc:
         log.error("Retrieving Species was not successful. Parameters: {0}".format(locals()))
         log.error(exc)
+        # check if it was a pymysql error:
+        if "pymysql" in exc.args[0]:
+            raise HTTPException(status_code=400, detail="Database error. See log file for details.")
         raise HTTPException(status_code=400, detail="Species search not successful. Error: {0}".format(exc))
 
     if not species:
@@ -80,6 +85,9 @@ async def get_summary_species(taxon_id: Optional[List[int]] = Query(None), db: S
     except Exception as exc:
         log.error("Retrieving summary information for Species was not successful. Species IDs: {0}".format(taxon_id))
         log.error(exc)
+        # check if it was a pymysql error:
+        if "pymysql" in exc.args[0]:
+            raise HTTPException(status_code=400, detail="Database error. See log file for details.")
         raise HTTPException(status_code=400, detail="Vsummary not successful. Error: {0}".format(exc))
 
     if not len(species_summary) == len(taxon_id):
@@ -137,6 +145,9 @@ def search_vog(db: Session = Depends(get_db),
     except Exception as exc:
         log.error("Retrieving VOGs was not successful. Parameters: {0}".format(locals()))
         log.error(exc)
+        # check if it was a pymysql error:
+        if "pymysql" in exc.args[0]:
+            raise HTTPException(status_code=400, detail="Database error. See log file for details.")
         raise HTTPException(status_code=400, detail="VOG search not successful. Error: {0}".format(exc))
 
     if not vogs:
@@ -161,9 +172,13 @@ async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get
 
     try:
         vog_summary = find_vogs_by_uid(db, id)
+    # ToDo: catch DB error
     except Exception as exc:
         log.error("Retrieving summary information for VOG was not successful. Parameters: {0}".format(id))
         log.error(exc)
+        # check if it was a pymysql error:
+        if "pymysql" in exc.args[0]:
+            raise HTTPException(status_code=400, detail="Database error. See log file for details.")
         raise HTTPException(status_code=400, detail="Vsummary not successful. Error: {0}".format(exc))
 
     if not vog_summary:
@@ -198,6 +213,9 @@ async def search_protein(db: Session = Depends(get_db),
     except Exception as exc:
         log.error("Retrieving Proteins was not successful. Parameters: {0}".format(locals()))
         log.error(exc)
+        # check if it was a pymysql error:
+        if "pymysql" in exc.args[0]:
+            raise HTTPException(status_code=400, detail="Database error. See log file for details.")
         raise HTTPException(status_code=400, detail="Protein search not successful. Error: {0}".format(exc))
 
     if not proteins:
@@ -226,10 +244,12 @@ async def get_summary_protein(id: List[str] = Query(None), db: Session = Depends
     except Exception as exc:
         log.error("Retrieving summary information for Proteins was not successful. Protein IDs: {0}".format(id))
         log.error(exc)
+        # check if it was a pymysql error:
+        if "pymysql" in exc.args[0]:
+            raise HTTPException(status_code=400, detail="Database error. See log file for details.")
         raise HTTPException(status_code=400, detail="Vsummary not successful. Error: {0}".format(exc))
 
     if not len(protein_summary) == len(id):
-        # log.warning(len(protein_summary))
         log.warning("At least one of the proteins was not found, or there were duplicates.\n"
                         "IDs given: {0}".format(id))
 

@@ -19,6 +19,7 @@ log = logging.getLogger(__name__)  # this logger works in any module
 # configuring logging
 logging.basicConfig(level=logging.DEBUG, filename="../vogdb/vogapi.log", filemode='w')
 
+
 # Configuration
 config = Config()
 config.bind = ["localhost:8000"]  # here we add our domain
@@ -39,7 +40,6 @@ config.statsd_host = "localhost:8000"
 # config.ca_certs = <path/to/cert.pem>
 # config.keyfile = <path/to/key.pem>
 # config.insecure_bind = ["domain:80"]
-
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 shutdown_event = asyncio.Event()

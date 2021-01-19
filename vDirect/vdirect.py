@@ -3,7 +3,6 @@ import json
 from API_requests import *
 import sys
 import argparse
-import logging
 
 """
 This is the implementation of the Argument Parser
