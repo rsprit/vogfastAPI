@@ -242,3 +242,12 @@ if __name__ == '__main__':
     except Exception as ex:
         stderr.write("Request has failed. Detail: {0}".format(ex))
         stderr.write('\n')
+
+#ToDo: large requests not working
+"""
+$ python vdirect.py vsearch vog -pmax 10 | python vdirect.py vsummary vog
+Request has failed. Detail: Undefined error. Check log file for details.
+But:
+$ python vdirect.py vsearch vog -pmax 10 -pmin 10 | python vdirect.py vsummary vog
+works!
+"""
