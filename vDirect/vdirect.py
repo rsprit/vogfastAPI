@@ -1,4 +1,3 @@
-import json
 
 from API_requests import *
 import sys
@@ -8,8 +7,6 @@ import argparse
 This is the implementation of the Argument Parser
 """
 
-stdout = sys.stdout
-stderr = sys.stderr
 
 def main():
     parser = argparse.ArgumentParser(description='Welcome to vDirect!', epilog='Thank you for using vDirect!')
@@ -174,7 +171,7 @@ def main():
             else:
                 id = args.id
 
-            print(vfetch(return_object=args.return_object, return_type=args.return_type, id=id), file=stdout)
+            print(vfetch(return_object=args.return_object, return_type=args.return_type, id=id), file=sys.stdout)
 
 
         elif args.command == 'vsummary':
@@ -190,7 +187,7 @@ def main():
                         id.append(int(ele))
                 else:
                     id = args.id
-                print(vsummary(return_object=args.return_object, format=args.format, taxon_id=id), file=stdout)
+                print(vsummary(return_object=args.return_object, format=args.format, taxon_id=id), file=sys.stdout)
 
             elif args.return_object == 'protein' or args.return_object == 'vog':
                 if not sys.stdin.isatty():
@@ -199,14 +196,14 @@ def main():
                         raise Exception("The search output cannot be 'json' when piping.")
                 else:
                     id = args.id
-                print(vsummary(return_object=args.return_object, format=args.format, id=id), file=stdout)
+                print(vsummary(return_object=args.return_object, format=args.format, id=id), file=sys.stdout)
             else:
                 raise Exception("unknown return object")
 
 
         elif args.command == 'vsearch':
             result = vsearch(**vars(args))
-            print(result, file=stdout)
+            print(result, file=sys.stdout)
 
     except Exception as exc:
         raise Exception(exc)
@@ -216,13 +213,12 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as ex:
-        print("Request has failed. {0}".format(ex), file=stderr)
+        print("Request has failed. {0}".format(ex), file=sys.stderr)
 
-#ToDo: large requests not working
+#ToDo: large requests not working. now working !
 """
 $ python vdirect.py vsearch vog -pmax 10 | python vdirect.py vsummary vog
 Now works!
-But:
 $ python vdirect.py vsearch vog -pmax 10 -pmin 10 | python vdirect.py vsummary vog
 works!
 """
