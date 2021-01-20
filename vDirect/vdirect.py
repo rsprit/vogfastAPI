@@ -166,16 +166,6 @@ def main():
     try:
         args = parser.parse_args()
 
-        # write json and df to output:
-        def json_to_stdout(input):
-            json.dump(input, stdout)
-            stdout.write("\n")
-
-        def df_to_stdout(input):
-            input.to_csv(stdout, sep='\t')
-            stdout.write("\n")
-
-
         if args.command == 'vfetch':
             if not sys.stdin.isatty():
                 id = args.id.read().split()
@@ -184,7 +174,7 @@ def main():
             else:
                 id = args.id
 
-            stdout.write(str(vfetch(return_object=args.return_object, return_type=args.return_type, id=id)) + '\n')
+            print(vfetch(return_object=args.return_object, return_type=args.return_type, id=id), file=stdout)
 
 
         elif args.command == 'vsummary':
@@ -200,7 +190,7 @@ def main():
                         id.append(int(ele))
                 else:
                     id = args.id
-                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, taxon_id=id)) + '\n')
+                print(vsummary(return_object=args.return_object, format=args.format, taxon_id=id), file=stdout)
 
             elif args.return_object == 'protein' or args.return_object == 'vog':
                 if not sys.stdin.isatty():
@@ -209,28 +199,14 @@ def main():
                         raise Exception("The search output cannot be 'json' when piping.")
                 else:
                     id = args.id
-                stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)) + '\n')
+                print(vsummary(return_object=args.return_object, format=args.format, id=id), file=stdout)
             else:
                 raise Exception("unknown return object")
-
-            # elif args.return_object == 'vog':
-            #     if not sys.stdin.isatty():
-            #         id = args.id.read().split()
-            #         if id[0][0] == '[':
-            #             raise Exception("The search output cannot be 'json' when piping.")
-            #     else:
-            #         id = args.id
-            #     stdout.write(str(vsummary(return_object=args.return_object, format=args.format, id=id)))
 
 
         elif args.command == 'vsearch':
             result = vsearch(**vars(args))
-            if args.format == 'df':
-                df_to_stdout(result)
-            elif args.format == 'json':
-                json_to_stdout(result)
-            else:
-                stdout.write(result + '\n')
+            print(result, file=stdout)
 
     except Exception as exc:
         raise Exception(exc)
@@ -240,13 +216,12 @@ if __name__ == '__main__':
     try:
         main()
     except Exception as ex:
-        stderr.write("Request has failed. Detail: {0}".format(ex))
-        stderr.write('\n')
+        print("Request has failed. {0}".format(ex), file=stderr)
 
 #ToDo: large requests not working
 """
 $ python vdirect.py vsearch vog -pmax 10 | python vdirect.py vsummary vog
-Request has failed. Detail: Undefined error. Check log file for details.
+Now works!
 But:
 $ python vdirect.py vsearch vog -pmax 10 -pmin 10 | python vdirect.py vsummary vog
 works!
