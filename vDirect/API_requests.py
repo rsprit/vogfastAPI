@@ -36,7 +36,6 @@ def vfetch(return_object="vog", return_type="msa", **params):
         assert k in _valid_params, 'Unknown parameter: %s' % k
 
     url = base_url + 'vfetch/{0}'.format(return_object) + '/{0}?'.format(return_type)
-    print(url)
     if return_object == "vog":
         if return_type not in ["msa", "hmm"]:
             # return_type does not compare equal to any enum value:
@@ -49,6 +48,10 @@ def vfetch(return_object="vog", return_type="msa", **params):
 
     # API GET request
     r = requests.get(url=url, params=params)
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise Exception(e.response.text)
     response = r.json()
     return response
 
@@ -77,6 +80,13 @@ def vsummary(return_object="vog", format="json", **params):
 
     # API GET request
     r = requests.get(url=url, params=params)
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        if e.response.text:
+            raise Exception(e.response.text)
+        else:
+            raise Exception("Undefined error. Check log file for details.")
     response = r.json()
 
     # formatting
@@ -88,7 +98,7 @@ def vsummary(return_object="vog", format="json", **params):
     return response
 
 
-def vsearch(return_object="vog", format="json", **params):
+def vsearch(command='vsearch', return_object="vog", format="json", **params):
     """Yield the response (vog/species/protein summary of a query."""
 
     # First make some basic checks.
@@ -115,6 +125,10 @@ def vsearch(return_object="vog", format="json", **params):
 
     # API GET request
     r = requests.get(url=url, params=params)
+    try:
+        r.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise Exception(e.response.text)
     response = r.json()
 
     # formatting
