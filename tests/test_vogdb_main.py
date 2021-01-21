@@ -151,9 +151,11 @@ def test_vsummaryVog_ERROR403_longParameter(get_test_client):
 
 def test_vsummarySpecies_SpeciesProfiles_ids(get_test_client):
     client = get_test_client
-    params = {"taxon_id": ["2713301", "2713308"]}
+    #taxon IDs are Integers
+    params = {"taxon_id": [2713301, 2713308]}
+    # params = {"taxon_id": ["2713301", "2713308"]}
     response = client.get(url="/vsummary/species/", params=params)
-    expected = ["2713301", "2713308"]
+    expected = [2713301, 2713308]
 
     data = response.json()
     data = pd.DataFrame.from_dict(data) # converting to df so its easier to validate
@@ -162,7 +164,8 @@ def test_vsummarySpecies_SpeciesProfiles_ids(get_test_client):
 
 def test_vsummarySpecies_speciesProfileFieldNames_ids(get_test_client):
     client = get_test_client
-    params = {"taxon_id": ["2713301", "2713308"]}
+    #taxon IDs are Integers
+    params = {"taxon_id": [2713301, 2713308]}
     response = client.get(url="/vsummary/species/", params=params)
     expected = ['species_name', 'taxon_id', 'phage', 'source',
        'version']
@@ -200,6 +203,7 @@ def test_vsummarySpecies_ResponseUnder500ms_ids(get_test_client):
 
 #ToDo positiv + optional parameters e.g. sort, limit, skip...
 
+# but species IDS are integers
 def test_vsummarySpecies_ERROR422_integers(get_test_client):
     client = get_test_client
     params = {"taxon_id": [657567, 123, 124124, 1123]}

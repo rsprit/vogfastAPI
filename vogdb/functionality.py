@@ -1,6 +1,7 @@
 # from database.generate_db import ncbi
 import os
 
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from . import models
@@ -42,7 +43,7 @@ def find_species_by_id(db: Session, ids: Optional[List[int]]):
         return results
     else:
         log.info("No IDs were given.")
-        raise Exception("No IDs.")
+        raise HTTPException(status_code=422, detail="No IDs.")
 
 
 def get_species(db: Session,
@@ -100,7 +101,7 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
         return results
     else:
         log.error("No IDs were given.")
-        raise Exception("No IDs.")
+        raise HTTPException(status_code=422, detail="No IDs.")
 
 
 def find_vogs_hmm_by_uid(uid):
@@ -119,7 +120,7 @@ def find_vogs_hmm_by_uid(uid):
             vog_hmm_list.append(vog_id.upper() + ".hmm")
     else:
         log.info("No IDs were given.")
-        raise Exception("No IDs.")
+        raise HTTPException(status_code=422, detail="No IDs.")
 
     hmm_response = []
     for vog_hmm in vog_hmm_list:
@@ -149,7 +150,7 @@ def find_vogs_msa_by_uid(uid):
             vog_msa_list.append(vog_id.upper() + ".msa")
     else:
         log.info("No IDs were given.")
-        raise Exception("No IDs.")
+        raise HTTPException(status_code=422, detail="No IDs.")
 
     msa_response = []
     for vog_msa in vog_msa_list:
@@ -418,7 +419,7 @@ def find_proteins_by_id(db: Session, pids: Optional[List[str]]):
         return results
     else:
         log.error("No IDs were given.")
-        raise Exception("No IDs.")
+        raise HTTPException(status_code=422, detail="No IDs.")
 
 
 def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
@@ -431,7 +432,7 @@ def find_protein_faa_by_id(db: Session, id: Optional[List[str]]):
         return results
     else:
         log.error("No IDs were given.")
-        raise Exception("No IDs.")
+        raise HTTPException(status_code=422, detail="No IDs.")
 
 
 def find_protein_fna_by_id(db: Session, pid):
@@ -444,5 +445,5 @@ def find_protein_fna_by_id(db: Session, pid):
         return results
     else:
         log.error("No IDs were given.")
-        raise Exception("No IDs.")
+        raise HTTPException(status_code=422, detail="No IDs.")
 

@@ -82,9 +82,11 @@ async def get_summary_species(taxon_id: Optional[List[int]] = Query(None), db: S
 
     try:
         species_summary = find_species_by_id(db, taxon_id)
-    except Exception as exc:
+    except HTTPException as exc:
         log.error("Retrieving summary information for Species was not successful. Species IDs: {0}".format(taxon_id))
         log.error(exc)
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail)
+    except Exception as exc:
         # check if it was a pymysql error:
         if "pymysql" in exc.args[0]:
             raise HTTPException(status_code=400, detail="Database error. See log file for details.")
@@ -173,13 +175,16 @@ async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get
     try:
         vog_summary = find_vogs_by_uid(db, id)
     # ToDo: catch DB error
-    except Exception as exc:
+    except HTTPException as exc:
         log.error("Retrieving summary information for VOG was not successful. Parameters: {0}".format(id))
         log.error(exc)
+        raise HTTPException(status_code=exc.status_code, detail="Vsummary not successful. Error: {0}".format(exc))
+    except Exception as exc:
         # check if it was a pymysql error:
         if "pymysql" in exc.args[0]:
             raise HTTPException(status_code=400, detail="Database error. See log file for details.")
-        raise HTTPException(status_code=400, detail="Vsummary not successful. Error: {0}".format(exc))
+        else:
+            raise Exception(exc)
 
     if not vog_summary:
         log.error("No matching VOGs found")
@@ -241,9 +246,11 @@ async def get_summary_protein(id: List[str] = Query(None), db: Session = Depends
 
     try:
         protein_summary = find_proteins_by_id(db, id)
-    except Exception as exc:
+    except HTTPException as exc:
         log.error("Retrieving summary information for Proteins was not successful. Protein IDs: {0}".format(id))
         log.error(exc)
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail)
+    except Exception as exc:
         # check if it was a pymysql error:
         if "pymysql" in exc.args[0]:
             raise HTTPException(status_code=400, detail="Database error. See log file for details.")
