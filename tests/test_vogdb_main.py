@@ -768,7 +768,7 @@ def test_vsearchProtein_proteinProfileFieldNames_ids(get_test_client):
     client = get_test_client
     params = {"taxon_id": ["10295", "10298"]}
     response = client.get(url="/vsearch/protein/", params=params)
-    expected = ['taxon_id']
+    expected = ['id']
 
     data = response.json()
     data = pd.DataFrame.from_dict(data) # converting to df so its easier to validate
@@ -803,7 +803,7 @@ def test_vsearchProtein_ResponseUnder500ms_ids(get_test_client):
 
 #ToDo positiv + optional parameters e.g. sort, limit, skip...
 
-def test_vsearchProtein_ERROR422_idIntegers(get_test_client):
+def test_vsearchProtein_ERROR422_taxonIDidIntegers(get_test_client):
     client = get_test_client
     params = {"taxon_id": [657567, 123, 124124, 1123]}
     response = client.get(url="/vsearch/protein/", params=params)
@@ -811,7 +811,7 @@ def test_vsearchProtein_ERROR422_idIntegers(get_test_client):
 
     assert response.status_code == expected
 
-def test_vsearchProtein_ERROR404_randomString(get_test_client):
+def test_vsearchProtein_ERROR404_taxonIDrandomString(get_test_client):
     client = get_test_client
     params = {"taxon_id": ["SOMETHING"]}
     response = client.get(url="/vsearch/protein/", params=params)
@@ -820,7 +820,7 @@ def test_vsearchProtein_ERROR404_randomString(get_test_client):
     assert response.status_code == expected
 
 
-def test_vsearchProtein_ERROR422_noParameter(get_test_client):
+def test_vsearchProtein_ERROR422_taxonIDnoParameter(get_test_client):
     client = get_test_client
     params = {"taxon_id": None}
     response = client.get(url="/vsearch/protein/", params=params)
@@ -828,7 +828,7 @@ def test_vsearchProtein_ERROR422_noParameter(get_test_client):
 
     assert response.status_code == expected
 
-def test_vsearchProtein_ERROR403_longParameter(get_test_client):
+def test_vsearchProtein_ERROR403_taxonIDlongParameter(get_test_client):
     client = get_test_client
     letters = string.ascii_lowercase
     long_string = [''.join(random.choice(letters) for i in range(10000))]
@@ -838,14 +838,497 @@ def test_vsearchProtein_ERROR403_longParameter(get_test_client):
 
     assert response.status_code == expected
 
-# ToDo load testing
+def test_vsearchProtein_ERROR422_speciesNameIntegers(get_test_client):
+    client = get_test_client
+    params = {"species_name": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/protein/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchProtein_ERROR404_speciesNamerandomString(get_test_client):
+    client = get_test_client
+    params = {"species_name": ["SOMETHING"]}
+    response = client.get(url="/vsearch/protein/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchProtein_ERROR422_speciesNamenoParameter(get_test_client):
+    client = get_test_client
+    params = {"species_name": None}
+    response = client.get(url="/vsearch/protein/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchProtein_ERROR403_speciesNamelongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"species_name": long_string }
+    response = client.get(url="/vsearch/protein/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
+
+def test_vsearchProtein_ERROR422_VOGIDIntegers(get_test_client):
+    client = get_test_client
+    params = {"VOG_id": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/protein/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchProtein_ERROR404_VOGIDrandomString(get_test_client):
+    client = get_test_client
+    params = {"VOG_id": ["SOMETHING"]}
+    response = client.get(url="/vsearch/protein/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchProtein_ERROR422_VOGIDnoParameter(get_test_client):
+    client = get_test_client
+    params = {"VOG_id": None}
+    response = client.get(url="/vsearch/protein/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchProtein_ERROR403_VOGIDlongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"VOG_id": long_string }
+    response = client.get(url="/vsearch/protein/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
+
+
+
+
+#------------------------
+# vSearch/species
+#------------------------
+
+# taxon_id is a integer and it should be a string
+def test_vsearchSpecies_SpeciesProfiles_Ids(get_test_client):
+    client = get_test_client
+    params = {"ids": ["11128", "1335626", "1384461"]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = ["11128", "1335626", "1384461"]
+
+    data = response.json()
+    data = pd.DataFrame.from_dict(data) # converting to df so its easier to validate
+    print(data)
+    for response_id in data["taxon_id"].to_list():
+        assert any(expected_val in response_id for expected_val in expected)
+
+
+def test_vsearchSpecies_TaxonIDs_AllParameters(get_test_client):
+    client = get_test_client
+    params = {"ids": ["12390", "12348", "1384461"],
+              "name": "lacto",
+              "phage": True,
+              "source": "NCBI Refseq",
+              "version": 201}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = ["12390", "12348"]
+
+    data = response.json()
+    data = pd.DataFrame.from_dict(data) # converting to df so its easier to validate
+    for response_id in data["taxon_id"].to_list():
+        assert any(expected_val in response_id for expected_val in expected)
+
+
+
+def test_vsearchSpecies_proteinSpeciesFieldNames_ids(get_test_client):
+    client = get_test_client
+    params = {"ids": ["10295", "10298"]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = ['taxon_id']
+
+    data = response.json()
+    data = pd.DataFrame.from_dict(data) # converting to df so its easier to validate
+    assert list(data.keys()) == expected
+
+# ToDo test field types
+
+def test_vsearchSpecies_isIdempotent_ids(get_test_client):
+    client = get_test_client
+    params = {"ids": ["10295", "10298"]}
+
+    response = client.get(url="/vsearch/species/", params=params)
+    expected_response = client.get(url="/vsearch/species/", params=params)
+
+    response_data = response.json()
+    expected_data = expected_response.json()
+
+    assert response_data == expected_data
+
+
+def test_vsearchSpecies_ResponseUnder500ms_ids(get_test_client):
+    client = get_test_client
+    params = {"ids": ["10295", "10298"]}
+
+    expected_time = 0.5
+    start = time.time()
+    response = client.get(url="/vsearch/species/", params=params)
+    end = time.time()
+
+    assert end-start <= expected_time
+
+
+#ToDo positiv + optional parameters e.g. sort, limit, skip...
+
+def test_vsearchSpecies_ERROR422_idsIntegers(get_test_client):
+    client = get_test_client
+    params = {"ids": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR404_idsRandomString(get_test_client):
+    client = get_test_client
+    params = {"ids": ["SOMETHING"]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchSpeciesERROR422_idsNoParameter(get_test_client):
+    client = get_test_client
+    params = {"ids": None}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR403_IdsLongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"ids": long_string }
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
+
+# name
+
+def test_vsearchSpecies_ERROR422_nameIntegers(get_test_client):
+    client = get_test_client
+    params = {"name": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR404_nameRandomString(get_test_client):
+    client = get_test_client
+    params = {"name": ["SOMETHING"]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchSpeciesERROR422_nameNoParameter(get_test_client):
+    client = get_test_client
+    params = {"name": None}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR403_nameLongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"name": long_string }
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
+
+#phage
+
+def test_vsearchSpecies_ERROR422_phageIntegers(get_test_client):
+    client = get_test_client
+    params = {"phage": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR404_phageRandomString(get_test_client):
+    client = get_test_client
+    params = {"phage": ["SOMETHING"]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchSpeciesERROR422_phageNoParameter(get_test_client):
+    client = get_test_client
+    params = {"phage": None}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR403_phageLongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"phage": long_string }
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
+
+# source
+
+def test_vsearchSpecies_ERROR422_sourceIntegers(get_test_client):
+    client = get_test_client
+    params = {"source": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR404_sourceRandomString(get_test_client):
+    client = get_test_client
+    params = {"source": ["SOMETHING"]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchSpeciesERROR422_sourceNoParameter(get_test_client):
+    client = get_test_client
+    params = {"source": None}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR403_sourceLongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"source": long_string }
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
+
+# version
+
+def test_vsearchSpecies_ERROR422_versionIntegers(get_test_client):
+    client = get_test_client
+    params = {"version": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR404_versionRandomString(get_test_client):
+    client = get_test_client
+    params = {"version": ["SOMETHING"]}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchSpeciesERROR422_versionNoParameter(get_test_client):
+    client = get_test_client
+    params = {"version": None}
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchSpecies_ERROR403_versionLongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"version": long_string }
+    response = client.get(url="/vsearch/species/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
 
 
 
 
 
+#------------------------
+# vSearch/vog
+#------------------------
+#ToDo change this with inclusive parameter
+# taxon_id is a integer and it should be a string
+def test_vsearchVOG_VOGIds_VOGIds(get_test_client):
+    client = get_test_client
+    params = {"id": ["VOG00001", "VOG00023", "VOG00234"], "inclusive": "i"}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = ["VOG00001", "VOG00023", "VOG00234"]
+
+    data = response.json()
+    data = pd.DataFrame.from_dict(data) # converting to df so its easier to validate
+    print(data)
+    assert data["id"].to_list() == expected
 
 
+def test_vsearchVOG_VOGIDs_AllParameters(get_test_client): #not working atm
+    client = get_test_client
+    params = {"inclusive": "i",
+              "pmin": 23,
+              "pmax": 100,
+              "smax": 50,
+              "smin": 1,
+              "functional_category": "XrXs",
+              "consensus_function": "",
+              "mingLCA": 4,
+              "maxGLCA": 100,
+              "mingGLCA":5,
+              "maxgGLCA":99,
+              "ancestors": 5,
+              "h_stringency": False ,
+              "m_stringency": False,
+              "l_stringenca": True,
+              "virus_specific": True,
+              "phages_nonphages":"phages_only",
+              "proteins": "",
+              "species": "",
+              "tax_id": ""}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = ["12390", "12348"]
+
+    data = response.json()
+    data = pd.DataFrame.from_dict(data) # converting to df so its easier to validate
+    assert data["id"].to_list() == expected
+
+
+
+def test_vsearchVOG_VOGProfileFieldNames_ids(get_test_client):
+    client = get_test_client
+    params = {"id": ["VOG00001", "VOG00023", "VOG00234"], "inclusive": "i"}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = ['id']
+
+    data = response.json()
+    data = pd.DataFrame.from_dict(data) # converting to df so its easier to validate
+    assert list(data.keys()) == expected
+
+# ToDo test field types
+
+def test_vsearchVOG_isIdempotent_ids(get_test_client):
+    client = get_test_client
+    params = {"id": ["VOG00001", "VOG00023", "VOG00234"], "inclusive": "i"}
+
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected_response = client.get(url="/vsearch/vog/", params=params)
+
+    response_data = response.json()
+    expected_data = expected_response.json()
+
+    assert response_data == expected_data
+
+
+def test_vsearchVOG_ResponseUnder500ms_ids(get_test_client):
+    client = get_test_client
+    params = {"id": ["VOG00001", "VOG00023", "VOG00234"], "inclusive": "i"}
+
+    expected_time = 0.5
+    start = time.time()
+    response = client.get(url="/vsearch/vog/", params=params)
+    end = time.time()
+
+    assert end-start <= expected_time
+
+
+#ToDo positiv + optional parameters e.g. sort, limit, skip...
+
+def test_vsearchVOG_ERROR422_idsIntegers(get_test_client):
+    client = get_test_client
+    params = {"id": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchVOG_ERROR404_idsRandomString(get_test_client):
+    client = get_test_client
+    params = {"id": ["SOMETHING"]}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchVOGERROR422_idsNoParameter(get_test_client):
+    client = get_test_client
+    params = {"id": None}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchVOG_ERROR403_IdsLongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"id": long_string }
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
+
+#pmin
+def test_vsearchVOG_ERROR422_pminIntegers(get_test_client):
+    client = get_test_client
+    params = {"pmin": [657567, 123, 124124, 1123]}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchVOG_ERROR404_pminRandomString(get_test_client):
+    client = get_test_client
+    params = {"pmin": ["SOMETHING"]}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = 404
+
+    assert response.status_code == expected
+
+
+def test_vsearchVOGERROR422_pminNoParameter(get_test_client):
+    client = get_test_client
+    params = {"pmin": None}
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = 422
+
+    assert response.status_code == expected
+
+def test_vsearchVOG_ERROR403_pminLongParameter(get_test_client):
+    client = get_test_client
+    letters = string.ascii_lowercase
+    long_string = [''.join(random.choice(letters) for i in range(10000))]
+    params = {"pmin": long_string }
+    response = client.get(url="/vsearch/vog/", params=params)
+    expected = 403
+
+    assert response.status_code == expected
 
 
 
