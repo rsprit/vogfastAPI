@@ -1,4 +1,6 @@
 # from database.generate_db import ncbi
+import os
+
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from . import models
@@ -84,6 +86,7 @@ def find_vogs_by_uid(db: Session, ids: Optional[List[str]]):
 
 
 def find_vogs_hmm_by_uid(uid):
+
     file_name = "./data/vog.hmm.tar.gz"
     tar = tarfile.open(file_name, "r:gz")
     vog_hmm_list = []

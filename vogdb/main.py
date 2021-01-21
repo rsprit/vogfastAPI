@@ -95,7 +95,7 @@ def search_vog(db: Session = Depends(get_db),
     which meet the search criteria.
     :return:
     """
-
+    print()
     vogs = get_vogs(db, models.VOG_profile.id, id, pmin, pmax, smax, smin, functional_category, consensus_function,
                     mingLCA, maxgLCA, mingGLCA, maxgGLCA,
                     ancestors, h_stringency, m_stringency, l_stringency, virus_specific, phages_nonphages, proteins,
@@ -116,8 +116,7 @@ async def get_summary_vog(id: List[str] = Query(None), db: Session = Depends(get
     """
 
     vog_summary = find_vogs_by_uid(db, id)
-    print(type(vog_summary))
-    print(type(vog_summary[0]))
+
     if not vog_summary:
         raise HTTPException(status_code=404, detail="No matching VOGs found")
 
