@@ -1,17 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# In[ ]:
+
+
+#!/usr/bin/env python
+# coding: utf-8
+
 # Import Section----------------------------------------------------------------
-#! /bin/etc/python3
+
 import requests
 import pandas as pd
 from datetime import datetime
 dateTimeObj = datetime.now()
 
 import generate_db as gen
-
+import check
 import os
-import time
 
 # Main--------------------------------------------------------------------------
 
@@ -23,31 +28,40 @@ class Monitor:
         self.last_data_fname = "last_data"
     
     def exists(self): 
+        '''Check if data were retrieved from fileshare before or if this is the first call.'''
+        
         result = os.path.exists(self.last_data_fname)
         if not result:
-            print(f"{self.last_data_fname} file does not exit, created at {dateTimeObj}")
+            print(f"{self.last_data_fname} does not exist.Database is created from {self.url} for the first time at {dateTimeObj}")
         return result
     
     def initiate(self):
-        print(f"create new database from {self.url}, at {dateTimeObj}")
-        
+        '''Connect to url, fetch the table of dates of modification and store the file locally.
+        Execute the check script to control version equality between fileshare site and download directory.
+        Execute generate_db script to build a mysql database for the first time.
+        '''
+           
         result = requests.get(self.url)
+        
         if result.status_code != 200:
             raise ValueError('Service failed to respond')
         else:
             result = result.text
         
         data = pd.read_html(result)[0]["Last modified"].dropna()
-
         data.to_csv(self.last_data_fname, sep = ";", index = False)
-        gen.generate_db()
+        check.check_version()
+        gen.generate_db() 
+        print(f"Last modification at {str(data.iloc[-1,0])}")
     
     def get_last(self):
+        '''Build a dataframe with the data that were retrieved from url.'''
+                  
         return pd.read_csv(self.last_data_fname, sep = ";")
            
     def update(self, debug = False):
-        """Get the modification dates from fileshare and call generate_db function if the dates changed"""
-        
+        """Use the modification data from the dataframe and call generate_db function if the data changed."""
+
         self.last_data = self.get_last()
 
         result = requests.get(self.url)
@@ -58,23 +72,30 @@ class Monitor:
             
         data = pd.DataFrame(pd.read_html(result)[0]["Last modified"].dropna()) 
         
+        check.check_version()
+
         if not self.check_equality(self.numpy1DArrayToList(self.last_data.values), self.numpy1DArrayToList(data.values)):  
-            gen.generate_db()
-            print(f"Updating DB at {dateTimeObj}") 
+            data.to_csv(self.last_data_fname, sep = ";", index = False) # write a new last_data file
+                               
+            print(f"Updating DB from {self.url}, last modified at {str(data.iloc[-1,0])}") # comment for log file
+            gen.generate_db() # drop the old database and generate a new one with the latest vogdb version
+            print(f"Done. {dateTimeObj}")
+
         else:
-            print(f"checked for modified data at {dateTimeObj}") 
+            print(f"Nothing new at {self.url}, last modified {str(data.iloc[-1,0])}. Checked at {dateTimeObj}")
+
         if debug:
             return self.last_data.values, data.values
 
     @staticmethod  
-    def check_equality(date_old, date_new):
-        """Check if all items in the lists date_old and date_new are identical
-            Returns: bool""" 
-        date_old = list(date_old) 
-        date_new = list(date_new)
-        for i, item in enumerate(date_old):
+    def check_equality(old, new):
+        """Check if all items in the lists old and new are identical.""" 
+                  
+        old = list(old) 
+        new = list(new)
+        for i, item in enumerate(new):
             try:
-                if item != date_new[i]:
+                if item != old[i]:
                     return False
             except IndexError:
                 return False
@@ -85,6 +106,8 @@ class Monitor:
         return npArray.reshape(len(npArray)).tolist()
     
     def run(self):
+        '''Decides if a the database initiation script or the database update script is executed.'''
+                  
         if not self.exists():
             self.initiate()
         else:
@@ -95,7 +118,4 @@ class Monitor:
 if __name__ == "__main__":
     
     Monitor().run()
-
-
-
 
