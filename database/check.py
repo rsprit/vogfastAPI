@@ -7,7 +7,6 @@ from datetime import datetime
 dateTimeObj = datetime.now()
 
 def check_version():
-     
     '''check if versions in data directory and at fileshare are the same.'''
     
     url = "http://fileshare.csb.univie.ac.at/vog/latest/vog.species.list"
