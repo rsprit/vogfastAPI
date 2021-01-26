@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[11]:
 
 
 #!/usr/bin/env python
@@ -17,6 +17,8 @@ dateTimeObj = datetime.now()
 import generate_db as gen
 import check
 import os
+import time
+import vog_download as vog
 
 # Main--------------------------------------------------------------------------
 
@@ -32,11 +34,12 @@ class Monitor:
         
         result = os.path.exists(self.last_data_fname)
         if not result:
-            print(f"{self.last_data_fname} does not exist.Database is created from {self.url} for the first time at {dateTimeObj}")
+            print(f"{self.last_data_fname} file does not exist. Database is created from {self.url} for the first time at {dateTimeObj}")
         return result
     
     def initiate(self):
         '''Connect to url, fetch the table of dates of modification and store the file locally.
+        Download files from fileshare url.
         Execute the check script to control version equality between fileshare site and download directory.
         Execute generate_db script to build a mysql database for the first time.
         '''
@@ -50,9 +53,14 @@ class Monitor:
         
         data = pd.read_html(result)[0]["Last modified"].dropna()
         data.to_csv(self.last_data_fname, sep = ";", index = False)
+        
+        print(f'Starting download at {dateTimeObj}')
+        vog.download()
+        print('Download completed')
+        
         check.check_version()
         gen.generate_db() 
-        print(f"Last modification at {str(data.iloc[-1,0])}")
+        print(f"Last modification at {str(data.iloc[0,0])}")
     
     def get_last(self):
         '''Build a dataframe with the data that were retrieved from url.'''
@@ -70,19 +78,22 @@ class Monitor:
         else:
             result = result.text
             
-        data = pd.DataFrame(pd.read_html(result)[0]["Last modified"].dropna()) 
-        
-        check.check_version()
+        data = pd.DataFrame(pd.read_html(result)[0]["Last modified"].dropna())         
 
         if not self.check_equality(self.numpy1DArrayToList(self.last_data.values), self.numpy1DArrayToList(data.values)):  
             data.to_csv(self.last_data_fname, sep = ";", index = False) # write a new last_data file
-                               
-            print(f"Updating DB from {self.url}, last modified at {str(data.iloc[-1,0])}") # comment for log file
+            print(f'There is a new version at {self.url} that was modified at {str(data.iloc[0,0])}.\nStarting download at {dateTimeObj}')
+            vog.download()
+            print('Download completed') 
+            check.check_version()
+            
+            print('Updating database') # comment for log file
             gen.generate_db() # drop the old database and generate a new one with the latest vogdb version
-            print(f"Done. {dateTimeObj}")
+            print(f"Mysql database created. {dateTimeObj}")
 
         else:
-            print(f"Nothing new at {self.url}, last modified {str(data.iloc[-1,0])}. Checked at {dateTimeObj}")
+            check.check_version()
+            print(f"No modified files at {self.url}, last modified: {str(data.iloc[-1,0])}. \nChecked at {dateTimeObj}")
 
         if debug:
             return self.last_data.values, data.values
@@ -118,4 +129,10 @@ class Monitor:
 if __name__ == "__main__":
     
     Monitor().run()
+
+
+# In[ ]:
+
+
+
 
