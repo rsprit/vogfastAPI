@@ -8,7 +8,7 @@ import pandas as pd
 def download():
     
     url = 'http://fileshare.csb.univie.ac.at/vog/latest/'
-    data_path = "data/"
+    data_path = "../data/"
     vog = requests.get(url)
     vog = vog.text
     df = pd.DataFrame(pd.read_html(vog)[0]['Name'].dropna())
