@@ -1,9 +1,9 @@
 # VOGDB-API
 
 ## Introduction
-```bash
+
 The vDirect is a tool providing various filtering options for the VOGDB-data. 
-```
+
 ## Setting up
 
 ### Starting a MYSQL Server
@@ -32,12 +32,7 @@ sudo mysql -u root -p
 python version: 3.8.5
 
 ```bash
-pip install sqlalchemy
-pip install sqlalchemy-utils
-pip install pymysql
-pip install biopython
-pip install hypercorn
-pip install fastapi
+pip install -r requirements.txt
 ```
 ___________________________________________________________________________________________
 

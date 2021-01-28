@@ -1,0 +1,10 @@
+cryptography
+ete3
+pandas
+sqlalchemy
+sqlalchemy-utils
+pymysql
+biopython
+hypercorn
+fastapi
+
