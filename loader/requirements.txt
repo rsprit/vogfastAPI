@@ -1,0 +1,7 @@
+cryptography
+pandas
+sqlalchemy
+sqlalchemy-utils
+pymysql
+biopython
+

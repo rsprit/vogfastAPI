@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  db:
+    build:
+      context: ./db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: VOGDB
+    volumes:
+      - "dbdata:/var/lib/mysql"
+
+  loader:
+    init: true
+    build:
+      context: ./loader
+    depends_on:
+      - db
+    environment:
+      MYSQL_HOST: db
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: VOGDB
+
+
+volumes:
+  dbdata:

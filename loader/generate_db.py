@@ -1,12 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
-from Bio import Entrez, SeqIO
+from Bio import SeqIO
 import numpy as np
 import os
+import sys
 from sqlalchemy import VARCHAR
 from sqlalchemy.dialects.mysql import LONGTEXT
-from ete3 import NCBITaxa
 import tarfile
 
 
@@ -14,25 +14,32 @@ import tarfile
 Here we create our VOGDB and create all the tables that we are going to use
 Note: you may need to change the path of the data folder and your MYSQL credentials
 """
-data_path = "../data/"
+data_path = sys.argv[1] if len(sys.argv) > 1 else "../data/"
+if data_path[:-1] != "/":
+    data_path += "/"
 
 # MySQL database connection
-username = "root"
-password = "password"
-server = "localhost"
-database = "VOGDB"
+username = os.environ.get("MYSQL_USER", "root")
+password = os.environ.get("MYSQL_PASSWORD", "password")
+server = os.environ.get("MYSQL_HOST", "localhost")
+database = os.environ.get("MYSQL_DATABASE", "VOGDB")
 SQLALCHEMY_DATABASE_URL = ("mysql+pymysql://{0}:{1}@{2}/{3}").format(username, password, server, database)
 
 
 # Create an engine object.
-engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=False)
 
 # Create database if it does not exist.
 if not database_exists(engine.url):
     create_database(engine.url)
 else:
-    # Connect the database if exists.
-    engine.connect()
+    # drop tables in reverse dependency order, i.e. tables must be dropped when no other table references it.
+    with engine.connect() as con:
+        con.execute('DROP TABLE IF EXISTS Protein_profile;') # references VOG_profile and Species_profile
+        con.execute('DROP TABLE IF EXISTS VOG_profile;')
+        con.execute('DROP TABLE IF EXISTS Species_profile;')
+        con.execute('DROP TABLE IF EXISTS NT_seq;')
+        con.execute('DROP TABLE IF EXISTS AA_seq;')
 
 
 # ---------------------

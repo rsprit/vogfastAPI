@@ -14,15 +14,15 @@ rm -rf *
 
 # fetch all files from source
 
-wget -nv -r -np -nH -nd http://fileshare.csb.univie.ac.at/vog/vog${VERSION}/
+wget -nv -r -np -nH -nd http://fileshare.csb.univie.ac.at/vog/${VERSION}/
 
 # remove unneeded markup files
 
 rm index.html*
 
-# unzip tab separated files and FASTA files
+# unzip FASTA files
 
-gunzip *.tsv.gz *.fa.gz
+gunzip *.fa.gz
 
 # untar archives
 
