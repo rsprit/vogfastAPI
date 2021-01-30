@@ -1,7 +1,8 @@
 #!/bin/bash
 
-VERSION=${1:-latest}
-TARGET=data
+SOURCE="http://fileshare.csb.univie.ac.at/vog"
+TARGET=${1:-data}
+VERSION=${2:-latest}
 
 # create target directory
 
@@ -14,7 +15,7 @@ rm -rf *
 
 # fetch all files from source
 
-wget -nv -r -np -nH -nd http://fileshare.csb.univie.ac.at/vog/${VERSION}/
+wget -nv -r -np -nH -nd ${SOURCE}/${VERSION}/
 
 # remove unneeded markup files
 
